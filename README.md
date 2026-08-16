@@ -12,12 +12,23 @@
 
 ---
 
+## 📚 初学者の方へ（まずはこちらをチェック！）
+
+チーム開発の心得や、Git・SourceTree の詳しいセットアップ方法などは **[GitHub Wiki（Home）](https://github.com/R-production004682/Roll-a-Ball/wiki)** にまとめています！
+
+初めての方や開発環境の構築に不安がある方は、まず Wiki のトップページ（Home）を読んでから作業を始めましょう ✨
+
+* 📖 **[GitHub Wiki（Home）を開く](https://github.com/R-production004682/Roll-a-Ball/wiki)**
+
+---
+
 ## 🛠 開発環境・使用ツール
 
 ### 全体共通
 * **ゲームエンジン**: Unity 6000.3.20f1 【LTS】
 * **バージョン管理**: GitHub (`SourceTree` / `Git CLI` / `GitHub Desktop`)
 * **進行管理・連絡**: Discord
+
 ---
 
 ## 🌿 Git ブランチ運用ルール
