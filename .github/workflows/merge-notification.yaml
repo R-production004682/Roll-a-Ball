@@ -1,0 +1,28 @@
+name: Discord Merge Notification
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  notify:
+    # PRがクローズされ、かつマージされた場合のみ実行
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Discord Notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          # マージした人とPRタイトル、URLを取得
+          MERGER="${{ github.actor }}"
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+
+          # Discordへ送信するメッセージの構築
+          MESSAGE="🎉 **PR MERGED!**\n**マージ担当**: ${MERGER}\n**対象PR**: [${PR_TITLE}](${PR_URL})\n対応完了です！お疲れ様でした！"
+
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d "{\"content\": \"${MESSAGE}\"}" \
+               $DISCORD_WEBHOOK
