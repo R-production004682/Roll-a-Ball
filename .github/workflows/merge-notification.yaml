@@ -1,28 +1,60 @@
-name: Discord Merge Notification
+name: Discord PR Notification
 
 on:
   pull_request:
-    types: [closed]
+    types: [opened, closed]
 
 jobs:
   notify:
-    # PRがクローズされ、かつマージされた場合のみ実行
-    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
-      - name: Send Discord Notification
+      # ----------------------------------------------------
+      # 1. PRが新規作成（Opened）されたときの通知
+      # ----------------------------------------------------
+      - name: Send PR Opened Notification
+        if: github.event.action == 'opened'
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # マージした人とPRタイトル、URLを取得
-          MERGER="${{ github.actor }}"
-          PR_TITLE="${{ github.event.pull_request.title }}"
-          PR_URL="${{ github.event.pull_request.html_url }}"
+          # APIから表示名を取得（未設定ならユーザーID）
+          DISPLAY_NAME=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/users/${{ github.actor }}" | jq -r '.name // empty')
+          [ -z "$DISPLAY_NAME" ] && DISPLAY_NAME="${{ github.actor }}"
 
-          # Discordへ送信するメッセージの構築
-          MESSAGE="🎉 **PR MERGED!**\n**マージ担当**: ${MERGER}\n**対象PR**: [${PR_TITLE}](${PR_URL})\n対応完了です！お疲れ様でした！"
+          MESSAGE=$(cat << EOF
+          🚀 **NEW PR OPENED! レビューお願いします！**
 
-          curl -H "Content-Type: application/json" \
-               -X POST \
-               -d "{\"content\": \"${MESSAGE}\"}" \
-               $DISCORD_WEBHOOK
+          **作成者**: ${DISPLAY_NAME}
+          **対象PR**: [${{ github.event.pull_request.title }}](<${{ github.event.pull_request.html_url }}>)
+
+          新しいPRが作成されました！
+          手の空いている方は動作確認＆レビューをお願いします ✨
+          EOF
+          )
+          PAYLOAD=$(jq -n --arg msg "$MESSAGE" '{content: $msg}')
+          curl -H "Content-Type: application/json" -X POST -d "$PAYLOAD" $DISCORD_WEBHOOK
+
+      # ----------------------------------------------------
+      # 2. PRがマージ（Merged）されたときの通知
+      # ----------------------------------------------------
+      - name: Send PR Merged Notification
+        if: github.event.action == 'closed' && github.event.pull_request.merged == true
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # APIから表示名を取得（未設定ならユーザーID）
+          DISPLAY_NAME=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/users/${{ github.actor }}" | jq -r '.name // empty')
+          [ -z "$DISPLAY_NAME" ] && DISPLAY_NAME="${{ github.actor }}"
+
+          MESSAGE=$(cat << EOF
+          ✨ **PR MERGED! 感謝＆お疲れ様でした！** ✨
+
+          **マージ担当**: ${DISPLAY_NAME}
+          **対象PR**: [${{ github.event.pull_request.title }}](<${{ github.event.pull_request.html_url }}>)
+
+          対応完了です！お疲れ様でした！
+          EOF
+          )
+          PAYLOAD=$(jq -n --arg msg "$MESSAGE" '{content: $msg}')
+          curl -H "Content-Type: application/json" -X POST -d "$PAYLOAD" $DISCORD_WEBHOOK
