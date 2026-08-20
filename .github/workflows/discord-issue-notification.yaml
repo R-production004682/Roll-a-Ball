@@ -11,7 +11,7 @@ jobs:
       - name: Send Discord Notification
         uses: actions/github-script@v7
         env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_ISSUES_NOTIFY_WEBHOOK_URL }}
         with:
           script: |
             const issue = context.payload.issue;
@@ -32,8 +32,8 @@ jobs:
               // Issueがクローズされた時
               message = `✅ **Issueが解決（Closed）されました！**\n**タイトル:** #${issue.number} ${issue.title}\n**担当者:** ${assignee}\n**URL:** ${issue.html_url}`;
             } 
-            else if (action === 'opened' && issue.assignee) {
-              // 新規作成（opened）で、最初から担当者が割り当てられている時
+            else if (action === 'opened') {
+              // 新規作成（opened）時
               message = `📌 **新しいタスクチケットが起票されました！**\n**タイトル:** #${issue.number} ${issue.title}\n**担当者:** ${assignee}\n**URL:** ${issue.html_url}`;
             } 
             else if (action === 'assigned') {
@@ -42,7 +42,7 @@ jobs:
               message = `👤 **担当者が割り当てられました！**\n**タイトル:** #${issue.number} ${issue.title}\n**担当者:** ${assignee}\n**URL:** ${issue.html_url}`;
             } 
             else {
-              // 担当者のいない単なるopenedなどは通知をスキップして終了
+              // 未対応のイベントは通知をスキップして終了
               console.log(`Skip notification for action: ${action} (No assignee or unhandled)`);
               return;
             }
