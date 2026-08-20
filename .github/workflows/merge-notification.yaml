@@ -14,7 +14,7 @@ jobs:
       - name: Send PR Opened Notification
         if: github.event.action == 'opened'
         env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_ISSUES_NOTIFY_WEBHOOK_URL }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # APIから表示名を取得（未設定ならユーザーID）
