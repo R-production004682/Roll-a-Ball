@@ -36,11 +36,6 @@ jobs:
               // 新規作成（opened）時
               message = `📌 **新しいタスクチケットが起票されました！**\n**タイトル:** #${issue.number} ${issue.title}\n**担当者:** ${assignee}\n**URL:** ${issue.html_url}`;
             } 
-            else if (action === 'assigned') {
-              // 途中から担当者が割り当てられた時
-              // openedと同時実行の重複を弾くか、または担当者割り当て専用通知として処理
-              message = `👤 **担当者が割り当てられました！**\n**タイトル:** #${issue.number} ${issue.title}\n**担当者:** ${assignee}\n**URL:** ${issue.html_url}`;
-            } 
             else {
               // 未対応のイベントは通知をスキップして終了
               console.log(`Skip notification for action: ${action} (No assignee or unhandled)`);
