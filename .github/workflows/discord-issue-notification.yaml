@@ -1,0 +1,16 @@
+name: Notify Discord on Issue Assignment
+
+on:
+  issues:
+    types: [assigned, opened]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Discord Notification
+        uses: ilpodev/action-discord@v1.2.0
+        with:
+          args: '📌 **新しいタスクが割り当てられました！**\n**タイトル:** ${{ github.event.issue.title }}\n**担当者:** ${{ github.event.issue.assignee.login }}\n**URL:** ${{ github.event.issue.html_url }}'
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_ISSUES_NOTIFY_WEBHOOK_URL }}
