@@ -13,7 +13,33 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Run Unity Meta Check
-        uses: g3nar1/unity-meta-check-action@v2
-        with:
-          target-dir: 'Assets'
+      - name: Check Missing and Orphan Meta Files
+        run: |
+          python3 -c "
+          import os, sys
+          missing = False
+          
+          # ファイル/フォルダに対して .meta が存在するかチェック
+          for root, dirs, files in os.walk('Assets'):
+              for name in dirs + files:
+                  if name.endswith('.meta'): continue
+                  path = os.path.join(root, name)
+                  if not os.path.exists(path + '.meta'):
+                      print(f'[Error] Missing meta file: {path}.meta')
+                      missing = True
+
+          # 実体のない孤立した .meta が存在しないかチェック
+          for root, dirs, files in os.walk('Assets'):
+              for name in files:
+                  if name.endswith('.meta'):
+                      meta_path = os.path.join(root, name)
+                      target_path = meta_path[:-5]
+                      if not os.path.exists(target_path):
+                          print(f'[Error] Orphan meta file: {meta_path}')
+                          missing = True
+
+          if missing:
+              sys.exit(1)
+          else:
+              print('All .meta files are valid!')
+          "
