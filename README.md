@@ -26,7 +26,7 @@
 
 ### 全体共通
 * **ゲームエンジン**: Unity 6000.3.20f1 【LTS】
-* **バージョン管理**: GitHub (`SourceTree` / `Git CLI` / `GitHub Desktop`)
+* **バージョン管理**: GitHub (`SourceTree` / `Git CLI` / `GitHub Desktop` など)
 * **進行管理・連絡**: Discord
 
 ---
