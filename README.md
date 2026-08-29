@@ -67,5 +67,6 @@
 
 ---
 
-## 📄 企画書
-* 後日追記予定
+## 📄 開発スケジュール（ちょっと詳細版）
+<img width="1024" height="559" alt="image" src="https://github.com/user-attachments/assets/61e65155-4dff-4557-9c6b-904637a652ad" />
+
