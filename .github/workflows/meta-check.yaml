@@ -1,0 +1,19 @@
+name: Unity Meta Check
+
+on:
+  pull_request:
+    branches: [ "master" ]
+  push:
+    branches: [ "master" ]
+
+jobs:
+  check-meta:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Unity Meta Check
+        uses: g3nar1/unity-meta-check-action@v2
+        with:
+          target-dir: 'Assets'

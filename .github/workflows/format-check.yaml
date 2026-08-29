@@ -1,0 +1,35 @@
+name: C# Code Format Check
+
+on:
+  pull_request:
+    branches: [ "master" ]
+  push:
+    branches: [ "master" ]
+
+jobs:
+  check-format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Create Temporary C# Project for Formatting
+        run: |
+          cat << 'EOF' > TempFormatCheck.csproj
+          <Project Sdk="Microsoft.NET.Sdk">
+            <PropertyGroup>
+              <TargetFramework>net8.0</TargetFramework>
+            </PropertyGroup>
+            <ItemGroup>
+              <Compile Include="Assets/**/*.cs" />
+            </ItemGroup>
+          </Project>
+          EOF
+
+      - name: Verify Code Formatting
+        run: dotnet format TempFormatCheck.csproj --verify-no-changes
