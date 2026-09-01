@@ -1,3 +1,6 @@
+## 🎫 対応 issue
+- issue : https://github.com/R-production004682/Roll-a-Ball/issues/xxx
+
 ## 📝 概要
 <!-- 何をしたのか、簡潔に書いてね！ -->
 - 
