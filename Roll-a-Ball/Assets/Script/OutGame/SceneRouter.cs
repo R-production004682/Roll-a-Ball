@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -17,28 +16,31 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         public void LoadSelectedScene()
         {
-            var sceneName = SceneNameMap.Get(targetScene);
-
-            if (string.IsNullOrEmpty(sceneName))
-            {
-                Debug.LogError("遷移先が設定されていません。", this);
-                return;
-            }
-
-            StartCoroutine(LoadSceneRoutine(sceneName));
+            LoadScene(targetScene, this);
         }
 
         /// <summary>
-        /// Scene を非同期で読み込む
+        /// 指定された Scene を読み込む
         /// </summary>
-        /// <param name="sceneName"></param>
-        /// <returns></returns>
-        private IEnumerator LoadSceneRoutine(string sceneName)
+        /// <param name="sceneType">読み込む Scene</param>
+        /// <param name="context">エラー発生時に紐付ける Unity Object</param>
+        /// <returns>読み込みを開始できた場合は true</returns>
+        public static bool LoadScene(SceneType sceneType, Object context = null)
         {
-            yield return SceneManager.LoadSceneAsync(
+            var sceneName = SceneNameMap.Get(sceneType);
+
+            if (string.IsNullOrEmpty(sceneName))
+            {
+                Debug.LogError("遷移先が設定されていません。", context);
+                return false;
+            }
+
+            SceneManager.LoadSceneAsync(
                 sceneName,
                 LoadSceneMode.Single
             );
+
+            return true;
         }
     }
 }
