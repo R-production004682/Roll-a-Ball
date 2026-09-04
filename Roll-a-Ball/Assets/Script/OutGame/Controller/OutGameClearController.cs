@@ -1,7 +1,5 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.SocialPlatforms;
 using UnityEngine.UI;
 
 namespace Roll_a_Ball.OutGame
@@ -12,33 +10,50 @@ namespace Roll_a_Ball.OutGame
     /// </summary>
     public sealed class OutGameClearController : MonoBehaviour
     {
+        private const KeyCode ClearKey = KeyCode.C;
+
         [SerializeField] private Button clearButton;
         [SerializeField] private GameObject clearDialog;
         [SerializeField] private Button titleButton;
-        [SerializeField] private Button retryButton;
 
         // ゲームクリア状態かどうかを記録するフラグ
         private bool isCleared;
 
+        /// <summary>
+        /// クリアダイアログを初期化し、必須の UI 参照を検証する
+        /// </summary>
         private void Awake()
         {
-            Time.timeScale = 1f;
-
-            // OutGameTestScene は通常の UI 画面なので、開始時からクリックできる状態にする。
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-
-            // 既存シーンの Canvas ルートに残っている 0 スケールを補正
-            transform.localScale = Vector3.one;
-
             if (clearDialog != null)
             {
                 clearDialog.SetActive(false);
             }
 
-            if (clearButton == null || clearDialog == null || titleButton == null || retryButton == null)
+            if (clearDialog == null || titleButton == null)
             {
                 Debug.LogError("OutGameClearController の UI 参照が設定されていません。", this);
+            }
+        }
+
+        /// <summary>
+        /// ゲーム開始状態に応じてデバッグ用クリアボタンの表示を切り替える
+        /// </summary>
+        private void Start()
+        {
+            if (clearButton != null)
+            {
+                clearButton.gameObject.SetActive(!OutGameStateController.IsPlaying);
+            }
+        }
+
+        /// <summary>
+        /// プレイ中のクリアキー入力を監視する
+        /// </summary>
+        private void Update()
+        {
+            if (OutGameStateController.IsPlaying && Input.GetKeyDown(ClearKey))
+            {
+                MarkClear();
             }
         }
 
@@ -54,12 +69,7 @@ namespace Roll_a_Ball.OutGame
 
             isCleared = true;
 
-            // ゲームクリア時に Time.timeScale を変更する前の値を保持する
-            var timeScaleBeforeClear = Time.timeScale;
-
-            Time.timeScale = 0f;
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
+            OutGameStateController.Enter(GameFlowState.Cleared);
 
             if (clearButton != null)
             {
@@ -82,17 +92,15 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         public void GoToTitle()
         {
-            Time.timeScale = 1f;
             SceneRouter.LoadScene(SceneType.Title, this);
         }
 
         /// <summary>
-        /// OutGameTestScene を読み直してリトライする
+        /// MainScene を読み直してリトライする
         /// </summary>
         public void Retry()
         {
-            Time.timeScale = 1f;
-            SceneRouter.LoadScene(SceneType.OutGameTest, this);
+            SceneRouter.LoadScene(SceneType.Main, this);
         }
     }
 }

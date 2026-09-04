@@ -5,21 +5,12 @@ namespace Roll_a_Ball.OutGame
 {
     /// <summary>
     /// OutGame から別シーンへ移動する責務だけを持つクラス
-    /// Button から SceneManager を直接呼ばないための薄い窓口として使用
+    /// 各画面から SceneManager を直接呼ばないための薄い窓口として使用
     /// </summary>
-    public sealed class SceneRouter : MonoBehaviour
+    public static class SceneRouter
     {
-        [SerializeField, Header("遷移させたい Scene を指定する")] private SceneType targetScene;
-
+        // 現在実行中の非同期処理を保持
         private static AsyncOperation currentLoadOperation;
-
-        /// <summary>
-        /// 選択された Scene を読み込む
-        /// </summary>
-        public void LoadSelectedScene()
-        {
-            LoadScene(targetScene, this);
-        }
 
         /// <summary>
         /// 指定された Scene を読み込む
