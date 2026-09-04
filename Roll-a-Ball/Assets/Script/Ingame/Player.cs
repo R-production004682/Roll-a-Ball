@@ -8,6 +8,12 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float mouseSensitivity;//マウス視点操作の感度
 
+    [SerializeField]
+    private int fall;//落下地点
+
+    [SerializeField]
+    private Vector3 respawnPoint;//リスポーン地点
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -32,6 +38,9 @@ public class Player : MonoBehaviour
 
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;//マウスの左右移動量を取得
         transform.Rotate(Vector3.up * mouseX);//オブジェクトのy軸を中心に回転
+
+        if (transform.position.y <= fall)
+            transform.position = respawnPoint;//落下地点以下にいるとリスポーン地点に戻る
 
     }
 }
