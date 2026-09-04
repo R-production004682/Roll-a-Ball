@@ -7,7 +7,7 @@ namespace Roll_a_Ball.OutGame
     /// </summary>
     internal static class SceneNameMap
     {
-        private static readonly IReadOnlyDictionary<SceneType, string> Names =
+        private static readonly IReadOnlyDictionary<SceneType, string> SceneNames =
             new Dictionary<SceneType, string>
             {
                 [SceneType.Title] = "TitleScene",
@@ -15,11 +15,9 @@ namespace Roll_a_Ball.OutGame
                 [SceneType.Main] = "MainScene"
             };
 
-        public static string Get(SceneType sceneType)
+        public static bool TryGet(SceneType sceneType, out string sceneName)
         {
-            return Names.TryGetValue(sceneType, out var sceneName)
-                ? sceneName
-                : string.Empty;
+            return SceneNames.TryGetValue(sceneType, out sceneName);
         }
     }
 }

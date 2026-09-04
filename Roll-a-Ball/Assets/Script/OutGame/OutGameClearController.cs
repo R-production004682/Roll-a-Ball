@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.SocialPlatforms;
 using UnityEngine.UI;
 
 namespace Roll_a_Ball.OutGame
@@ -16,7 +17,7 @@ namespace Roll_a_Ball.OutGame
         [SerializeField] private Button titleButton;
         [SerializeField] private Button retryButton;
 
-        private readonly List<MonoBehaviour> stoppedBehaviours = new List<MonoBehaviour>();
+        // ゲームクリア状態かどうかを記録するフラグ
         private bool isCleared;
 
         private void Awake()
@@ -52,7 +53,9 @@ namespace Roll_a_Ball.OutGame
             }
 
             isCleared = true;
-            StopGameplayInput();
+
+            // ゲームクリア時に Time.timeScale を変更する前の値を保持する
+            var timeScaleBeforeClear = Time.timeScale;
 
             Time.timeScale = 0f;
             Cursor.lockState = CursorLockMode.None;
@@ -90,60 +93,6 @@ namespace Roll_a_Ball.OutGame
         {
             Time.timeScale = 1f;
             SceneRouter.LoadScene(SceneType.OutGameTest, this);
-        }
-
-        /// <summary>
-        /// ゲームプレイ中の MonoBehaviour を停止して、クリア画面の UI 操作だけを有効にする
-        /// </summary>
-        private void StopGameplayInput()
-        {
-            stoppedBehaviours.Clear();
-
-            // MonoBehaviour のみを止めることで、Camera / Light / AudioListener と
-            // クリア画面の UI イベント処理は維持する。
-            var behaviours = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
-            foreach (var behaviour in behaviours)
-            {
-                if (behaviour == null || !behaviour.enabled || ShouldKeepEnabled(behaviour))
-                {
-                    continue;
-                }
-
-                behaviour.enabled = false;
-                stoppedBehaviours.Add(behaviour);
-            }
-        }
-
-        /// <summary>
-        /// クリア画面の UI 操作に必要な MonoBehaviour は停止しない
-        /// </summary>
-        /// <param name="behaviour"></param>
-        /// <returns></returns>
-        private bool ShouldKeepEnabled(MonoBehaviour behaviour)
-        {
-            return behaviour == this
-                || behaviour is Graphic
-                || behaviour is Selectable
-                || behaviour is EventSystem
-                || behaviour is BaseInputModule
-                || behaviour is BaseRaycaster
-                || behaviour is PauseMenuController;
-        }
-
-        /// <summary>
-        /// ゲームクリア画面を閉じるときに、停止していた MonoBehaviour を再開
-        /// </summary>
-        private void OnDestroy()
-        {
-            Time.timeScale = 1f;
-
-            foreach (var behaviour in stoppedBehaviours)
-            {
-                if (behaviour != null)
-                {
-                    behaviour.enabled = true;
-                }
-            }
         }
     }
 }
