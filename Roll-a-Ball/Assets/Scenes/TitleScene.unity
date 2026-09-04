@@ -574,7 +574,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1067826239}
-  - component: {fileID: 1067826238}
   - component: {fileID: 1067826237}
   m_Layer: 0
   m_Name: TitleController
@@ -594,21 +593,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2f7c1b3e6a3d4c5f8b7e9d0a1c2b3d4e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RollABall.OutGame.TitleController
-  sceneRouter: {fileID: 1067826238}
---- !u!114 &1067826238
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1067826236}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a61b5d8a4e841a2b217b0f27c31aa01, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RollABall.OutGame.SceneRouter
-  targetScene: 1
+  m_EditorClassIdentifier: Assembly-CSharp::Roll_a_Ball.OutGame.TitleController
 --- !u!4 &1067826239
 Transform:
   m_ObjectHideFlags: 0
@@ -637,7 +622,7 @@ GameObject:
   - component: {fileID: 1412911425}
   - component: {fileID: 1412911424}
   m_Layer: 5
-  m_Name: Button
+  m_Name: TransitionMainSceneButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -660,7 +645,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -58}
   m_SizeDelta: {x: -1593.1843, y: -1050}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1412911424
@@ -707,9 +692,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1067826238}
-        m_TargetAssemblyTypeName: Roll_a_Ball.OutGame.SceneRouter, Assembly-CSharp
-        m_MethodName: LoadSelectedScene
+      - m_Target: {fileID: 1067826237}
+        m_TargetAssemblyTypeName: Roll_a_Ball.OutGame.TitleController, Assembly-CSharp
+        m_MethodName: StartGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -814,7 +799,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Title => OutGameTestScene
+  m_text: 'Title => Main
+
+'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

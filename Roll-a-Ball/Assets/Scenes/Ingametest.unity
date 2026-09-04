@@ -281,6 +281,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Player
   Playerspeed: 20
   mouseSensitivity: 200
+  fall: -5
+  respawnPoint: {x: 0, y: 0, z: 0}
 --- !u!54 &795761522
 Rigidbody:
   m_ObjectHideFlags: 0
