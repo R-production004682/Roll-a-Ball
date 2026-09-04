@@ -15,11 +15,9 @@ namespace Roll_a_Ball.OutGame
                 [SceneType.Main] = "MainScene"
             };
 
-        public static string Get(SceneType sceneType)
+        public static bool TryGet(SceneType sceneType, out string sceneName)
         {
-            return SceneNames.TryGetValue(sceneType, out var sceneName)
-                ? sceneName
-                : string.Empty;
+            return SceneNames.TryGetValue(sceneType, out sceneName);
         }
     }
 }

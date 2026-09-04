@@ -11,6 +11,8 @@ namespace Roll_a_Ball.OutGame
     {
         [SerializeField, Header("遷移させたい Scene を指定する")] private SceneType targetScene;
 
+        private static AsyncOperation currentLoadOperation;
+
         /// <summary>
         /// 選択された Scene を読み込む
         /// </summary>
@@ -27,18 +29,34 @@ namespace Roll_a_Ball.OutGame
         /// <returns>読み込みを開始できた場合は true</returns>
         public static bool LoadScene(SceneType sceneType, Object context = null)
         {
-            var sceneName = SceneNameMap.Get(sceneType);
+            if (currentLoadOperation != null && !currentLoadOperation.isDone)
+            {
+                Debug.LogWarning("シーン遷移はすでに実行中です。", context);
+                return false;
+            }
 
-            if (string.IsNullOrEmpty(sceneName))
+            if (!SceneNameMap.TryGet(sceneType, out var sceneName))
             {
                 Debug.LogError("遷移先が設定されていません。", context);
                 return false;
             }
 
-            SceneManager.LoadSceneAsync(
+            if (!Application.CanStreamedLevelBeLoaded(sceneName))
+            {
+                Debug.LogError($"シーンが Build Settings に登録されていません: {sceneName}", context);
+                return false;
+            }
+
+            currentLoadOperation = SceneManager.LoadSceneAsync(
                 sceneName,
                 LoadSceneMode.Single
             );
+
+            if (currentLoadOperation == null)
+            {
+                Debug.LogError($"シーンの読み込みを開始できませんでした: {sceneName}", context);
+                return false;
+            }
 
             return true;
         }
