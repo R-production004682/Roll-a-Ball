@@ -12,7 +12,6 @@ namespace Roll_a_Ball.OutGame
     {
         private const KeyCode ClearKey = KeyCode.C;
 
-        [SerializeField] private Button clearButton;
         [SerializeField] private GameObject clearDialog;
         [SerializeField] private Button titleButton;
 
@@ -32,17 +31,6 @@ namespace Roll_a_Ball.OutGame
             if (clearDialog == null || titleButton == null)
             {
                 Debug.LogError("OutGameClearController の UI 参照が設定されていません。", this);
-            }
-        }
-
-        /// <summary>
-        /// ゲーム開始状態に応じてデバッグ用クリアボタンの表示を切り替える
-        /// </summary>
-        private void Start()
-        {
-            if (clearButton != null)
-            {
-                clearButton.gameObject.SetActive(!OutGameStateController.IsPlaying);
             }
         }
 
@@ -70,11 +58,6 @@ namespace Roll_a_Ball.OutGame
             isCleared = true;
 
             OutGameStateController.Enter(GameFlowState.Cleared);
-
-            if (clearButton != null)
-            {
-                clearButton.interactable = false;
-            }
 
             if (clearDialog != null)
             {

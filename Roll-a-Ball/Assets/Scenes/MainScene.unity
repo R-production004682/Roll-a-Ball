@@ -2518,7 +2518,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8dbd4f8cc8e34d4a9d6dd2f43f1f3b1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Roll_a_Ball.OutGame.OutGameClearController
-  clearButton: {fileID: 0}
   clearDialog: {fileID: 37661167}
   titleButton: {fileID: 419023041}
 --- !u!114 &1179970796
@@ -2534,7 +2533,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Roll_a_Ball.OutGame.PauseMenuController
   menuDialog: {fileID: 501700938}
-  menuButton: {fileID: 0}
   controlsGuide: {fileID: 0}
   startsInPlay: 1
 --- !u!114 &1179970797

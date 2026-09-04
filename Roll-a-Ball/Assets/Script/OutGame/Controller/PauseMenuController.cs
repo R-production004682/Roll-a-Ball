@@ -10,7 +10,6 @@ namespace Roll_a_Ball.OutGame
         private const KeyCode MenuKey = KeyCode.M;
 
         [SerializeField] private GameObject menuDialog;
-        [SerializeField] private GameObject menuButton;
         [SerializeField] private GameObject controlsGuide;
         [SerializeField, Header("ゲーム開始時の状態")] private bool startsInPlay;
 
@@ -22,11 +21,6 @@ namespace Roll_a_Ball.OutGame
             if (menuDialog != null)
             {
                 menuDialog.SetActive(false);
-            }
-
-            if (startsInPlay && menuButton != null)
-            {
-                menuButton.SetActive(false);
             }
 
             if (startsInPlay)
