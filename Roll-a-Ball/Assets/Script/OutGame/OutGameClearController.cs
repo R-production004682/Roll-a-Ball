@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.SocialPlatforms;
 using UnityEngine.UI;
 
 namespace Roll_a_Ball.OutGame
@@ -15,12 +16,9 @@ namespace Roll_a_Ball.OutGame
         [SerializeField] private GameObject clearDialog;
         [SerializeField] private Button titleButton;
         [SerializeField] private Button retryButton;
-        [SerializeField] private List<MonoBehaviour> gameplayBehaviours = new List<MonoBehaviour>();
 
-        private readonly List<MonoBehaviour> stoppedBehaviours = new List<MonoBehaviour>();
+        // ゲームクリア状態かどうかを記録するフラグ
         private bool isCleared;
-        private float timeScaleBeforeClear;
-        private bool hasChangedTimeScale;
 
         private void Awake()
         {
@@ -56,9 +54,10 @@ namespace Roll_a_Ball.OutGame
 
             isCleared = true;
 
-            timeScaleBeforeClear = Time.timeScale;
+            // ゲームクリア時に Time.timeScale を変更する前の値を保持する
+            var timeScaleBeforeClear = Time.timeScale;
+
             Time.timeScale = 0f;
-            hasChangedTimeScale = true;
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
 
@@ -94,24 +93,6 @@ namespace Roll_a_Ball.OutGame
         {
             Time.timeScale = 1f;
             SceneRouter.LoadScene(SceneType.OutGameTest, this);
-        }
-
-        /// ゲームクリア画面を閉じるときに、停止していた MonoBehaviour を再開
-        /// </summary>
-        private void OnDestroy()
-        {
-            if (hasChangedTimeScale)
-            {
-                Time.timeScale = timeScaleBeforeClear;
-            }
-
-            foreach (var behaviour in stoppedBehaviours)
-            {
-                if (behaviour != null)
-                {
-                    behaviour.enabled = true;
-                }
-            }
         }
     }
 }
