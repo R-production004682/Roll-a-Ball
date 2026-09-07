@@ -35,6 +35,7 @@ namespace Roll_a_Ball.OutGame
             var isStopped = state == GameFlowState.Paused || state == GameFlowState.Cleared;
 
             Time.timeScale = isStopped ? 0f : 1f;
+            AudioListener.pause = isStopped;
             Cursor.lockState = isPlaying ? CursorLockMode.Locked : CursorLockMode.None;
             Cursor.visible = !isPlaying;
 

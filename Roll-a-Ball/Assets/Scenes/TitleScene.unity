@@ -621,6 +621,8 @@ GameObject:
   - component: {fileID: 1412911426}
   - component: {fileID: 1412911425}
   - component: {fileID: 1412911424}
+  - component: {fileID: 1412911428}
+  - component: {fileID: 1412911427}
   m_Layer: 5
   m_Name: TransitionMainSceneButton
   m_TagString: Untagged
@@ -691,19 +693,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1412911425}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1067826237}
-        m_TargetAssemblyTypeName: Roll_a_Ball.OutGame.TitleController, Assembly-CSharp
-        m_MethodName: StartGame
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1412911425
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -742,6 +732,34 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1412911422}
   m_CullTransparentMesh: 1
+--- !u!114 &1412911427
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1412911422}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 774cf9c1f5118cb4c96b268efe5e6a0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Roll_a_Ball.OutGame.ButtonSoundEffect
+  clickSound: {fileID: 8300000, guid: 45151ac3775413e40beb7e5f6c158cc6, type: 3}
+--- !u!114 &1412911428
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1412911422}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d1e27950d9025d49977f5ea27fceead, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Roll_a_Ball.OutGame.SceneTransitionButton
+  destination:
+    scenePath: Assets/Scenes/StageSelectScene.unity
+    sceneGuid: 2cf7963b28fe83347a2a8221117771a6
 --- !u!1 &1579482229
 GameObject:
   m_ObjectHideFlags: 0
@@ -799,9 +817,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Title => Main
-
-'
+  m_text: Title => StageSelectScene
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

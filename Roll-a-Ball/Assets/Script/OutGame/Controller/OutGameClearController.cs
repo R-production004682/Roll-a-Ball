@@ -70,20 +70,5 @@ namespace Roll_a_Ball.OutGame
             }
         }
 
-        /// <summary>
-        /// TitleScene に戻る
-        /// </summary>
-        public void GoToTitle()
-        {
-            SceneRouter.LoadScene(SceneType.Title, this);
-        }
-
-        /// <summary>
-        /// MainScene を読み直してリトライする
-        /// </summary>
-        public void Retry()
-        {
-            SceneRouter.LoadScene(SceneType.Main, this);
-        }
     }
 }

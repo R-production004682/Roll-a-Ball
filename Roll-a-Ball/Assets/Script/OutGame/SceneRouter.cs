@@ -15,10 +15,10 @@ namespace Roll_a_Ball.OutGame
         /// <summary>
         /// 指定された Scene を読み込む
         /// </summary>
-        /// <param name="sceneType">読み込む Scene</param>
+        /// <param name="scenePath">読み込む Scene の Asset パス</param>
         /// <param name="context">エラー発生時に紐付ける Unity Object</param>
         /// <returns>読み込みを開始できた場合は true</returns>
-        public static bool LoadScene(SceneType sceneType, Object context = null)
+        public static bool LoadScene(string scenePath, Object context = null)
         {
             if (currentLoadOperation != null && !currentLoadOperation.isDone)
             {
@@ -26,26 +26,26 @@ namespace Roll_a_Ball.OutGame
                 return false;
             }
 
-            if (!SceneNameMap.TryGet(sceneType, out var sceneName))
+            if (string.IsNullOrWhiteSpace(scenePath))
             {
                 Debug.LogError("遷移先が設定されていません。", context);
                 return false;
             }
 
-            if (!Application.CanStreamedLevelBeLoaded(sceneName))
+            if (!Application.CanStreamedLevelBeLoaded(scenePath))
             {
-                Debug.LogError($"シーンが Build Settings に登録されていません: {sceneName}", context);
+                Debug.LogError($"シーンが Build Settings に登録されていません: {scenePath}", context);
                 return false;
             }
 
             currentLoadOperation = SceneManager.LoadSceneAsync(
-                sceneName,
+                scenePath,
                 LoadSceneMode.Single
             );
 
             if (currentLoadOperation == null)
             {
-                Debug.LogError($"シーンの読み込みを開始できませんでした: {sceneName}", context);
+                Debug.LogError($"シーンの読み込みを開始できませんでした: {scenePath}", context);
                 return false;
             }
 

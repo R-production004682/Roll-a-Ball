@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace Roll_a_Ball.OutGame
 {
@@ -10,6 +12,7 @@ namespace Roll_a_Ball.OutGame
         private const KeyCode MenuKey = KeyCode.M;
 
         [SerializeField] private GameObject menuDialog;
+        [SerializeField] private Button firstSelectedButton;
         [SerializeField] private GameObject controlsGuide;
         [SerializeField, Header("ゲーム開始時の状態")] private bool startsInPlay;
 
@@ -50,10 +53,14 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private void Update()
         {
-            // インプレイ中に、メニューキーが押されたらメニューを開く
             if (OutGameStateController.IsPlaying && Input.GetKeyDown(MenuKey))
             {
                 OpenMenu();
+            }
+            else if (menuDialog != null && menuDialog.activeSelf && Input.GetKeyDown(MenuKey))
+            {
+                if (firstSelectedButton != null) firstSelectedButton.onClick.Invoke();
+                else ResumeGame();
             }
         }
 
@@ -70,6 +77,11 @@ namespace Roll_a_Ball.OutGame
 
             menuDialog.SetActive(true);
             OutGameStateController.Enter(GameFlowState.Paused);
+
+            if (EventSystem.current != null && firstSelectedButton != null)
+            {
+                EventSystem.current.SetSelectedGameObject(firstSelectedButton.gameObject);
+            }
         }
 
         /// <summary>
@@ -78,14 +90,6 @@ namespace Roll_a_Ball.OutGame
         public void PauseGame()
         {
             OpenMenu();
-        }
-
-        /// <summary>
-        /// タイトルへ戻る
-        /// </summary>
-        public void GoToTitle()
-        {
-            SceneRouter.LoadScene(SceneType.Title, this);
         }
 
         /// <summary>
