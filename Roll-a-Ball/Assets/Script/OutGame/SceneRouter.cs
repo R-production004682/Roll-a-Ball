@@ -18,13 +18,14 @@ namespace Roll_a_Ball.OutGame
         /// <param name="scenePath">読み込む Scene の Asset パス</param>
         /// <param name="context">エラー発生時に紐付ける Unity Object</param>
         /// <returns>読み込みを開始できた場合は true</returns>
-        public static bool LoadScene(string scenePath, Object context = null)
+        public static bool LoadScene(string scenePath, Object context)
         {
             if (currentLoadOperation != null && !currentLoadOperation.isDone)
             {
                 Debug.LogWarning("シーン遷移はすでに実行中です。", context);
                 return false;
             }
+
 
             if (string.IsNullOrWhiteSpace(scenePath))
             {
