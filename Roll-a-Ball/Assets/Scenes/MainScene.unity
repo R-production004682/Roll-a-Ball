@@ -508,6 +508,7 @@ GameObject:
   - component: {fileID: 419023039}
   - component: {fileID: 419023043}
   - component: {fileID: 419023042}
+  - component: {fileID: 419023044}
   m_Layer: 5
   m_Name: TitleButton
   m_TagString: Untagged
@@ -645,6 +646,30 @@ MonoBehaviour:
   destination:
     scenePath: Assets/Scenes/StageSelectScene.unity
     sceneGuid: 2cf7963b28fe83347a2a8221117771a6
+--- !u!114 &419023044
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 419023037}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d70f58bc0a44746b13cf4ae2cbcd62c, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Roll_a_Ball.OutGame.ButtonPressAnimation
+  animationTarget: {fileID: 0}
+  hoverScale: 1.025
+  pressedScale: {x: 0.96, y: 0.9}
+  clickOvershootScale: 1.055
+  animateSelection: 1
+  hoverDuration: 0.12
+  pressDuration: 0.075
+  releaseDuration: 0.16
+  useUnscaledTime: 1
+  hoverEase: 6
+  pressEase: 9
+  releaseEase: 9
 --- !u!1 &583776811
 GameObject:
   m_ObjectHideFlags: 0
@@ -659,6 +684,7 @@ GameObject:
   - component: {fileID: 583776814}
   - component: {fileID: 583776817}
   - component: {fileID: 583776816}
+  - component: {fileID: 583776818}
   m_Layer: 5
   m_Name: RetryButton
   m_TagString: Untagged
@@ -796,6 +822,30 @@ MonoBehaviour:
   destination:
     scenePath: Assets/Scenes/MainScene.unity
     sceneGuid: a214e2a22156b4a43ab298b90d0eebf6
+--- !u!114 &583776818
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 583776811}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d70f58bc0a44746b13cf4ae2cbcd62c, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Roll_a_Ball.OutGame.ButtonPressAnimation
+  animationTarget: {fileID: 0}
+  hoverScale: 1.025
+  pressedScale: {x: 0.96, y: 0.9}
+  clickOvershootScale: 1.055
+  animateSelection: 1
+  hoverDuration: 0.12
+  pressDuration: 0.075
+  releaseDuration: 0.16
+  useUnscaledTime: 1
+  hoverEase: 6
+  pressEase: 9
+  releaseEase: 9
 --- !u!1 &682882513
 GameObject:
   m_ObjectHideFlags: 0

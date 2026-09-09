@@ -623,6 +623,7 @@ GameObject:
   - component: {fileID: 1412911424}
   - component: {fileID: 1412911428}
   - component: {fileID: 1412911427}
+  - component: {fileID: 1412911429}
   m_Layer: 5
   m_Name: TransitionMainSceneButton
   m_TagString: Untagged
@@ -760,6 +761,30 @@ MonoBehaviour:
   destination:
     scenePath: Assets/Scenes/StageSelectScene.unity
     sceneGuid: 2cf7963b28fe83347a2a8221117771a6
+--- !u!114 &1412911429
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1412911422}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d70f58bc0a44746b13cf4ae2cbcd62c, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Roll_a_Ball.OutGame.ButtonPressAnimation
+  animationTarget: {fileID: 0}
+  hoverScale: 1.025
+  pressedScale: {x: 0.96, y: 0.9}
+  clickOvershootScale: 1.055
+  animateSelection: 1
+  hoverDuration: 0.12
+  pressDuration: 0.075
+  releaseDuration: 0.16
+  useUnscaledTime: 1
+  hoverEase: 6
+  pressEase: 9
+  releaseEase: 9
 --- !u!1 &1579482229
 GameObject:
   m_ObjectHideFlags: 0

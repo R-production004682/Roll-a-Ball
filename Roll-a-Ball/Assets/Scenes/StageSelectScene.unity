@@ -902,6 +902,7 @@ GameObject:
   - component: {fileID: 1165957361}
   - component: {fileID: 1165957360}
   - component: {fileID: 1165957359}
+  - component: {fileID: 1165957364}
   m_Layer: 5
   m_Name: TransitionShopSceneButton
   m_TagString: Untagged
@@ -1039,6 +1040,30 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1165957357}
   m_CullTransparentMesh: 1
+--- !u!114 &1165957364
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1165957357}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d70f58bc0a44746b13cf4ae2cbcd62c, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Roll_a_Ball.OutGame.ButtonPressAnimation
+  animationTarget: {fileID: 0}
+  hoverScale: 1.025
+  pressedScale: {x: 0.96, y: 0.9}
+  clickOvershootScale: 1.055
+  animateSelection: 1
+  hoverDuration: 0.12
+  pressDuration: 0.075
+  releaseDuration: 0.16
+  useUnscaledTime: 1
+  hoverEase: 6
+  pressEase: 9
+  releaseEase: 9
 --- !u!1 &1254935231
 GameObject:
   m_ObjectHideFlags: 0
@@ -1053,6 +1078,7 @@ GameObject:
   - component: {fileID: 1254935233}
   - component: {fileID: 1254935237}
   - component: {fileID: 1254935236}
+  - component: {fileID: 1254935238}
   m_Layer: 5
   m_Name: TransitionOutGameTestSceneButton
   m_TagString: Untagged
@@ -1188,8 +1214,32 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Roll_a_Ball.OutGame.SceneTransitionButton
   destination:
-    scenePath: Assets/Scenes/OutGameTestScene.unity
+    scenePath: Assets/Scenes/TestScene/OutGameTestScene.unity
     sceneGuid: 182c64d0ad3833a4f8b52af92f904e1c
+--- !u!114 &1254935238
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1254935231}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d70f58bc0a44746b13cf4ae2cbcd62c, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Roll_a_Ball.OutGame.ButtonPressAnimation
+  animationTarget: {fileID: 0}
+  hoverScale: 1.025
+  pressedScale: {x: 0.96, y: 0.9}
+  clickOvershootScale: 1.055
+  animateSelection: 1
+  hoverDuration: 0.12
+  pressDuration: 0.075
+  releaseDuration: 0.16
+  useUnscaledTime: 1
+  hoverEase: 6
+  pressEase: 9
+  releaseEase: 9
 --- !u!1 &1465685181
 GameObject:
   m_ObjectHideFlags: 0
@@ -1384,6 +1434,7 @@ GameObject:
   - component: {fileID: 1918775918}
   - component: {fileID: 1918775917}
   - component: {fileID: 1918775920}
+  - component: {fileID: 1918775921}
   m_Layer: 0
   m_Name: SettingsButton
   m_TagString: Untagged
@@ -1518,6 +1569,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Roll_a_Ball.OutGame.ButtonSoundEffect
   clickSound: {fileID: 8300000, guid: 45151ac3775413e40beb7e5f6c158cc6, type: 3}
+--- !u!114 &1918775921
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1918775915}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d70f58bc0a44746b13cf4ae2cbcd62c, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Roll_a_Ball.OutGame.ButtonPressAnimation
+  animationTarget: {fileID: 0}
+  hoverScale: 1.025
+  pressedScale: {x: 0.96, y: 0.9}
+  clickOvershootScale: 1.055
+  animateSelection: 1
+  hoverDuration: 0.12
+  pressDuration: 0.075
+  releaseDuration: 0.16
+  useUnscaledTime: 1
+  hoverEase: 6
+  pressEase: 9
+  releaseEase: 9
 --- !u!1 &1975305768
 GameObject:
   m_ObjectHideFlags: 0
