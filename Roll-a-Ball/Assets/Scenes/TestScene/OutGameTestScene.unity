@@ -888,6 +888,7 @@ GameObject:
   - component: {fileID: 489975529}
   - component: {fileID: 489975532}
   - component: {fileID: 489975531}
+  - component: {fileID: 489975533}
   m_Layer: 5
   m_Name: TitleButton
   m_TagString: Untagged
@@ -1025,6 +1026,30 @@ MonoBehaviour:
   destination:
     scenePath: Assets/Scenes/StageSelectScene.unity
     sceneGuid: 2cf7963b28fe83347a2a8221117771a6
+--- !u!114 &489975533
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 489975526}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d70f58bc0a44746b13cf4ae2cbcd62c, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Roll_a_Ball.OutGame.ButtonPressAnimation
+  animationTarget: {fileID: 0}
+  hoverScale: 1.025
+  pressedScale: {x: 0.96, y: 0.9}
+  clickOvershootScale: 1.055
+  animateSelection: 1
+  hoverDuration: 0.12
+  pressDuration: 0.075
+  releaseDuration: 0.16
+  useUnscaledTime: 1
+  hoverEase: 6
+  pressEase: 9
+  releaseEase: 9
 --- !u!1 &566612869
 GameObject:
   m_ObjectHideFlags: 0
@@ -1690,6 +1715,7 @@ GameObject:
   - component: {fileID: 1114106965}
   - component: {fileID: 1114106969}
   - component: {fileID: 1114106968}
+  - component: {fileID: 1114106970}
   m_Layer: 5
   m_Name: RetryButton
   m_TagString: Untagged
@@ -1825,8 +1851,32 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Roll_a_Ball.OutGame.SceneTransitionButton
   destination:
-    scenePath: Assets/Scenes/OutGameTestScene.unity
+    scenePath: Assets/Scenes/TestScene/OutGameTestScene.unity
     sceneGuid: 182c64d0ad3833a4f8b52af92f904e1c
+--- !u!114 &1114106970
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1114106963}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d70f58bc0a44746b13cf4ae2cbcd62c, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Roll_a_Ball.OutGame.ButtonPressAnimation
+  animationTarget: {fileID: 0}
+  hoverScale: 1.025
+  pressedScale: {x: 0.96, y: 0.9}
+  clickOvershootScale: 1.055
+  animateSelection: 1
+  hoverDuration: 0.12
+  pressDuration: 0.075
+  releaseDuration: 0.16
+  useUnscaledTime: 1
+  hoverEase: 6
+  pressEase: 9
+  releaseEase: 9
 --- !u!1 &1147771496
 GameObject:
   m_ObjectHideFlags: 0
