@@ -3,7 +3,9 @@ using UnityEngine;
 
 namespace Roll_a_Ball.OutGame
 {
-    /// <summary>全シーンで共有する音量設定。値は 0～1、保存先は PlayerPrefs。</summary>
+    /// <summary>
+    /// 全シーンで共有する音量を管理し、値は 0～1、保存先は PlayerPrefs
+    /// </summary>
     public static class GameSettings
     {
         public const float DefaultBgmVolume = 0.7f;

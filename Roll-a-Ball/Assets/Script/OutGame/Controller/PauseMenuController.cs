@@ -21,10 +21,7 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private void Awake()
         {
-            if (menuDialog != null)
-            {
-                menuDialog.SetActive(false);
-            }
+            CloseMenuVisuals();
 
             if (startsInPlay)
             {
@@ -75,6 +72,11 @@ namespace Roll_a_Ball.OutGame
                 return;
             }
 
+            if (!OutGameStateController.IsPlaying)
+            {
+                return;
+            }
+
             menuDialog.SetActive(true);
             OutGameStateController.Enter(GameFlowState.Paused);
 
@@ -82,6 +84,8 @@ namespace Roll_a_Ball.OutGame
             {
                 EventSystem.current.SetSelectedGameObject(firstSelectedButton.gameObject);
             }
+
+            Debug.Log("ポーズメニューを開きました。", this);
         }
 
         /// <summary>
@@ -97,11 +101,29 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         public void ResumeGame()
         {
-            OutGameStateController.Enter(GameFlowState.Playing);
+            if (menuDialog == null || !menuDialog.activeSelf)
+            {
+                return;
+            }
 
+            OutGameStateController.Enter(GameFlowState.Playing);
+            CloseMenuVisuals();
+            Debug.Log("ポーズメニューを閉じてゲームを再開しました。", this);
+        }
+
+        /// <summary>
+        /// ポーズメニューの表示を閉じ、再開時は選択状態を解除する
+        /// </summary>
+        private void CloseMenuVisuals()
+        {
             if (menuDialog != null)
             {
                 menuDialog.SetActive(false);
+            }
+
+            if (EventSystem.current != null && OutGameStateController.IsPlaying)
+            {
+                EventSystem.current.SetSelectedGameObject(null);
             }
         }
 

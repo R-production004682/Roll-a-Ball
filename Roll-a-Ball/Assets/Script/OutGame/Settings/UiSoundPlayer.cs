@@ -2,7 +2,9 @@ using UnityEngine;
 
 namespace Roll_a_Ball.OutGame
 {
-    /// <summary>Scene 遷移やポーズをまたいで UI 効果音を最後まで再生する。</summary>
+    /// <summary>
+    /// Scene 遷移やポーズをまたいで UI 効果音を最後まで再生する
+    /// </summary>
     internal sealed class UiSoundPlayer : MonoBehaviour
     {
         private static UiSoundPlayer instance;

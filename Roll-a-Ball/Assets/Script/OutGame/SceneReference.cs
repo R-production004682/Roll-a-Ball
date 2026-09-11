@@ -3,7 +3,9 @@ using UnityEngine;
 
 namespace Roll_a_Ball.OutGame
 {
-    /// <summary>Inspector で Scene アセットを指定し、実行時にはそのパスを使用する参照。</summary>
+    /// <summary>
+    /// Inspector で Scene アセットを指定し、実行時にはそのパスを使用する参照
+    /// </summary>
     [Serializable]
     public sealed class SceneReference
     {

@@ -11,6 +11,17 @@ namespace Roll_a_Ball.OutGame
     {
         // 現在実行中の非同期処理を保持
         private static AsyncOperation currentLoadOperation;
+        private static bool transitionRequested;
+
+        /// <summary>
+        /// プレイ開始時に Scene 遷移状態を初期化する
+        /// </summary>
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetRuntimeState()
+        {
+            currentLoadOperation = null;
+            transitionRequested = false;
+        }
 
         /// <summary>
         /// 指定された Scene を読み込む
@@ -20,7 +31,7 @@ namespace Roll_a_Ball.OutGame
         /// <returns>読み込みを開始できた場合は true</returns>
         public static bool LoadScene(string scenePath, Object context)
         {
-            if (currentLoadOperation != null && !currentLoadOperation.isDone)
+            if (transitionRequested || FadeTransition.IsTransitioning || currentLoadOperation != null && !currentLoadOperation.isDone)
             {
                 Debug.LogWarning("シーン遷移はすでに実行中です。", context);
                 return false;
@@ -39,17 +50,27 @@ namespace Roll_a_Ball.OutGame
                 return false;
             }
 
-            currentLoadOperation = SceneManager.LoadSceneAsync(
+            var fadeTransition = FadeTransition.GetPersistent();
+            transitionRequested = true;
+            var started = fadeTransition.PlaySceneLoad(
                 scenePath,
-                LoadSceneMode.Single
+                () =>
+                {
+                    currentLoadOperation = SceneManager.LoadSceneAsync(scenePath, LoadSceneMode.Single);
+                    return currentLoadOperation;
+                },
+                _ => transitionRequested = false,
+                context
             );
 
-            if (currentLoadOperation == null)
+            if (!started)
             {
-                Debug.LogError($"シーンの読み込みを開始できませんでした: {scenePath}", context);
+                transitionRequested = false;
+                Debug.LogError($"シーンのフェード遷移を開始できませんでした: {scenePath}", context);
                 return false;
             }
 
+            Debug.Log($"シーン遷移を開始しました: {scenePath}", context);
             return true;
         }
     }
