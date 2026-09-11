@@ -155,7 +155,7 @@ namespace Roll_a_Ball.OutGame
         public void PlayClickFeedback()
         {
             // An earlier click listener may close a dialog or destroy/disable the Button.
-            if (this == null || !CanAnimate || IsPressed) return;
+            if (this == null || !CanAnimate) return;
 
             StopTween();
             Sequence sequence = DOTween.Sequence();

@@ -2,7 +2,9 @@ using UnityEngine;
 
 namespace Roll_a_Ball.OutGame
 {
-    /// <summary>AudioSource に追加し、BGM / SE の共有音量を適用する。</summary>
+    /// <summary>
+    /// AudioSource に追加し、BGM / SE の共有音量を適用する
+    /// </summary>
     [RequireComponent(typeof(AudioSource))]
     [DisallowMultipleComponent]
     public sealed class AudioVolumeBinding : MonoBehaviour

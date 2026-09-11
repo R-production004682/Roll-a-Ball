@@ -5,8 +5,7 @@ using UnityEngine.UI;
 namespace Roll_a_Ball.OutGame
 {
     /// <summary>
-    /// OutGameTestScene 内でゲームクリアを完結させるための状態だけを管理
-    /// UI 自体は OutGameTestScene に配置し、ここでは参照して表示／遷移を制御
+    /// OutGameTestScene 内でゲームクリアを完結させるための状態だけを管理し、UI の表示と遷移を制御
     /// </summary>
     public sealed class OutGameClearController : MonoBehaviour
     {
@@ -52,6 +51,7 @@ namespace Roll_a_Ball.OutGame
         {
             if (isCleared)
             {
+                Debug.LogWarning("クリア処理はすでに完了しています。", this);
                 return;
             }
 
@@ -68,6 +68,8 @@ namespace Roll_a_Ball.OutGame
             {
                 EventSystem.current.SetSelectedGameObject(titleButton.gameObject);
             }
+
+            Debug.Log("ゲームクリアを確定し、クリアダイアログを表示しました。", this);
         }
 
     }
