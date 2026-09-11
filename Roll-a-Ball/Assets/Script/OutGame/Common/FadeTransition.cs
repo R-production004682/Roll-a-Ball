@@ -7,7 +7,7 @@ using UnityEngine.UI;
 namespace Roll_a_Ball.OutGame
 {
     /// <summary>
-        /// アウトゲームの画面とシーンの切り替えを黒いフェードで覆う
+    /// アウトゲームの画面とシーンの切り替えを黒いフェードで覆う
     /// </summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Canvas))]
