@@ -1719,6 +1719,8 @@ GameObject:
   - component: {fileID: 2126029157494678703}
   - component: {fileID: 7847134832138521433}
   - component: {fileID: 6539743404977741969}
+  - component: {fileID: 7711901719799159905}
+  - component: {fileID: 3152399784816928309}
   m_Layer: 0
   m_Name: SettingsDialog
   m_TagString: Untagged
@@ -1785,6 +1787,46 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!225 &7711901719799159905
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3620473235989066659}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &3152399784816928309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3620473235989066659}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27fbeeaa8a0aaac46a65d17ef2bd413b, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Roll_a_Ball.OutGame.UiInputScope
+  firstSelected: {fileID: 2843743220819907879}
+  onCancel:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8000940056094106119}
+        m_TargetAssemblyTypeName: Roll_a_Ball.OutGame.SettingsDialogController, Assembly-CSharp
+        m_MethodName: Close
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName:
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument:
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &3868641234120805458
 GameObject:
   m_ObjectHideFlags: 0
@@ -3324,7 +3366,7 @@ MonoBehaviour:
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 1280, y: 720}
-  m_ScreenMatchMode: 0
+  m_ScreenMatchMode: 1
   m_MatchWidthOrHeight: 0.5
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96

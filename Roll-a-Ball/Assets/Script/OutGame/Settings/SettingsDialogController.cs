@@ -1,3 +1,4 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -23,6 +24,7 @@ namespace Roll_a_Ball.OutGame
 
         private GameObject previousSelection;
         private bool fromPause;
+        private bool confirmingDefaults;
         public bool IsOpen => dialog != null && dialog.activeSelf;
 
         /// <summary>
@@ -57,8 +59,16 @@ namespace Roll_a_Ball.OutGame
         private void OnDisable()
         {
             GameSettings.Changed -= RefreshValues;
-            if (previewSource != null) previewSource.Stop();
-            if (IsOpen) Close();
+            confirmingDefaults = false;
+            if (previewSource != null)
+            {
+                previewSource.Stop();
+            }
+
+            if (IsOpen)
+            {
+                Close();
+            }
         }
 
         /// <summary>
@@ -66,16 +76,15 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private void OnDestroy()
         {
-            if (bgmSlider != null) bgmSlider.onValueChanged.RemoveListener(GameSettings.SetBgmVolume);
-            if (seSlider != null) seSlider.onValueChanged.RemoveListener(GameSettings.SetSeVolume);
-        }
+            if (bgmSlider != null)
+            {
+                bgmSlider.onValueChanged.RemoveListener(GameSettings.SetBgmVolume);
+            }
 
-        /// <summary>
-        /// 表示中の Escape 入力で設定ダイアログを閉じる
-        /// </summary>
-        private void Update()
-        {
-            if (IsOpen && Input.GetKeyDown(KeyCode.Escape)) Close();
+            if (seSlider != null)
+            {
+                seSlider.onValueChanged.RemoveListener(GameSettings.SetSeVolume);
+            }
         }
 
         /// <summary>
@@ -94,6 +103,11 @@ namespace Roll_a_Ball.OutGame
         /// <param name="openedFromPause">ポーズ画面から開いた場合は true</param>
         private void Open(bool openedFromPause)
         {
+            if (!isActiveAndEnabled || UiInputScope.IsBlocked)
+            {
+                return;
+            }
+
             if (IsOpen)
             {
                 Debug.LogWarning("設定ダイアログはすでに開いています。", this);
@@ -104,13 +118,20 @@ namespace Roll_a_Ball.OutGame
             if (fromPause)
             {
                 OutGameStateController.Enter(GameFlowState.Paused);
-                if (pauseMenu != null) pauseMenu.SetActive(false);
+                if (pauseMenu != null)
+                {
+                    pauseMenu.SetActive(false);
+                }
             }
             backLabel.text = fromPause ? "BACK TO PAUSE" : "BACK TO STAGES";
             contextLabel.text = fromPause ? "GAME PAUSED  /  Test SE to preview your volume" : "MAKE YOURSELF COMFORTABLE";
             RefreshValues();
             dialog.SetActive(true);
-            if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(bgmSlider.gameObject);
+            if (EventSystem.current != null)
+            {
+                EventSystem.current.SetSelectedGameObject(bgmSlider.gameObject);
+            }
+
             Debug.Log(fromPause ? "ポーズ中の設定ダイアログを開きました。" : "設定ダイアログを開きました。", this);
         }
 
@@ -119,13 +140,28 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         public void Close()
         {
-            if (!IsOpen) return;
+            if (!IsOpen)
+            {
+                return;
+            }
+
+            if (isActiveAndEnabled && !dialog.GetComponent<UiInputScope>().CanReceiveInput)
+            {
+                return;
+            }
+
             GameSettings.Save();
             previewSource.Stop();
             dialog.SetActive(false);
-            if (fromPause && pauseMenu != null) pauseMenu.SetActive(true);
+            if (fromPause && pauseMenu != null)
+            {
+                pauseMenu.SetActive(true);
+            }
+
             if (EventSystem.current != null)
+            {
                 EventSystem.current.SetSelectedGameObject(previousSelection != null && previousSelection.activeInHierarchy ? previousSelection : null);
+            }
 
             previousSelection = null;
             Debug.Log("設定ダイアログを閉じ、設定を保存しました。", this);
@@ -156,9 +192,59 @@ namespace Roll_a_Ball.OutGame
         }
 
         /// <summary>
-        /// 設定値を既定値へ戻す
+        /// 共通確認ダイアログの結果を待ち、了承された場合だけ既定値へ戻す
         /// </summary>
-        public void RestoreDefaults() => GameSettings.RestoreDefaults();
+        public void RestoreDefaults()
+        {
+            if (!IsOpen || confirmingDefaults || !dialog.GetComponent<UiInputScope>().CanReceiveInput)
+            {
+                return;
+            }
+
+            var screenManager = GameServices.Screens;
+            if (screenManager == null)
+            {
+                Debug.LogError("設定の確認ダイアログに必要な ScreenManager がありません。", this);
+                return;
+            }
+
+            confirmingDefaults = true;
+            StartCoroutine(WaitForDefaultsConfirmation(screenManager));
+        }
+
+        /// <summary>
+        /// 確認 Task の完了状態を監視し、成功時だけ既定値を適用する
+        /// </summary>
+        /// <param name="screenManager">確認ダイアログを表示する ScreenManager</param>
+        /// <returns>確認結果が確定するまで待機する Coroutine</returns>
+        private IEnumerator WaitForDefaultsConfirmation(ScreenManager screenManager)
+        {
+            var confirmation = screenManager.ShowDialogAsync<ConfirmDialog, bool>("Restore default audio settings?");
+            while (!confirmation.IsCompleted)
+            {
+                yield return null;
+            }
+
+            if (confirmation.IsCanceled)
+            {
+                confirmingDefaults = false;
+                yield break;
+            }
+
+            if (confirmation.IsFaulted)
+            {
+                Debug.LogError($"設定の確認処理に失敗しました: {confirmation.Exception}", this);
+                confirmingDefaults = false;
+                yield break;
+            }
+
+            if (confirmation.Result && this != null && IsOpen)
+            {
+                GameSettings.RestoreDefaults();
+            }
+
+            confirmingDefaults = false;
+        }
 
         /// <summary>
         /// GameSettings の値をスライダー、ラベル、試聴音へ反映する
@@ -183,22 +269,36 @@ namespace Roll_a_Ball.OutGame
         /// <returns>必須参照がすべて設定されている場合は true</returns>
         private bool ValidateReferences()
         {
-            var isValid = dialog != null && bgmSlider != null && seSlider != null &&
-                bgmValue != null && seValue != null && backLabel != null &&
-                contextLabel != null && previewSource != null;
+            var missingReferences = SettingsDialogAlgorithm.GetMissingReferences(
+                dialog,
+                bgmSlider,
+                seSlider,
+                bgmValue,
+                seValue,
+                backLabel,
+                contextLabel,
+                previewSource);
 
-            if (!isValid)
+            if (missingReferences.Count > 0)
             {
-                Debug.LogError("SettingsDialogController の UI 参照が不足しています。", this);
+                var missingReferenceNames = string.Join(", ", missingReferences);
+                Debug.LogError($"SettingsDialogController の UI 参照が不足しています: {missingReferenceNames}", this);
+                return false;
             }
 
-            return isValid;
+            return true;
         }
 
         /// <summary>
         /// アプリがバックグラウンドへ移るとき設定を保存する
         /// </summary>
-        private void OnApplicationPause(bool paused) { if (paused) GameSettings.Save(); }
+        private void OnApplicationPause(bool paused)
+        {
+            if (paused)
+            {
+                GameSettings.Save();
+            }
+        }
 
         /// <summary>
         /// アプリ終了時に設定を保存する

@@ -31,7 +31,7 @@ namespace Roll_a_Ball.OutGame
         /// <returns>読み込みを開始できた場合は true</returns>
         public static bool LoadScene(string scenePath, Object context)
         {
-            if (transitionRequested || FadeTransition.IsTransitioning || currentLoadOperation != null && !currentLoadOperation.isDone)
+            if (transitionRequested || UiInputScope.IsBlocked || currentLoadOperation != null && !currentLoadOperation.isDone)
             {
                 Debug.LogWarning("シーン遷移はすでに実行中です。", context);
                 return false;

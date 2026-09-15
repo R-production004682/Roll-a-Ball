@@ -22,6 +22,7 @@ namespace Roll_a_Ball.OutGame
             }
 
             backButton.onClick.AddListener(ReturnToStages);
+            GetComponent<UiInputScope>().CancelRequested.AddListener(ReturnToStages);
             backButton.Select();
             Debug.Log("ShopScreen を表示しました。", this);
         }
@@ -31,6 +32,7 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         public override void OnClose()
         {
+            GetComponent<UiInputScope>().CancelRequested.RemoveListener(ReturnToStages);
             if (backButton != null)
             {
                 backButton.onClick.RemoveListener(ReturnToStages);
@@ -42,6 +44,11 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private void ReturnToStages()
         {
+            if (!GetComponent<UiInputScope>().CanReceiveInput)
+            {
+                return;
+            }
+
             if (GameServices.Screens != null)
             {
                 GameServices.Screens.Replace<StageSelectScreen>();

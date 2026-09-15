@@ -15,6 +15,7 @@ namespace Roll_a_Ball.OutGame
         private static void ResetRuntimeState()
         {
             Current = GameFlowState.Menu;
+            HasState = false;
             Time.timeScale = 1f;
             AudioListener.pause = false;
             Cursor.lockState = CursorLockMode.None;
@@ -33,6 +34,11 @@ namespace Roll_a_Ball.OutGame
         public static bool IsPlaying => Current == GameFlowState.Playing;
 
         /// <summary>
+        /// シーンの Controller が状態を設定済みかを示し、Player 単独のテストシーンを区別する
+        /// </summary>
+        internal static bool HasState { get; private set; }
+
+        /// <summary>
         /// ゲーム進行状態が変更されたときに通知するイベント
         /// </summary>
         public static event Action<GameFlowState> StateChanged;
@@ -49,6 +55,7 @@ namespace Roll_a_Ball.OutGame
                 return;
             }
 
+            HasState = true;
             if (Current == state)
             {
                 ApplyRuntimeState(state);
@@ -68,13 +75,21 @@ namespace Roll_a_Ball.OutGame
         /// <param name="state">反映するゲーム進行状態</param>
         private static void ApplyRuntimeState(GameFlowState state)
         {
-            var isPlaying = state == GameFlowState.Playing;
             var isStopped = state == GameFlowState.Paused || state == GameFlowState.Cleared;
 
             Time.timeScale = isStopped ? 0f : 1f;
             AudioListener.pause = isStopped;
-            Cursor.lockState = isPlaying ? CursorLockMode.Locked : CursorLockMode.None;
-            Cursor.visible = !isPlaying;
+            RefreshCursor();
+        }
+
+        /// <summary>
+        /// 進行状態と UI の有無に応じてカーソルだけを反映し、時間やポーズ状態を変更しない
+        /// </summary>
+        internal static void RefreshCursor()
+        {
+            var capture = IsPlaying && !UiInputScope.HasOpenUi && !UiInputScope.IsBlocked;
+            Cursor.lockState = capture ? CursorLockMode.Locked : CursorLockMode.None;
+            Cursor.visible = !capture;
         }
 
         /// <summary>

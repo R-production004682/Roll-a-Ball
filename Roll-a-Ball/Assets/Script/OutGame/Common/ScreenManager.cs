@@ -20,6 +20,8 @@ namespace Roll_a_Ball.OutGame
         private bool changing;
         private Transform stagingRoot;
         private ScreenBase pendingScreen;
+        private ScreenBase openingScreen;
+        private Action pendingCompletion;
 
         /// <summary>
         /// ScreenRoot を補完し、現在のシーンへ Manager を登録する
@@ -57,14 +59,15 @@ namespace Roll_a_Ball.OutGame
             if (initialScreen != null && stack.Count == 0)
             {
                 var screen = Create(initialScreen.GetType());
-                if (screen != null) CommitReplacement(screen, null);
+                if (screen != null)
+                {
+                    CommitReplacement(screen, null);
+                }
+
                 return;
             }
 
-            if (initialScreen == null)
-            {
-                Debug.LogWarning("初期 Screen が未設定です。必要な画面を明示的に Replace してください。", this);
-            }
+            // 初期 Screen なしのホストは既存 UI 上へ Dialog だけを表示する。
         }
 
         /// <summary>
@@ -72,6 +75,7 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private void OnDestroy()
         {
+            changing = true;
             if (pendingScreen != null && pendingScreen != initialScreen)
             {
                 Destroy(pendingScreen.gameObject);
@@ -135,7 +139,7 @@ namespace Roll_a_Ball.OutGame
                 return;
             }
 
-            if (changing || FadeTransition.IsTransitioning)
+            if (changing || UiInputScope.IsBlocked)
             {
                 Debug.LogWarning("画面遷移中のため Pop を無視しました。", this);
                 return;
@@ -193,13 +197,32 @@ namespace Roll_a_Ball.OutGame
             if (stack.Count == 0 || stack[stack.Count - 1] != dialog)
             {
                 Debug.LogError("最上位ではない Dialog から完了通知を受け取りました。", this);
-                dialog.Cancel();
                 return;
             }
 
-            stack.RemoveAt(stack.Count - 1);
-            dialog.SetResult(result);
-            CloseAndDestroy(dialog);
+            if (openingScreen == dialog)
+            {
+                pendingCompletion = () => CompleteDialog(dialog, result);
+                return;
+            }
+
+            if (changing || UiInputScope.IsBlocked)
+            {
+                Debug.LogWarning($"処理中のため Dialog の完了を無視しました: {dialog.name}", this);
+                return;
+            }
+
+            changing = true;
+            try
+            {
+                stack.RemoveAt(stack.Count - 1);
+                dialog.SetResult(result);
+                CloseAndDestroy(dialog);
+            }
+            finally
+            {
+                changing = false;
+            }
             Debug.Log($"Dialog を結果確定で閉じました: {dialog.GetType().Name}", this);
         }
 
@@ -217,14 +240,18 @@ namespace Roll_a_Ball.OutGame
                 return null;
             }
 
-            if (changing || FadeTransition.IsTransitioning)
+            if (changing || UiInputScope.IsBlocked)
             {
                 Debug.LogWarning($"画面遷移中のため Replace を無視しました: {type.Name}", this);
                 return null;
             }
 
             var screen = Create(type);
-            if (screen == null) return null;
+            if (screen == null)
+            {
+                return null;
+            }
+
 
             changing = true;
             pendingScreen = screen;
@@ -236,7 +263,11 @@ namespace Roll_a_Ball.OutGame
             else if (screenTransition == null || !screenTransition.Play(
                 () => CommitReplacement(screen, arg), () => changing = false))
             {
-                if (screen != initialScreen) Destroy(screen.gameObject);
+                if (screen != initialScreen)
+                {
+                    Destroy(screen.gameObject);
+                }
+
                 pendingScreen = null;
                 changing = false;
                 Debug.LogError($"画面フェードを開始できません: {type.Name}", this);
@@ -250,7 +281,11 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private void CommitReplacement(ScreenBase screen, object arg)
         {
-            if (this == null || screen == null) return;
+            if (this == null || screen == null)
+            {
+                return;
+            }
+
             CloseAll();
             screen.transform.SetParent(screenRoot, false);
             screen.gameObject.SetActive(true);
@@ -279,9 +314,15 @@ namespace Roll_a_Ball.OutGame
                 return null;
             }
 
-            if (changing || FadeTransition.IsTransitioning)
+            if (changing || UiInputScope.IsBlocked)
             {
                 Debug.LogWarning($"画面遷移中のため Push を無視しました: {type.Name}", this);
+                return null;
+            }
+
+            if (stack.Any(candidate => candidate != null && candidate.GetType() == type))
+            {
+                Debug.LogWarning($"表示済みの Screen を重複して追加できません: {type.Name}", this);
                 return null;
             }
 
@@ -307,6 +348,9 @@ namespace Roll_a_Ball.OutGame
             {
                 changing = false;
             }
+            var complete = pendingCompletion;
+            pendingCompletion = null;
+            complete?.Invoke();
             Debug.Log(screen != null ? $"画面を追加しました: {type.Name}" : $"画面を追加できませんでした: {type.Name}", this);
             return screen;
         }
@@ -329,16 +373,16 @@ namespace Roll_a_Ball.OutGame
                 return null;
             }
 
-            var prefab = screenPrefabs.FirstOrDefault(candidate => candidate != null && candidate.GetType() == type);
-            if (prefab == null)
+            var matches = screenPrefabs.Where(candidate => candidate != null && candidate.GetType() == type).ToArray();
+            if (matches.Length != 1)
             {
-                Debug.LogError($"Screen prefab が登録されていません: {type.Name}", this);
+                Debug.LogError($"Screen prefab は型ごとに一つ登録してください: {type.Name} (登録数: {matches.Length})", this);
                 return null;
             }
 
             try
             {
-                return Instantiate(prefab, stagingRoot);
+                return Instantiate(matches[0], stagingRoot);
             }
             catch (Exception exception)
             {
@@ -362,13 +406,19 @@ namespace Roll_a_Ball.OutGame
                     dialog.PrepareForOpen(this);
                 }
 
+                openingScreen = screen;
                 screen.OnOpen(arg);
                 return true;
             }
             catch (Exception exception)
             {
                 Debug.LogError($"Screen の OnOpen に失敗しました: {screen.GetType().Name}\n{exception}", screen);
+                pendingCompletion = null;
                 return false;
+            }
+            finally
+            {
+                openingScreen = null;
             }
         }
 
