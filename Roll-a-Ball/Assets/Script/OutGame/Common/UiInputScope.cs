@@ -25,11 +25,29 @@ namespace Roll_a_Ball.OutGame
         private CanvasGroup canvasGroup;
         private GameObject lastSelection;
 
+        /// <summary>
+        /// 登録中の入力範囲が一つ以上あるか
+        /// </summary>
         public static bool HasOpenUi => scopes.Count > 0;
+
+        /// <summary>
+        /// 入力ロックまたは画面遷移によって UI 入力が遮断されているか
+        /// </summary>
         public static bool IsBlocked => inputLocks.Count > 0 || FadeTransition.IsTransitioning;
+
+        /// <summary>
+        /// 開いている UI、入力ロック、または Cancel 処理中のフレームにプレイヤー入力を遮断するか
+        /// </summary>
         public static bool BlocksPlayer => HasOpenUi || IsBlocked || cancelFrame == Time.frameCount;
-        public bool CanReceiveInput => isActiveAndEnabled && !IsBlocked &&
-            scopes.Count > 0 && scopes[scopes.Count - 1] == this;
+
+        /// <summary>
+        /// この入力範囲が有効で、遮断されておらず、最前面にあるため入力を受け付けられるか
+        /// </summary>
+        public bool CanReceiveInput => isActiveAndEnabled && !IsBlocked && scopes.Count > 0 && scopes[scopes.Count - 1] == this;
+
+        /// <summary>
+        /// 最前面の UI からのキャンセル要求イベント
+        /// </summary>
         public UnityEvent CancelRequested => onCancel;
 
         /// <summary>
