@@ -60,20 +60,6 @@ namespace Roll_a_Ball.OutGame
         private void OnEnable() => GameSettings.Changed += RefreshValues;
 
         /// <summary>
-        /// アウトゲームのメニューで ESC が押されたとき設定ダイアログを開く
-        /// </summary>
-        private void Update()
-        {
-            if (!Input.GetKeyDown(KeyCode.Escape) || IsOpen || UiInputScope.IsBlocked ||
-                OutGameStateController.Current != GameFlowState.Menu)
-            {
-                return;
-            }
-
-            OpenFromStageSelect();
-        }
-
-        /// <summary>
         /// 設定値の変更通知を解除し、試聴音と表示を後始末する
         /// </summary>
         private void OnDisable()
@@ -147,7 +133,6 @@ namespace Roll_a_Ball.OutGame
             contextLabel.text = fromPause ? "GAME PAUSED  /  Test SE to preview your volume" : "MAKE YOURSELF COMFORTABLE";
             RefreshValues();
             dialog.SetActive(true);
-            UiInputScope.ConsumeCancelForCurrentFrame();
             if (EventSystem.current != null)
             {
                 EventSystem.current.SetSelectedGameObject(bgmSlider.gameObject);
