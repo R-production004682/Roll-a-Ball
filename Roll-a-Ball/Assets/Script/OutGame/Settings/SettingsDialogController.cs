@@ -26,6 +26,7 @@ namespace Roll_a_Ball.OutGame
         private UiInputScope dialogInputScope;
         private bool fromPause;
         private bool confirmingDefaults;
+
         /// <summary>
         /// 設定ダイアログが表示中か
         /// </summary>
