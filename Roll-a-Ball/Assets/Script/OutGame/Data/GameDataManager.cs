@@ -151,6 +151,36 @@ namespace Roll_a_Ball.OutGame
         }
 
         /// <summary>
+        /// 解放済みステージをクリア済みにして保存する
+        /// </summary>
+        /// <param name="stageId">クリアしたステージを識別する安定 ID</param>
+        /// <returns>クリア済み、または新たに保存できた場合は true</returns>
+        public static bool TryMarkStageCleared(string stageId)
+        {
+            EnsureInitialized();
+            if (string.IsNullOrWhiteSpace(stageId))
+            {
+                return false;
+            }
+
+            var currentStage = FindStage(stageId);
+            if (currentStage == null || !currentStage.isUnlocked)
+            {
+                return false;
+            }
+
+            if (currentStage.isCleared)
+            {
+                return true;
+            }
+
+            var candidate = GameDataAlgorithm.Clone(saveData);
+            var candidateStage = FindStage(candidate, stageId);
+            candidateStage.isCleared = true;
+            return TryCommit(candidate);
+        }
+
+        /// <summary>
         /// 指定したステージを解放して保存する
         /// </summary>
         /// <param name="stageId">解放するステージの安定 ID</param>

@@ -13,7 +13,7 @@
 
 セーブは `Application.persistentDataPath/roll-a-ball-save.json` に保存し、版番号は `GameSaveData.CurrentVersion` が管理します。置換前のファイルは `.backup` に残します。正常な変更はその都度保存します。
 
-ステージの順序やクリア報酬額は定義していません。ゲーム進行側が `UnlockStage` で解放し、報酬がある場合は `TryAddCurrency` を呼び出してください。`OutGameClearController` は Inspector の `stageId`（既定 `stage-1`）でクリアとタイムを記録します。
+ステージの順序やクリア報酬額は定義していません。ゲーム進行側が `UnlockStage` で解放し、報酬がある場合は `TryAddCurrency` を呼び出してください。インゲームの Goal 到達時は `TryMarkStageCleared(stageId)` を呼び、タイムも記録する場合だけ `RecordStageClear(stageId, clearTimeSeconds, out rank)` を使用します。
 
 保存が破損している場合や未対応の版の場合は初期値で動作し、既存ファイルへの書き込みを止めます。`HasLoadFailure` で状態を確認できます。`ResetToDefaults` はゲーム進行データを明示的に初期化し、既存ファイルを `.backup` に退避します。
 
@@ -31,6 +31,7 @@ if (GameDataManager.TryPurchaseItem("skin.red", 50, out balance))
 }
 
 GameDataManager.UnlockStage("stage-2");
+GameDataManager.TryMarkStageCleared("stage-2");
 if (GameDataManager.RecordStageClear("stage-2", 42.5f, out var rank))
 {
     Debug.Log($"クリア記録の順位: {rank}");
