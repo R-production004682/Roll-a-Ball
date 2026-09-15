@@ -5,7 +5,7 @@ using UnityEngine.UI;
 namespace Roll_a_Ball.OutGame
 {
     /// <summary>
-    /// OutGameTestScene 内でゲームクリアを完結させるための状態だけを管理し、UI の表示と遷移を制御
+    /// ステージのクリア記録を保存し、結果 UI の表示と遷移を制御
     /// </summary>
     public sealed class OutGameClearController : MonoBehaviour
     {
@@ -13,7 +13,10 @@ namespace Roll_a_Ball.OutGame
 
         [SerializeField] private GameObject clearDialog;
         [SerializeField] private Button titleButton;
+        [SerializeField, Tooltip("ステージ進行データとクリア記録に使う安定 ID")]
+        private string stageId = GameDataManager.InitialStageId;
         private UiInputScope clearInputScope;
+        private float elapsedPlayTimeSeconds;
 
         // ゲームクリア状態かどうかを記録するフラグ
         private bool isCleared;
@@ -23,6 +26,12 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private void Awake()
         {
+            if (string.IsNullOrWhiteSpace(stageId))
+            {
+                Debug.LogError("OutGameClearController のステージ ID が未設定です。初期ステージ ID を使用します。", this);
+                stageId = GameDataManager.InitialStageId;
+            }
+
             clearInputScope = clearDialog != null ? clearDialog.GetComponent<UiInputScope>() : null;
             if (clearDialog != null)
             {
@@ -62,7 +71,13 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private void Update()
         {
-            if (OutGameStateController.IsPlaying && !UiInputScope.BlocksPlayer && Input.GetKeyDown(ClearKey))
+            if (!OutGameStateController.IsPlaying)
+            {
+                return;
+            }
+
+            elapsedPlayTimeSeconds += Time.deltaTime;
+            if (!UiInputScope.BlocksPlayer && Input.GetKeyDown(ClearKey))
             {
                 MarkClear();
             }
@@ -80,6 +95,10 @@ namespace Roll_a_Ball.OutGame
             }
 
             isCleared = true;
+            GameDataManager.RecordStageClear(
+                stageId,
+                elapsedPlayTimeSeconds,
+                out _);
 
             OutGameStateController.Enter(GameFlowState.Cleared);
 
