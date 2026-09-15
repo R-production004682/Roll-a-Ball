@@ -24,6 +24,9 @@ namespace Roll_a_Ball.OutGame
 
         private CanvasGroup canvasGroup;
         private Coroutine runningRoutine;
+        private EventSystem transitionEventSystem;
+        private bool navigationWasEnabled;
+        private Action transitionFinished;
 
         /// <summary>
         /// 画面またはシーンのフェード中かどうかを取得する
@@ -36,7 +39,10 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private void Awake()
         {
-            if (!EnsureVisuals()) enabled = false;
+            if (!EnsureVisuals())
+            {
+                enabled = false;
+            }
         }
 
         /// <summary>
@@ -54,16 +60,20 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private void OnDestroy()
         {
-            if (runningRoutine != null)
-            {
-                StopCoroutine(runningRoutine);
-                runningRoutine = null;
-            }
+            StopRunningRoutine();
 
             if (persistentInstance == this)
             {
                 persistentInstance = null;
             }
+        }
+
+        /// <summary>
+        /// 無効化時に実行中の遷移を停止し、入力状態を復元する
+        /// </summary>
+        private void OnDisable()
+        {
+            StopRunningRoutine();
         }
 
         /// <summary>
@@ -239,35 +249,67 @@ namespace Roll_a_Ball.OutGame
         {
             if (runningRoutine != null)
             {
-                StopCoroutine(runningRoutine);
+                StopRunningRoutine();
             }
 
             IsTransitioning = true;
-            runningRoutine = StartCoroutine(RunRoutine(routine, onFinished));
+            transitionEventSystem = EventSystem.current;
+            navigationWasEnabled = transitionEventSystem != null && transitionEventSystem.sendNavigationEvents;
+            transitionFinished = onFinished;
+            if (transitionEventSystem != null)
+            {
+                transitionEventSystem.sendNavigationEvents = false;
+            }
+
+            runningRoutine = StartCoroutine(RunRoutine(routine));
         }
 
         /// <summary>
-        /// フェード中のナビゲーション入力を止め、終了時に入力と共有状態を復元する
+        /// フェード処理の完了時に共有状態と入力を復元する
         /// </summary>
         /// <param name="routine">実行するコルーチン</param>
-        /// <param name="onFinished">入力と共有状態を復元した後の通知</param>
-        private IEnumerator RunRoutine(IEnumerator routine, Action onFinished)
+        private IEnumerator RunRoutine(IEnumerator routine)
         {
-            var eventSystem = EventSystem.current;
-            var navigationEnabled = eventSystem != null && eventSystem.sendNavigationEvents;
-            try
+            yield return routine;
+            CompleteRoutine();
+        }
+
+        /// <summary>
+        /// 遷移終了時にレイキャスト、ナビゲーション、共有状態を復元し完了通知を送る
+        /// </summary>
+        private void CompleteRoutine()
+        {
+            if (transitionEventSystem != null)
             {
-                if (eventSystem != null) eventSystem.sendNavigationEvents = false;
-                yield return routine;
+                transitionEventSystem.sendNavigationEvents = navigationWasEnabled;
             }
-            finally
+
+            if (canvasGroup != null)
             {
-                if (eventSystem != null) eventSystem.sendNavigationEvents = navigationEnabled;
-                if (canvasGroup != null) canvasGroup.blocksRaycasts = false;
-                runningRoutine = null;
-                IsTransitioning = false;
-                onFinished?.Invoke();
+                canvasGroup.blocksRaycasts = false;
             }
+
+            runningRoutine = null;
+            transitionEventSystem = null;
+            navigationWasEnabled = false;
+            IsTransitioning = false;
+            var callback = transitionFinished;
+            transitionFinished = null;
+            callback?.Invoke();
+        }
+
+        /// <summary>
+        /// 実行中のコルーチンを停止し、停止経路でも遷移状態を復元する
+        /// </summary>
+        private void StopRunningRoutine()
+        {
+            if (runningRoutine == null)
+            {
+                return;
+            }
+
+            StopCoroutine(runningRoutine);
+            CompleteRoutine();
         }
 
         /// <summary>
@@ -284,6 +326,7 @@ namespace Roll_a_Ball.OutGame
             }
             catch (Exception exception)
             {
+                // 遷移を要求した画面の失敗を記録し、フェードアウトは続ける。
                 Debug.LogError($"暗転中のフェードコールバックに失敗しました\n{exception}", this);
             }
             yield return FadeAlpha(1f, 0f);
@@ -310,6 +353,7 @@ namespace Roll_a_Ball.OutGame
             }
             catch (Exception exception)
             {
+                // SceneRouter から渡されたローダーの失敗を記録し、失敗結果として後続を実行する。
                 Debug.LogError($"シーンの読み込み開始に失敗しました: {scenePath}\n{exception}", context);
             }
 
@@ -333,6 +377,7 @@ namespace Roll_a_Ball.OutGame
             }
             catch (Exception exception)
             {
+                // SceneRouter の完了処理失敗を記録し、フェードの終了処理を続ける。
                 Debug.LogError($"シーンのフェード完了コールバックに失敗しました: {scenePath}\n{exception}", context);
             }
             yield return FadeAlpha(1f, 0f);
