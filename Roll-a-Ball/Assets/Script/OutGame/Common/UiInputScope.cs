@@ -73,6 +73,14 @@ namespace Roll_a_Ball.OutGame
         }
 
         /// <summary>
+        /// 現在フレームの Cancel を処理済みにし、有効化直後の UI が同じ入力で閉じることを防ぐ
+        /// </summary>
+        public static void ConsumeCancelForCurrentFrame()
+        {
+            cancelFrame = Time.frameCount;
+        }
+
+        /// <summary>
         /// 表示された入力範囲を最前面へ登録し、直前のフォーカスを保持する
         /// </summary>
         private void OnEnable()

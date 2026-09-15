@@ -147,6 +147,7 @@ namespace Roll_a_Ball.OutGame
             contextLabel.text = fromPause ? "GAME PAUSED  /  Test SE to preview your volume" : "MAKE YOURSELF COMFORTABLE";
             RefreshValues();
             dialog.SetActive(true);
+            UiInputScope.ConsumeCancelForCurrentFrame();
             if (EventSystem.current != null)
             {
                 EventSystem.current.SetSelectedGameObject(bgmSlider.gameObject);
