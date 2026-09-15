@@ -70,7 +70,6 @@ namespace Roll_a_Ball.OutGame
                 return false;
             }
 
-            Debug.Log($"シーン遷移を開始しました: {scenePath}", context);
             return true;
         }
     }

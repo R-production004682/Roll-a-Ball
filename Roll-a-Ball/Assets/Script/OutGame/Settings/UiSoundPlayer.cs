@@ -10,18 +10,45 @@ namespace Roll_a_Ball.OutGame
         private static UiSoundPlayer instance;
         private AudioSource source;
 
-        private void OnEnable() => GameSettings.Changed += ApplyVolume;
-        private void OnDisable() => GameSettings.Changed -= ApplyVolume;
-        private void ApplyVolume()
+        /// <summary>
+        /// 音量変更の購読を開始する
+        /// </summary>
+        private void OnEnable()
         {
-            if (source != null) source.volume = GameSettings.SeVolume;
+            GameSettings.Changed += ApplyVolume;
         }
 
+        /// <summary>
+        /// 音量変更の購読を解除する
+        /// </summary>
+        private void OnDisable()
+        {
+            GameSettings.Changed -= ApplyVolume;
+        }
+
+        /// <summary>
+        /// 共通 SE 音量を AudioSource へ反映する
+        /// </summary>
+        private void ApplyVolume()
+        {
+            if (source != null)
+            {
+                source.volume = GameSettings.SeVolume;
+            }
+        }
+
+        /// <summary>
+        /// シーンをまたいで共有する UI 効果音プレイヤーを取得する
+        /// </summary>
         private static UiSoundPlayer Instance
         {
             get
             {
-                if (instance != null) return instance;
+                if (instance != null)
+                {
+                    return instance;
+                }
+
                 var playerObject = new GameObject("UI Sound Player");
                 DontDestroyOnLoad(playerObject);
                 instance = playerObject.AddComponent<UiSoundPlayer>();
@@ -29,6 +56,9 @@ namespace Roll_a_Ball.OutGame
             }
         }
 
+        /// <summary>
+        /// UI 効果音用の AudioSource を初期化する
+        /// </summary>
         private void Awake()
         {
             if (instance != null && instance != this)
@@ -44,9 +74,17 @@ namespace Roll_a_Ball.OutGame
             source.ignoreListenerPause = true;
         }
 
+        /// <summary>
+        /// 指定された UI 効果音を現在の SE 音量で再生する
+        /// </summary>
+        /// <param name="clip">再生する効果音</param>
         public static void Play(AudioClip clip)
         {
-            if (clip == null) return;
+            if (clip == null)
+            {
+                return;
+            }
+
             Instance.source.volume = GameSettings.SeVolume;
             Instance.source.PlayOneShot(clip);
         }

@@ -32,12 +32,18 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private void OnDestroy()
         {
-            if (button != null) button.onClick.RemoveListener(Play);
+            if (button != null)
+            {
+                button.onClick.RemoveListener(Play);
+            }
         }
 
         /// <summary>
         /// 設定された効果音を UI 用プレイヤーへ渡す
         /// </summary>
-        private void Play() => UiSoundPlayer.Play(clickSound);
+        private void Play()
+        {
+            UiSoundPlayer.Play(clickSound);
+        }
     }
 }
