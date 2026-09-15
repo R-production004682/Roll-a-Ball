@@ -7,6 +7,9 @@ namespace Roll_a_Ball.OutGame.Editor
     [CustomPropertyDrawer(typeof(SceneReference))]
     public sealed class SceneReferenceDrawer : PropertyDrawer
     {
+        /// <summary>
+        /// SceneReference を Scene アセット選択欄として描画する
+        /// </summary>
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             var pathProperty = property.FindPropertyRelative("scenePath");
@@ -29,16 +32,28 @@ namespace Roll_a_Ball.OutGame.Editor
         }
     }
 
-    /// <summary>Scene の移動・改名後も、ビルドに含める遷移パスを最新にする。</summary>
+    /// <summary>
+    /// Scene の移動・改名後も、ビルドに含める遷移パスを最新にする
+    /// </summary>
     public sealed class SceneReferenceBuildProcessor : UnityEditor.Build.IProcessSceneWithReport
     {
+        /// <summary>
+        /// Scene パス同期の実行順序を返す
+        /// </summary>
         public int callbackOrder => 0;
 
+        /// <summary>
+        /// ビルド対象 Scene の遷移先パスを最新化する
+        /// </summary>
         public void OnProcessScene(UnityEngine.SceneManagement.Scene scene, UnityEditor.Build.Reporting.BuildReport report)
         {
             foreach (var root in scene.GetRootGameObjects())
+            {
                 foreach (var button in root.GetComponentsInChildren<SceneTransitionButton>(true))
+                {
                     button.SynchronizeDestination();
+                }
+            }
         }
     }
 }

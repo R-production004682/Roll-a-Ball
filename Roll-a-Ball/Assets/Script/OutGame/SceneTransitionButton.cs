@@ -18,12 +18,18 @@ namespace Roll_a_Ball.OutGame
         /// <summary>
         /// Inspector で SceneReference のパスを最新化する
         /// </summary>
-        private void OnValidate() => SynchronizeDestination();
+        private void OnValidate()
+        {
+            SynchronizeDestination();
+        }
 
         /// <summary>
         /// SceneReference の保存パスを同期する
         /// </summary>
-        public void SynchronizeDestination() => destination.SynchronizePath();
+        public void SynchronizeDestination()
+        {
+            destination.SynchronizePath();
+        }
 #endif
 
         /// <summary>
@@ -40,7 +46,10 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private void OnDestroy()
         {
-            if (button != null) button.onClick.RemoveListener(LoadDestination);
+            if (button != null)
+            {
+                button.onClick.RemoveListener(LoadDestination);
+            }
         }
 
         /// <summary>

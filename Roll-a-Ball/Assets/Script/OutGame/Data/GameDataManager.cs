@@ -419,27 +419,11 @@ namespace Roll_a_Ball.OutGame
         }
 
         /// <summary>
-        /// 購読者ごとに変更を通知し、一つの通知先の失敗で後続を止めない
+        /// 購読者へゲームデータの変更を通知する
         /// </summary>
         private static void NotifyChanged()
         {
-            if (Changed == null)
-            {
-                return;
-            }
-
-            foreach (var callback in Changed.GetInvocationList())
-            {
-                try
-                {
-                    ((Action)callback)();
-                }
-                catch (Exception exception)
-                {
-                    // 保存済みデータの変更を維持し、問題のある購読者を特定する。
-                    Debug.LogError($"GameDataManager.Changed の通知先で例外が発生しました。{Environment.NewLine}{exception}");
-                }
-            }
+            Changed?.Invoke();
         }
 
         /// <summary>

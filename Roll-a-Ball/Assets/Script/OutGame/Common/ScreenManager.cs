@@ -48,7 +48,6 @@ namespace Roll_a_Ball.OutGame
             stagingObject.transform.SetParent(transform, false);
             stagingObject.SetActive(false);
             stagingRoot = stagingObject.transform;
-            Debug.Log("ScreenManager を登録しました。", this);
         }
 
         /// <summary>
@@ -151,7 +150,6 @@ namespace Roll_a_Ball.OutGame
             CloseAndDestroy(current);
             changing = false;
 
-            Debug.Log($"画面を閉じました: {current.GetType().Name}", this);
         }
 
         /// <summary>
@@ -211,7 +209,6 @@ namespace Roll_a_Ball.OutGame
             dialog.SetResult(result);
             CloseAndDestroy(dialog);
             changing = false;
-            Debug.Log($"Dialog を結果確定で閉じました: {dialog.GetType().Name}", this);
         }
 
         /// <summary>
@@ -285,7 +282,6 @@ namespace Roll_a_Ball.OutGame
                 CloseAndDestroy(screen);
                 return;
             }
-            Debug.Log($"画面を切り替えました: {screen.GetType().Name}", this);
         }
 
         /// <summary>
@@ -333,7 +329,6 @@ namespace Roll_a_Ball.OutGame
             var complete = pendingCompletion;
             pendingCompletion = null;
             complete?.Invoke();
-            Debug.Log(screen != null ? $"画面を追加しました: {type.Name}" : $"画面を追加できませんでした: {type.Name}", this);
             return screen;
         }
 
@@ -366,33 +361,22 @@ namespace Roll_a_Ball.OutGame
         }
 
         /// <summary>
-        /// Screen.OnOpen を実行し、例外発生時に原因を記録する
+        /// Screen.OnOpen を実行する
         /// </summary>
         /// <param name="screen">開く Screen</param>
         /// <param name="arg">Screen に渡す表示引数</param>
         /// <returns>正常に開けた場合は true</returns>
         private bool OpenScreen(ScreenBase screen, object arg)
         {
-            try
+            if (screen is IDialog dialog)
             {
-                if (screen is IDialog dialog)
-                {
-                    dialog.PrepareForOpen(this);
-                }
+                dialog.PrepareForOpen(this);
+            }
 
-                openingScreen = screen;
-                screen.OnOpen(arg);
-                openingScreen = null;
-                return true;
-            }
-            catch (Exception exception)
-            {
-                // Screen 単体の初期化失敗を表示全体へ波及させず、生成した表示を Manager が閉じられるようにする。
-                openingScreen = null;
-                Debug.LogError($"Screen の OnOpen に失敗しました: {screen.GetType().Name}\n{exception}", screen);
-                pendingCompletion = null;
-                return false;
-            }
+            openingScreen = screen;
+            screen.OnOpen(arg);
+            openingScreen = null;
+            return true;
         }
 
         /// <summary>
@@ -419,27 +403,11 @@ namespace Roll_a_Ball.OutGame
                 return;
             }
 
-            try
-            {
-                screen.OnClose();
-            }
-            catch (Exception exception)
-            {
-                // OnClose の失敗後も Dialog のキャンセルと GameObject の破棄を続ける。
-                Debug.LogError($"Screen の OnClose に失敗しました: {screen.GetType().Name}\n{exception}", screen);
-            }
+            screen.OnClose();
 
             if (screen is IDialog dialog)
             {
-                try
-                {
-                    dialog.CancelForClose();
-                }
-                catch (Exception exception)
-                {
-                    // Dialog の後始末失敗で GameObject の破棄を止めない。
-                    Debug.LogError($"Dialog のキャンセル処理に失敗しました: {screen.GetType().Name}\n{exception}", screen);
-                }
+                dialog.CancelForClose();
             }
 
             screen.gameObject.SetActive(false);

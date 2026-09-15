@@ -27,7 +27,6 @@ namespace Roll_a_Ball.OutGame
                 return;
             }
 
-            Debug.Log($"初期 Screen を表示します: {initialScreen.GetType().Name}", this);
             screenManager.Replace(initialScreen.GetType());
         }
     }

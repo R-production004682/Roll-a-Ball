@@ -1,4 +1,3 @@
-using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,21 +12,37 @@ namespace Roll_a_Ball.OutGame
         [SerializeField] private TMP_Text messageText;
         [SerializeField] private Button okButton;
         [SerializeField] private Button cancelButton;
+        private UiInputScope inputScope;
+        private bool isReady;
 
         /// <summary>
-        /// 文字列の表示引数とボタン購読を設定し、必須参照不足では例外で表示を中止する
+        /// 必須の Inspector 参照を取得して検証する
+        /// </summary>
+        private void Awake()
+        {
+            inputScope = GetComponent<UiInputScope>();
+            isReady = messageText != null && okButton != null && cancelButton != null && inputScope != null;
+            if (!isReady)
+            {
+                Debug.LogError($"ConfirmDialog の参照が不足しています: {name}", this);
+            }
+        }
+
+        /// <summary>
+        /// 文字列の表示引数とボタン購読を設定する
         /// </summary>
         public override void OnOpen(object arg)
         {
-            if (messageText == null || okButton == null || cancelButton == null)
+            if (!isReady)
             {
-                throw new InvalidOperationException($"ConfirmDialog の参照が不足しています: {name}");
+                Complete(false);
+                return;
             }
 
             messageText.text = arg as string ?? "Are you sure?";
             okButton.onClick.AddListener(Accept);
             cancelButton.onClick.AddListener(Decline);
-            GetComponent<UiInputScope>().CancelRequested.AddListener(Decline);
+            inputScope.CancelRequested.AddListener(Decline);
         }
 
         /// <summary>
@@ -45,17 +60,26 @@ namespace Roll_a_Ball.OutGame
                 cancelButton.onClick.RemoveListener(Decline);
             }
 
-            GetComponent<UiInputScope>().CancelRequested.RemoveListener(Decline);
+            if (inputScope != null)
+            {
+                inputScope.CancelRequested.RemoveListener(Decline);
+            }
         }
 
         /// <summary>
         /// 最前面でのみ決定を所有 Manager へ渡す
         /// </summary>
-        private void Accept() => Complete(true);
+        private void Accept()
+        {
+            Complete(true);
+        }
 
         /// <summary>
         /// 最前面でのみ通常のキャンセル結果を所有 Manager へ渡す
         /// </summary>
-        private void Decline() => Complete(false);
+        private void Decline()
+        {
+            Complete(false);
+        }
     }
 }
