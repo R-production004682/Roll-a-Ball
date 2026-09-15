@@ -22,6 +22,9 @@ public class Coin : MonoBehaviour
             PlayerPrefs.SetInt("HasCoin", PlayerPrefs.GetInt("HasCoin", 0) + coinAmount);//所持コインにコインの金額を加算   
               coinAmount = 0;//コインの保有する金額を0にする
             PlayerPrefs.Save();//保存確定
+
+            Debug.Log("保存されたコイン：" + PlayerPrefs.GetInt("HasCoin", 0));//保存されているコインを確認
+
             Destroy(gameObject);//コイン消える
         }
 
