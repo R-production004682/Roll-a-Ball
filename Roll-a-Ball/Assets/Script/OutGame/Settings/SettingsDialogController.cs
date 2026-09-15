@@ -26,6 +26,10 @@ namespace Roll_a_Ball.OutGame
         private UiInputScope dialogInputScope;
         private bool fromPause;
         private bool confirmingDefaults;
+
+        /// <summary>
+        /// 設定ダイアログが表示中か
+        /// </summary>
         public bool IsOpen => dialog != null && dialog.activeSelf;
 
         /// <summary>
@@ -54,6 +58,20 @@ namespace Roll_a_Ball.OutGame
         /// 設定値の変更通知を購読する
         /// </summary>
         private void OnEnable() => GameSettings.Changed += RefreshValues;
+
+        /// <summary>
+        /// アウトゲームのメニューで ESC が押されたとき設定ダイアログを開く
+        /// </summary>
+        private void Update()
+        {
+            if (!Input.GetKeyDown(KeyCode.Escape) || IsOpen || UiInputScope.IsBlocked ||
+                OutGameStateController.Current != GameFlowState.Menu)
+            {
+                return;
+            }
+
+            OpenFromStageSelect();
+        }
 
         /// <summary>
         /// 設定値の変更通知を解除し、試聴音と表示を後始末する
