@@ -12,7 +12,10 @@ namespace Roll_a_Ball.OutGame
         /// <summary>
         /// ステージ選択用の OutGame 状態を初期化する
         /// </summary>
-        private void Awake() => OutGameStateController.Enter(GameFlowState.Menu);
+        private void Awake()
+        {
+            OutGameStateController.Enter(GameFlowState.Menu);
+        }
 
         /// <summary>
         /// ショップを別シーンへロードせず、現在の Canvas 上で切り替える

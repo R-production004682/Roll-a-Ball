@@ -320,15 +320,7 @@ namespace Roll_a_Ball.OutGame
         {
             canvasGroup.blocksRaycasts = true;
             yield return FadeAlpha(0f, 1f);
-            try
-            {
-                onCovered?.Invoke();
-            }
-            catch (Exception exception)
-            {
-                // 遷移を要求した画面の失敗を記録し、フェードアウトは続ける。
-                Debug.LogError($"暗転中のフェードコールバックに失敗しました\n{exception}", this);
-            }
+            onCovered?.Invoke();
             yield return FadeAlpha(1f, 0f);
             canvasGroup.blocksRaycasts = false;
         }
@@ -345,17 +337,8 @@ namespace Roll_a_Ball.OutGame
             canvasGroup.blocksRaycasts = true;
             yield return FadeAlpha(0f, 1f);
 
-            AsyncOperation operation = null;
+            var operation = loadScene();
             var succeeded = false;
-            try
-            {
-                operation = loadScene();
-            }
-            catch (Exception exception)
-            {
-                // SceneRouter から渡されたローダーの失敗を記録し、失敗結果として後続を実行する。
-                Debug.LogError($"シーンの読み込み開始に失敗しました: {scenePath}\n{exception}", context);
-            }
 
             if (operation == null)
             {
@@ -371,15 +354,7 @@ namespace Roll_a_Ball.OutGame
                 succeeded = true;
             }
 
-            try
-            {
-                onCompleted?.Invoke(succeeded);
-            }
-            catch (Exception exception)
-            {
-                // SceneRouter の完了処理失敗を記録し、フェードの終了処理を続ける。
-                Debug.LogError($"シーンのフェード完了コールバックに失敗しました: {scenePath}\n{exception}", context);
-            }
+            onCompleted?.Invoke(succeeded);
             yield return FadeAlpha(1f, 0f);
             canvasGroup.blocksRaycasts = false;
         }

@@ -9,22 +9,30 @@ namespace Roll_a_Ball.OutGame
     public sealed class ShopScreen : ScreenBase
     {
         [SerializeField] private Button backButton;
+        private UiInputScope inputScope;
+
+        /// <summary>
+        /// 共通入力範囲を取得する
+        /// </summary>
+        private void Awake()
+        {
+            inputScope = GetComponent<UiInputScope>();
+        }
 
         /// <summary>
         /// ショップ画面を表示し、戻る操作を登録する
         /// </summary>
         public override void OnOpen(object arg)
         {
-            if (backButton == null)
+            if (backButton == null || inputScope == null)
             {
-                Debug.LogError("ShopScreen の戻るボタンが設定されていません。", this);
+                Debug.LogError("ShopScreen の戻るボタンまたは UiInputScope が設定されていません。", this);
                 return;
             }
 
             backButton.onClick.AddListener(ReturnToStages);
-            GetComponent<UiInputScope>().CancelRequested.AddListener(ReturnToStages);
+            inputScope.CancelRequested.AddListener(ReturnToStages);
             backButton.Select();
-            Debug.Log("ShopScreen を表示しました。", this);
         }
 
         /// <summary>
@@ -32,7 +40,10 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         public override void OnClose()
         {
-            GetComponent<UiInputScope>().CancelRequested.RemoveListener(ReturnToStages);
+            if (inputScope != null)
+            {
+                inputScope.CancelRequested.RemoveListener(ReturnToStages);
+            }
             if (backButton != null)
             {
                 backButton.onClick.RemoveListener(ReturnToStages);
@@ -44,7 +55,7 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private void ReturnToStages()
         {
-            if (!GetComponent<UiInputScope>().CanReceiveInput)
+            if (inputScope == null || !inputScope.CanReceiveInput)
             {
                 return;
             }

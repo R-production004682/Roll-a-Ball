@@ -26,6 +26,9 @@ namespace Roll_a_Ball.OutGame
         private UiInputScope dialogInputScope;
         private bool fromPause;
         private bool confirmingDefaults;
+        /// <summary>
+        /// 設定ダイアログが表示中か
+        /// </summary>
         public bool IsOpen => dialog != null && dialog.activeSelf;
 
         /// <summary>
@@ -53,7 +56,10 @@ namespace Roll_a_Ball.OutGame
         /// <summary>
         /// 設定値の変更通知を購読する
         /// </summary>
-        private void OnEnable() => GameSettings.Changed += RefreshValues;
+        private void OnEnable()
+        {
+            GameSettings.Changed += RefreshValues;
+        }
 
         /// <summary>
         /// 設定値の変更通知を解除し、試聴音と表示を後始末する
@@ -92,12 +98,18 @@ namespace Roll_a_Ball.OutGame
         /// <summary>
         /// ステージ選択画面から設定を開く
         /// </summary>
-        public void OpenFromStageSelect() => Open(false);
+        public void OpenFromStageSelect()
+        {
+            Open(false);
+        }
 
         /// <summary>
         /// ポーズ画面から設定を開き、ポーズ状態を維持する
         /// </summary>
-        public void OpenFromPause() => Open(true);
+        public void OpenFromPause()
+        {
+            Open(true);
+        }
 
         /// <summary>
         /// 呼び出し元を記録し、設定 UI とフォーカスを表示する
@@ -134,7 +146,6 @@ namespace Roll_a_Ball.OutGame
                 EventSystem.current.SetSelectedGameObject(bgmSlider.gameObject);
             }
 
-            Debug.Log(fromPause ? "ポーズ中の設定ダイアログを開きました。" : "設定ダイアログを開きました。", this);
         }
 
         /// <summary>
@@ -166,7 +177,6 @@ namespace Roll_a_Ball.OutGame
             }
 
             previousSelection = null;
-            Debug.Log("設定ダイアログを閉じ、設定を保存しました。", this);
         }
 
         /// <summary>
@@ -190,7 +200,6 @@ namespace Roll_a_Ball.OutGame
             previewSource.clip = previewClip;
             previewSource.volume = GameSettings.SeVolume;
             previewSource.Play();
-            Debug.Log("SE の試聴を再生しました。", this);
         }
 
         /// <summary>
@@ -301,6 +310,9 @@ namespace Roll_a_Ball.OutGame
         /// <summary>
         /// アプリ終了時に設定を保存する
         /// </summary>
-        private void OnApplicationQuit() => GameSettings.Save();
+        private void OnApplicationQuit()
+        {
+            GameSettings.Save();
+        }
     }
 }

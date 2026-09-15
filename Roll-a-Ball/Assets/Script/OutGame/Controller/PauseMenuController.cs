@@ -126,7 +126,6 @@ namespace Roll_a_Ball.OutGame
                 EventSystem.current.SetSelectedGameObject(firstSelectedButton.gameObject);
             }
 
-            Debug.Log("ポーズメニューを開きました。", this);
         }
 
         /// <summary>
@@ -154,7 +153,6 @@ namespace Roll_a_Ball.OutGame
 
             OutGameStateController.Enter(GameFlowState.Playing);
             CloseMenuVisuals();
-            Debug.Log("ポーズメニューを閉じてゲームを再開しました。", this);
         }
 
         /// <summary>

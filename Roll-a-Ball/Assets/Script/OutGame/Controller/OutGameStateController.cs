@@ -62,11 +62,9 @@ namespace Roll_a_Ball.OutGame
                 return;
             }
 
-            var previousState = Current;
             Current = state;
             ApplyRuntimeState(state);
             NotifyStateChanged(state);
-            Debug.Log($"OutGame 状態を変更しました: {previousState} -> {state}");
         }
 
         /// <summary>
@@ -93,28 +91,12 @@ namespace Roll_a_Ball.OutGame
         }
 
         /// <summary>
-        /// 状態変更を購読者へ通知し、個別購読者の例外を記録して処理を継続する
+        /// 状態変更を購読者へ通知する
         /// </summary>
         /// <param name="state">通知するゲーム進行状態</param>
         private static void NotifyStateChanged(GameFlowState state)
         {
-            if (StateChanged == null)
-            {
-                return;
-            }
-
-            foreach (var callback in StateChanged.GetInvocationList())
-            {
-                try
-                {
-                    ((Action<GameFlowState>)callback)(state);
-                }
-                catch (Exception exception)
-                {
-                    // 一購読者の失敗で他の購読者への状態通知を中断しない。
-                    Debug.LogError($"GameFlowState の通知先で例外が発生しました。\n{exception}");
-                }
-            }
+            StateChanged?.Invoke(state);
         }
     }
 }
