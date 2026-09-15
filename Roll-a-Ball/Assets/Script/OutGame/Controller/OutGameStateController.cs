@@ -111,6 +111,7 @@ namespace Roll_a_Ball.OutGame
                 }
                 catch (Exception exception)
                 {
+                    // 一購読者の失敗で他の購読者への状態通知を中断しない。
                     Debug.LogError($"GameFlowState の通知先で例外が発生しました。\n{exception}");
                 }
             }

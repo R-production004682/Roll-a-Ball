@@ -23,6 +23,7 @@ namespace Roll_a_Ball.OutGame
         [SerializeField] private GameObject pauseMenu;
 
         private GameObject previousSelection;
+        private UiInputScope dialogInputScope;
         private bool fromPause;
         private bool confirmingDefaults;
         public bool IsOpen => dialog != null && dialog.activeSelf;
@@ -33,6 +34,7 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private void Awake()
         {
+            dialogInputScope = dialog != null ? dialog.GetComponent<UiInputScope>() : null;
             if (!ValidateReferences())
             {
                 enabled = false;
@@ -145,7 +147,7 @@ namespace Roll_a_Ball.OutGame
                 return;
             }
 
-            if (isActiveAndEnabled && !dialog.GetComponent<UiInputScope>().CanReceiveInput)
+            if (isActiveAndEnabled && !dialogInputScope.CanReceiveInput)
             {
                 return;
             }
@@ -196,7 +198,7 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         public void RestoreDefaults()
         {
-            if (!IsOpen || confirmingDefaults || !dialog.GetComponent<UiInputScope>().CanReceiveInput)
+            if (!IsOpen || confirmingDefaults || !dialogInputScope.CanReceiveInput)
             {
                 return;
             }
@@ -251,11 +253,6 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private void RefreshValues()
         {
-            if (bgmSlider == null || seSlider == null || bgmValue == null || seValue == null)
-            {
-                return;
-            }
-
             bgmSlider.SetValueWithoutNotify(GameSettings.BgmVolume);
             seSlider.SetValueWithoutNotify(GameSettings.SeVolume);
             bgmValue.text = Mathf.RoundToInt(GameSettings.BgmVolume * 100f) + "%";
@@ -271,6 +268,7 @@ namespace Roll_a_Ball.OutGame
         {
             var missingReferences = SettingsDialogAlgorithm.GetMissingReferences(
                 dialog,
+                dialogInputScope,
                 bgmSlider,
                 seSlider,
                 bgmValue,

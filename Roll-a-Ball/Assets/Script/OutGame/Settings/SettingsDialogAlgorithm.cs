@@ -14,6 +14,7 @@ namespace Roll_a_Ball.OutGame
         /// 未設定の Inspector 参照名を取得する
         /// </summary>
         /// <param name="dialog">設定ダイアログの表示オブジェクト</param>
+        /// <param name="dialogInputScope">設定ダイアログの入力範囲</param>
         /// <param name="bgmSlider">BGM 音量スライダー</param>
         /// <param name="seSlider">SE 音量スライダー</param>
         /// <param name="bgmValue">BGM 音量表示</param>
@@ -24,6 +25,7 @@ namespace Roll_a_Ball.OutGame
         /// <returns>未設定の参照名一覧</returns>
         public static IReadOnlyList<string> GetMissingReferences(
             GameObject dialog,
+            UiInputScope dialogInputScope,
             Slider bgmSlider,
             Slider seSlider,
             TMP_Text bgmValue,
@@ -34,6 +36,7 @@ namespace Roll_a_Ball.OutGame
         {
             var missingReferences = new List<string>();
             AddMissingReference(dialog, nameof(dialog), missingReferences);
+            AddMissingReference(dialogInputScope, nameof(dialogInputScope), missingReferences);
             AddMissingReference(bgmSlider, nameof(bgmSlider), missingReferences);
             AddMissingReference(seSlider, nameof(seSlider), missingReferences);
             AddMissingReference(bgmValue, nameof(bgmValue), missingReferences);

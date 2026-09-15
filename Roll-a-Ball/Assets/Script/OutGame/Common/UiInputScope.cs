@@ -123,7 +123,11 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private static void RefreshScopes()
         {
-            foreach (var scope in scopes) scope.ApplyInputState();
+            foreach (var scope in scopes)
+            {
+                scope.ApplyInputState();
+            }
+
             if (scopes.Count > 0)
             {
                 scopes[scopes.Count - 1].RestoreSelection();
