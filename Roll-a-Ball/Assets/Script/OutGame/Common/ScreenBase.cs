@@ -5,7 +5,7 @@ namespace Roll_a_Ball.OutGame
     /// <summary>
     /// 同一シーン内で表示される主画面の共通基底
     /// </summary>
-    [RequireComponent(typeof(Canvas))]
+    [RequireComponent(typeof(Canvas), typeof(UiInputScope))]
     public abstract class ScreenBase : MonoBehaviour
     {
         /// <summary>

@@ -15,12 +15,20 @@ namespace Roll_a_Ball.OutGame
         [SerializeField] private Button firstSelectedButton;
         [SerializeField] private GameObject controlsGuide;
         [SerializeField, Header("ゲーム開始時の状態")] private bool startsInPlay;
+        private UiInputScope menuInputScope;
+
+        /// <summary>
+        /// 移行済みメニューは最前面の入力範囲を使い、未移行シーンは他の UI がない場合だけ許可する
+        /// </summary>
+        private bool CanUseMenu => menuDialog != null &&
+            (menuDialog.GetComponent<UiInputScope>()?.CanReceiveInput ?? !UiInputScope.HasOpenUi);
 
         /// <summary>
         /// メニュー UI とゲーム開始状態を初期化
         /// </summary>
         private void Awake()
         {
+            menuInputScope = menuDialog != null ? menuDialog.GetComponent<UiInputScope>() : null;
             CloseMenuVisuals();
 
             if (startsInPlay)
@@ -36,28 +44,56 @@ namespace Roll_a_Ball.OutGame
         }
 
         /// <summary>
-        /// ゲーム進行状態の変更通知を購読
+        /// ゲーム進行状態の変更と共通キャンセルを購読する
         /// </summary>
-        private void OnEnable() => OutGameStateController.StateChanged += RefreshControlsGuide;
+        private void OnEnable()
+        {
+            OutGameStateController.StateChanged += RefreshControlsGuide;
+            if (menuInputScope != null)
+            {
+                menuInputScope.CancelRequested.AddListener(ResumeGame);
+            }
+        }
 
         /// <summary>
-        /// ゲーム進行状態の変更通知を解除
+        /// ゲーム進行状態の変更と共通キャンセルの購読を解除する
         /// </summary>
-        private void OnDisable() => OutGameStateController.StateChanged -= RefreshControlsGuide;
+        private void OnDisable()
+        {
+            OutGameStateController.StateChanged -= RefreshControlsGuide;
+            if (menuInputScope != null)
+            {
+                menuInputScope.CancelRequested.RemoveListener(ResumeGame);
+            }
+        }
 
         /// <summary>
         /// プレイ中のメニューキー入力を監視する
         /// </summary>
         private void Update()
         {
-            if (OutGameStateController.IsPlaying && Input.GetKeyDown(MenuKey))
+            if (UiInputScope.IsBlocked)
+            {
+                return;
+            }
+
+            if (OutGameStateController.IsPlaying && !UiInputScope.BlocksPlayer &&
+                (Input.GetKeyDown(MenuKey) || Input.GetKeyDown(KeyCode.Escape)))
             {
                 OpenMenu();
             }
-            else if (menuDialog != null && menuDialog.activeSelf && Input.GetKeyDown(MenuKey))
+            else if (menuDialog != null && menuDialog.activeSelf &&
+                (Input.GetKeyDown(MenuKey) || Input.GetKeyDown(KeyCode.Escape)) &&
+                CanUseMenu)
             {
-                if (firstSelectedButton != null) firstSelectedButton.onClick.Invoke();
-                else ResumeGame();
+                if (firstSelectedButton != null)
+                {
+                    firstSelectedButton.onClick.Invoke();
+                }
+                else
+                {
+                    ResumeGame();
+                }
             }
         }
 
@@ -66,6 +102,11 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         public void OpenMenu()
         {
+            if (UiInputScope.BlocksPlayer)
+            {
+                return;
+            }
+
             if (menuDialog == null)
             {
                 Debug.LogError("PauseMenuController に MenuDialog が設定されていません。", this);
@@ -101,6 +142,11 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         public void ResumeGame()
         {
+            if (UiInputScope.IsBlocked || !CanUseMenu)
+            {
+                return;
+            }
+
             if (menuDialog == null || !menuDialog.activeSelf)
             {
                 return;

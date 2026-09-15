@@ -20,6 +20,8 @@ namespace Roll_a_Ball.OutGame
         private bool changing;
         private Transform stagingRoot;
         private ScreenBase pendingScreen;
+        private ScreenBase openingScreen;
+        private Action pendingCompletion;
 
         /// <summary>
         /// ScreenRoot を補完し、現在のシーンへ Manager を登録する
@@ -57,14 +59,15 @@ namespace Roll_a_Ball.OutGame
             if (initialScreen != null && stack.Count == 0)
             {
                 var screen = Create(initialScreen.GetType());
-                if (screen != null) CommitReplacement(screen, null);
+                if (screen != null)
+                {
+                    CommitReplacement(screen, null);
+                }
+
                 return;
             }
 
-            if (initialScreen == null)
-            {
-                Debug.LogWarning("初期 Screen が未設定です。必要な画面を明示的に Replace してください。", this);
-            }
+            // 初期 Screen なしのホストは既存 UI 上へ Dialog だけを表示する。
         }
 
         /// <summary>
@@ -72,6 +75,7 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private void OnDestroy()
         {
+            changing = true;
             if (pendingScreen != null && pendingScreen != initialScreen)
             {
                 Destroy(pendingScreen.gameObject);
@@ -107,7 +111,7 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         /// <typeparam name="T">表示する Screen の型</typeparam>
         /// <param name="arg">Screen に渡す任意の表示引数</param>
-        /// <returns>生成された Screen生成できない場合は null</returns>
+        /// <returns>生成された Screen。生成できない場合は null</returns>
         public T Replace<T>(object arg = null) where T : ScreenBase
         {
             return (T)Replace(typeof(T), arg);
@@ -118,7 +122,7 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         /// <typeparam name="T">追加する Screen の型</typeparam>
         /// <param name="arg">Screen に渡す任意の表示引数</param>
-        /// <returns>生成された Screen生成できない場合は null</returns>
+        /// <returns>生成された Screen。生成できない場合は null</returns>
         public T Push<T>(object arg = null) where T : ScreenBase
         {
             return (T)Push(typeof(T), arg);
@@ -135,7 +139,7 @@ namespace Roll_a_Ball.OutGame
                 return;
             }
 
-            if (changing || FadeTransition.IsTransitioning)
+            if (changing || UiInputScope.IsBlocked)
             {
                 Debug.LogWarning("画面遷移中のため Pop を無視しました。", this);
                 return;
@@ -143,15 +147,9 @@ namespace Roll_a_Ball.OutGame
 
             changing = true;
             var current = stack[stack.Count - 1];
-            try
-            {
-                stack.RemoveAt(stack.Count - 1);
-                CloseAndDestroy(current);
-            }
-            finally
-            {
-                changing = false;
-            }
+            stack.RemoveAt(stack.Count - 1);
+            CloseAndDestroy(current);
+            changing = false;
 
             Debug.Log($"画面を閉じました: {current.GetType().Name}", this);
         }
@@ -193,13 +191,26 @@ namespace Roll_a_Ball.OutGame
             if (stack.Count == 0 || stack[stack.Count - 1] != dialog)
             {
                 Debug.LogError("最上位ではない Dialog から完了通知を受け取りました。", this);
-                dialog.Cancel();
                 return;
             }
 
+            if (openingScreen == dialog)
+            {
+                pendingCompletion = () => CompleteDialog(dialog, result);
+                return;
+            }
+
+            if (changing || UiInputScope.IsBlocked)
+            {
+                Debug.LogWarning($"処理中のため Dialog の完了を無視しました: {dialog.name}", this);
+                return;
+            }
+
+            changing = true;
             stack.RemoveAt(stack.Count - 1);
             dialog.SetResult(result);
             CloseAndDestroy(dialog);
+            changing = false;
             Debug.Log($"Dialog を結果確定で閉じました: {dialog.GetType().Name}", this);
         }
 
@@ -208,7 +219,7 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         /// <param name="type">表示する Screen の型</param>
         /// <param name="arg">Screen に渡す任意の表示引数</param>
-        /// <returns>生成された Screen生成できない場合は null</returns>
+        /// <returns>生成された Screen。生成できない場合は null</returns>
         public ScreenBase Replace(Type type, object arg = null)
         {
             if (type == null || !typeof(ScreenBase).IsAssignableFrom(type))
@@ -217,14 +228,18 @@ namespace Roll_a_Ball.OutGame
                 return null;
             }
 
-            if (changing || FadeTransition.IsTransitioning)
+            if (changing || UiInputScope.IsBlocked)
             {
                 Debug.LogWarning($"画面遷移中のため Replace を無視しました: {type.Name}", this);
                 return null;
             }
 
             var screen = Create(type);
-            if (screen == null) return null;
+            if (screen == null)
+            {
+                return null;
+            }
+
 
             changing = true;
             pendingScreen = screen;
@@ -236,7 +251,11 @@ namespace Roll_a_Ball.OutGame
             else if (screenTransition == null || !screenTransition.Play(
                 () => CommitReplacement(screen, arg), () => changing = false))
             {
-                if (screen != initialScreen) Destroy(screen.gameObject);
+                if (screen != initialScreen)
+                {
+                    Destroy(screen.gameObject);
+                }
+
                 pendingScreen = null;
                 changing = false;
                 Debug.LogError($"画面フェードを開始できません: {type.Name}", this);
@@ -250,7 +269,11 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private void CommitReplacement(ScreenBase screen, object arg)
         {
-            if (this == null || screen == null) return;
+            if (this == null || screen == null)
+            {
+                return;
+            }
+
             CloseAll();
             screen.transform.SetParent(screenRoot, false);
             screen.gameObject.SetActive(true);
@@ -279,34 +302,37 @@ namespace Roll_a_Ball.OutGame
                 return null;
             }
 
-            if (changing || FadeTransition.IsTransitioning)
+            if (changing || UiInputScope.IsBlocked)
             {
                 Debug.LogWarning($"画面遷移中のため Push を無視しました: {type.Name}", this);
                 return null;
             }
 
-            changing = true;
-            ScreenBase screen = null;
-            try
+            if (stack.Any(candidate => candidate != null && candidate.GetType() == type))
             {
-                screen = Create(type);
-                if (screen != null)
+                Debug.LogWarning($"表示済みの Screen を重複して追加できません: {type.Name}", this);
+                return null;
+            }
+
+            changing = true;
+            var screen = Create(type);
+            if (screen != null)
+            {
+                screen.transform.SetParent(screenRoot, false);
+                screen.gameObject.SetActive(true);
+                stack.Add(screen);
+                if (!OpenScreen(screen, arg))
                 {
-                    screen.transform.SetParent(screenRoot, false);
-                    screen.gameObject.SetActive(true);
-                    stack.Add(screen);
-                    if (!OpenScreen(screen, arg))
-                    {
-                        stack.Remove(screen);
-                        CloseAndDestroy(screen);
-                        screen = null;
-                    }
+                    stack.Remove(screen);
+                    CloseAndDestroy(screen);
+                    screen = null;
                 }
             }
-            finally
-            {
-                changing = false;
-            }
+
+            changing = false;
+            var complete = pendingCompletion;
+            pendingCompletion = null;
+            complete?.Invoke();
             Debug.Log(screen != null ? $"画面を追加しました: {type.Name}" : $"画面を追加できませんでした: {type.Name}", this);
             return screen;
         }
@@ -315,7 +341,7 @@ namespace Roll_a_Ball.OutGame
         /// Scene 所有の初期画面を返すか、登録済み prefab を非表示の待機ルートへ生成する
         /// </summary>
         /// <param name="type">生成する Screen の型</param>
-        /// <returns>生成された Screen登録がない場合は null</returns>
+        /// <returns>生成された Screen。登録がない場合は null</returns>
         private ScreenBase Create(Type type)
         {
             if (initialScreen != null && initialScreen.GetType() == type && initialScreen.gameObject.scene.IsValid())
@@ -329,22 +355,14 @@ namespace Roll_a_Ball.OutGame
                 return null;
             }
 
-            var prefab = screenPrefabs.FirstOrDefault(candidate => candidate != null && candidate.GetType() == type);
-            if (prefab == null)
+            var matches = screenPrefabs.Where(candidate => candidate != null && candidate.GetType() == type).ToArray();
+            if (matches.Length != 1)
             {
-                Debug.LogError($"Screen prefab が登録されていません: {type.Name}", this);
+                Debug.LogError($"Screen prefab は型ごとに一つ登録してください: {type.Name} (登録数: {matches.Length})", this);
                 return null;
             }
 
-            try
-            {
-                return Instantiate(prefab, stagingRoot);
-            }
-            catch (Exception exception)
-            {
-                Debug.LogError($"Screen の生成に失敗しました: {type.Name}\n{exception}", this);
-                return null;
-            }
+            return Instantiate(matches[0], stagingRoot);
         }
 
         /// <summary>
@@ -362,12 +380,17 @@ namespace Roll_a_Ball.OutGame
                     dialog.PrepareForOpen(this);
                 }
 
+                openingScreen = screen;
                 screen.OnOpen(arg);
+                openingScreen = null;
                 return true;
             }
             catch (Exception exception)
             {
+                // Screen 単体の初期化失敗を表示全体へ波及させず、生成した表示を Manager が閉じられるようにする。
+                openingScreen = null;
                 Debug.LogError($"Screen の OnOpen に失敗しました: {screen.GetType().Name}\n{exception}", screen);
+                pendingCompletion = null;
                 return false;
             }
         }
@@ -402,6 +425,7 @@ namespace Roll_a_Ball.OutGame
             }
             catch (Exception exception)
             {
+                // OnClose の失敗後も Dialog のキャンセルと GameObject の破棄を続ける。
                 Debug.LogError($"Screen の OnClose に失敗しました: {screen.GetType().Name}\n{exception}", screen);
             }
 
@@ -413,6 +437,7 @@ namespace Roll_a_Ball.OutGame
                 }
                 catch (Exception exception)
                 {
+                    // Dialog の後始末失敗で GameObject の破棄を止めない。
                     Debug.LogError($"Dialog のキャンセル処理に失敗しました: {screen.GetType().Name}\n{exception}", screen);
                 }
             }

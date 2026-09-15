@@ -72,7 +72,6 @@ namespace Roll_a_Ball.OutGame
                 return;
             }
 
-            completed = true;
             owner.CompleteDialog(this, result);
         }
 
@@ -98,6 +97,7 @@ namespace Roll_a_Ball.OutGame
         /// <param name="result">確定した結果</param>
         internal void SetResult(TResult result)
         {
+            completed = true;
             completionSource?.TrySetResult(result);
         }
 
@@ -110,8 +110,21 @@ namespace Roll_a_Ball.OutGame
         }
 
         /// <summary>
+        /// 外部から先に GameObject が破棄された場合も待機をキャンセルし、所有者参照を解除する
+        /// </summary>
+        protected virtual void OnDestroy()
+        {
+            Cancel();
+            ClearOwner();
+        }
+
+        /// <summary>
         /// 所有 Manager 以外からのクローズをキャンセルとして扱う
         /// </summary>
-        void IDialog.CancelForClose() => Cancel();
+        void IDialog.CancelForClose()
+        {
+            Cancel();
+            ClearOwner();
+        }
     }
 }

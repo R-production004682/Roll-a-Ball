@@ -13,6 +13,7 @@ namespace Roll_a_Ball.OutGame
 
         [SerializeField] private GameObject clearDialog;
         [SerializeField] private Button titleButton;
+        private UiInputScope clearInputScope;
 
         // ゲームクリア状態かどうかを記録するフラグ
         private bool isCleared;
@@ -22,6 +23,7 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private void Awake()
         {
+            clearInputScope = clearDialog != null ? clearDialog.GetComponent<UiInputScope>() : null;
             if (clearDialog != null)
             {
                 clearDialog.SetActive(false);
@@ -34,11 +36,33 @@ namespace Roll_a_Ball.OutGame
         }
 
         /// <summary>
+        /// 結果画面の共通 Cancel を Title への戻り操作へ接続する
+        /// </summary>
+        private void OnEnable()
+        {
+            if (clearInputScope != null)
+            {
+                clearInputScope.CancelRequested.AddListener(CancelToTitle);
+            }
+        }
+
+        /// <summary>
+        /// 結果画面の共通 Cancel 購読を解除する
+        /// </summary>
+        private void OnDisable()
+        {
+            if (clearInputScope != null)
+            {
+                clearInputScope.CancelRequested.RemoveListener(CancelToTitle);
+            }
+        }
+
+        /// <summary>
         /// プレイ中のクリアキー入力を監視する
         /// </summary>
         private void Update()
         {
-            if (OutGameStateController.IsPlaying && Input.GetKeyDown(ClearKey))
+            if (OutGameStateController.IsPlaying && !UiInputScope.BlocksPlayer && Input.GetKeyDown(ClearKey))
             {
                 MarkClear();
             }
@@ -70,6 +94,17 @@ namespace Roll_a_Ball.OutGame
             }
 
             Debug.Log("ゲームクリアを確定し、クリアダイアログを表示しました。", this);
+        }
+
+        /// <summary>
+        /// 結果画面で Cancel されたとき Title ボタンの共通遷移を実行する
+        /// </summary>
+        private void CancelToTitle()
+        {
+            if (isCleared && titleButton != null && titleButton.isActiveAndEnabled)
+            {
+                titleButton.onClick.Invoke();
+            }
         }
 
     }

@@ -1359,6 +1359,9 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8806315628718007584, guid: 123b5b99ec5807d489cc21081b6bca5a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 738911744}
     - targetCorrespondingSourceObject: {fileID: 9022197601968904487, guid: 123b5b99ec5807d489cc21081b6bca5a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 738911742}
@@ -1399,6 +1402,18 @@ MonoBehaviour:
   destination:
     scenePath: Assets/Scenes/StageSelectScene.unity
     sceneGuid: 2cf7963b28fe83347a2a8221117771a6
+--- !u!225 &738911744
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 738911739}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &849986103
 GameObject:
   m_ObjectHideFlags: 0
@@ -2275,6 +2290,8 @@ GameObject:
   - component: {fileID: 1240760633}
   - component: {fileID: 1240760635}
   - component: {fileID: 1240760634}
+  - component: {fileID: 1240760637}
+  - component: {fileID: 1240760636}
   m_Layer: 5
   m_Name: ClearDialog
   m_TagString: Untagged
@@ -2340,6 +2357,34 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &1240760636
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1240760632}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27fbeeaa8a0aaac46a65d17ef2bd413b, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Roll_a_Ball.OutGame.UiInputScope
+  firstSelected: {fileID: 489975527}
+  onCancel:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!225 &1240760637
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1240760632}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &1259913301
 GameObject:
   m_ObjectHideFlags: 0
@@ -2420,11 +2465,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.CanvasScaler
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
-  m_ScreenMatchMode: 0
+  m_ReferenceResolution: {x: 1920, y: 1080}
+  m_ScreenMatchMode: 1
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
@@ -2620,6 +2665,37 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Roll_a_Ball.OutGame.AudioVolumeBinding
   channel: 0
   baseVolume: 1
+--- !u!1 &1394431170
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1394431171}
+  m_Layer: 0
+  m_Name: ScreenRoot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1394431171
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1394431170}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1918444422}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1408636652
 GameObject:
   m_ObjectHideFlags: 0
@@ -3179,6 +3255,56 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
+--- !u!1 &1918444420
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1918444422}
+  - component: {fileID: 1918444421}
+  m_Layer: 0
+  m_Name: ScreenManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1918444421
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1918444420}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb2cb35425f255a42ae024f2ee502f94, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Roll_a_Ball.OutGame.ScreenManager
+  screenRoot: {fileID: 1394431171}
+  screenPrefabs:
+  - {fileID: 2916739899545590328, guid: 0e36448874cce144cb487cab4a30622d, type: 3}
+  initialScreen: {fileID: 0}
+  screenTransition: {fileID: 0}
+--- !u!4 &1918444422
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1918444420}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1394431171}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1945228135
 GameObject:
   m_ObjectHideFlags: 0
@@ -3416,3 +3542,4 @@ SceneRoots:
   - {fileID: 1386317491}
   - {fileID: 418376214}
   - {fileID: 738911738}
+  - {fileID: 1918444422}
