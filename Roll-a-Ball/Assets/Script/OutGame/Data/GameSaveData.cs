@@ -10,7 +10,7 @@ namespace Roll_a_Ball.OutGame
     internal sealed class GameSaveData
     {
         public const int CurrentVersion = 1;
-        public const int MaximumClearTimeCount = 5;
+        public const int MaximumClearTimeCount = 3;
 
         public int version;
         public int currency;
