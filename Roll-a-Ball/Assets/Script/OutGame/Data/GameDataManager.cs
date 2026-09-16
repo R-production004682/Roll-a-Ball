@@ -212,11 +212,11 @@ namespace Roll_a_Ball.OutGame
         }
 
         /// <summary>
-        /// ステージのクリア状態と上位5件のタイムを保存する
+        /// ステージのクリア状態と上位3件のタイムを保存する
         /// </summary>
         /// <param name="stageId">クリアした解放済みステージの安定 ID</param>
         /// <param name="clearTimeSeconds">クリアまでにかかった有限の秒数</param>
-        /// <param name="rank">上位5件に入った場合は1始まりの順位、それ以外は0</param>
+        /// <param name="rank">上位3件に入った場合は1始まりの順位、それ以外は0</param>
         /// <returns>クリア状態を保存できた場合は true</returns>
         public static bool RecordStageClear(string stageId, float clearTimeSeconds, out int rank)
         {
@@ -254,7 +254,7 @@ namespace Roll_a_Ball.OutGame
         }
 
         /// <summary>
-        /// 指定ステージのクリアタイム上位5件を秒単位で返す
+        /// 指定ステージのクリアタイム上位3件を秒単位で返す
         /// </summary>
         /// <param name="stageId">ステージを識別する安定 ID</param>
         /// <returns>昇順のタイム配列。未登録なら空配列</returns>

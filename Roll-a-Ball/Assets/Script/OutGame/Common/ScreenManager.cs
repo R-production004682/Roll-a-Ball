@@ -13,7 +13,8 @@ namespace Roll_a_Ball.OutGame
     {
         [SerializeField] private Transform screenRoot;
         [SerializeField] private List<ScreenBase> screenPrefabs = new List<ScreenBase>();
-        [SerializeField] private ScreenBase initialScreen;
+        [SerializeField, Tooltip("最初に開く Screen の Prefab。Scene 上の Screen は指定しません")]
+        private ScreenBase initialScreen;
         [SerializeField] private FadeTransition screenTransition;
 
         private readonly List<ScreenBase> stack = new List<ScreenBase>();
@@ -51,10 +52,12 @@ namespace Roll_a_Ball.OutGame
         }
 
         /// <summary>
-        /// Inspector に指定された初期 Screen を一度だけ表示する
+        /// サービス窓口を再登録して Inspector に指定された初期 Screen を一度だけ表示する
         /// </summary>
         private void Start()
         {
+            GameServices.RegisterScreens(this);
+
             if (initialScreen != null && stack.Count == 0)
             {
                 var screen = Create(initialScreen.GetType());
@@ -75,7 +78,7 @@ namespace Roll_a_Ball.OutGame
         private void OnDestroy()
         {
             changing = true;
-            if (pendingScreen != null && pendingScreen != initialScreen)
+            if (pendingScreen != null)
             {
                 Destroy(pendingScreen.gameObject);
             }
@@ -248,10 +251,7 @@ namespace Roll_a_Ball.OutGame
             else if (screenTransition == null || !screenTransition.Play(
                 () => CommitReplacement(screen, arg), () => changing = false))
             {
-                if (screen != initialScreen)
-                {
-                    Destroy(screen.gameObject);
-                }
+                Destroy(screen.gameObject);
 
                 pendingScreen = null;
                 changing = false;
@@ -333,17 +333,12 @@ namespace Roll_a_Ball.OutGame
         }
 
         /// <summary>
-        /// Scene 所有の初期画面を返すか、登録済み prefab を非表示の待機ルートへ生成する
+        /// 登録済み Prefab を非表示の待機ルートへ生成する
         /// </summary>
         /// <param name="type">生成する Screen の型</param>
         /// <returns>生成された Screen。登録がない場合は null</returns>
         private ScreenBase Create(Type type)
         {
-            if (initialScreen != null && initialScreen.GetType() == type && initialScreen.gameObject.scene.IsValid())
-            {
-                return initialScreen;
-            }
-
             if (screenRoot == null)
             {
                 Debug.LogError("screenRoot が未設定のため Screen を生成できません。", this);
@@ -393,7 +388,7 @@ namespace Roll_a_Ball.OutGame
         }
 
         /// <summary>
-        /// Screen を閉じ、Prefab は破棄して Scene 所有 Screen は非表示にする
+        /// Screen を閉じ、Screen 親ごと破棄する
         /// </summary>
         /// <param name="screen">破棄対象の Screen</param>
         private void CloseAndDestroy(ScreenBase screen)
@@ -411,11 +406,6 @@ namespace Roll_a_Ball.OutGame
             }
 
             screen.gameObject.SetActive(false);
-            if (screen == initialScreen && screen.gameObject.scene.IsValid())
-            {
-                return;
-            }
-
             UnityEngine.Object.Destroy(screen.gameObject);
         }
     }

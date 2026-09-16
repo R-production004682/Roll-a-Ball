@@ -861,19 +861,40 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8002756035408588895, guid: f69004348f1e37249b488e7d79f096c8, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 418376217}
   m_SourcePrefab: {fileID: 100100000, guid: f69004348f1e37249b488e7d79f096c8, type: 3}
 --- !u!114 &418376215 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8000940056094106119, guid: f69004348f1e37249b488e7d79f096c8, type: 3}
   m_PrefabInstance: {fileID: 418376214}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 418376216}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8dcd049d123ca4e438cbdfd24eb55c42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Roll_a_Ball.OutGame.SettingsDialogController
+--- !u!1 &418376216 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8002756035408588895, guid: f69004348f1e37249b488e7d79f096c8, type: 3}
+  m_PrefabInstance: {fileID: 418376214}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &418376217
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 418376216}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 187df25e3b598cf4caa1134e810007b7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Roll_a_Ball.OutGame.SettingsDialogHost
+  settingsDialogController: {fileID: 418376215}
 --- !u!1 &489975526
 GameObject:
   m_ObjectHideFlags: 0
@@ -1036,7 +1057,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6d70f58bc0a44746b13cf4ae2cbcd62c, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Roll_a_Ball.OutGame.ButtonPressAnimation
   animationTarget: {fileID: 0}
   hoverScale: 1.025
@@ -1878,7 +1899,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6d70f58bc0a44746b13cf4ae2cbcd62c, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Roll_a_Ball.OutGame.ButtonPressAnimation
   animationTarget: {fileID: 0}
   hoverScale: 1.025
@@ -2367,7 +2388,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 27fbeeaa8a0aaac46a65d17ef2bd413b, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Roll_a_Ball.OutGame.UiInputScope
   firstSelected: {fileID: 489975527}
   onCancel:
@@ -2418,8 +2439,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8dbd4f8cc8e34d4a9d6dd2f43f1f3b1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Roll_a_Ball.OutGame.OutGameClearController
-  clearDialog: {fileID: 1240760632}
-  titleButton: {fileID: 489975527}
+  stageId: stage-1
 --- !u!114 &1259913303
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3282,7 +3302,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eb2cb35425f255a42ae024f2ee502f94, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Roll_a_Ball.OutGame.ScreenManager
   screenRoot: {fileID: 1394431171}
   screenPrefabs:

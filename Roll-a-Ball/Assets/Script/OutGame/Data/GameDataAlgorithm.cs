@@ -139,7 +139,7 @@ namespace Roll_a_Ball.OutGame
         /// 有限かつ非負の時間を昇順に並べ、同タイムでは先に保存された記録を上位に保つ
         /// </summary>
         /// <param name="source">保存されていたクリアタイム</param>
-        /// <param name="normalized">上位5件に整えた記録</param>
+        /// <param name="normalized">上位3件に整えた記録</param>
         /// <returns>すべての時間が有効な場合は true</returns>
         internal static bool TryNormalizeClearTimes(
             List<ClearTimeRecord> source,
@@ -177,11 +177,11 @@ namespace Roll_a_Ball.OutGame
         }
 
         /// <summary>
-        /// クリアタイムを昇順に挿入し、上位5件に入った場合の順位を返す
+        /// クリアタイムを昇順に挿入し、上位3件に入った場合の順位を返す
         /// </summary>
         /// <param name="clearTimes">更新対象の順位済みタイム一覧</param>
         /// <param name="seconds">追加するタイム</param>
-        /// <returns>上位5件に入った場合は1始まりの順位、それ以外は0</returns>
+        /// <returns>上位3件に入った場合は1始まりの順位、それ以外は0</returns>
         internal static int InsertClearTime(List<ClearTimeRecord> clearTimes, float seconds)
         {
             var insertIndex = 0;

@@ -5,16 +5,16 @@ using UnityEngine.UI;
 namespace Roll_a_Ball.OutGame
 {
     /// <summary>
-    /// StageSelectScreen と入れ替えて表示するショップ画面
+    /// ステージ選択から開くカスタマイズ Screen の入口
     /// </summary>
-    public sealed class ShopScreen : ScreenBase
+    public sealed class CustomizationScreen : ScreenBase
     {
         [SerializeField] private Button backButton;
         private UiInputScope inputScope;
         private bool returnQueued;
 
         /// <summary>
-        /// 共通入力範囲を取得する
+        /// 入力範囲を取得する
         /// </summary>
         private void Awake()
         {
@@ -22,14 +22,14 @@ namespace Roll_a_Ball.OutGame
         }
 
         /// <summary>
-        /// ショップ画面を表示し、戻る操作を登録する
+        /// 戻る操作を登録する
         /// </summary>
         public override void OnOpen(object arg)
         {
             returnQueued = false;
-            if (backButton == null || inputScope == null)
+            if (inputScope == null || backButton == null)
             {
-                Debug.LogError("ShopScreen の戻るボタンまたは UiInputScope が設定されていません。", this);
+                Debug.LogError("CustomizationScreen の戻るボタンまたは UiInputScope が設定されていません。", this);
                 return;
             }
 
@@ -39,23 +39,24 @@ namespace Roll_a_Ball.OutGame
         }
 
         /// <summary>
-        /// ショップ画面を閉じ、戻る操作の購読を解除する
+        /// 戻る操作を解除する
         /// </summary>
         public override void OnClose()
         {
             returnQueued = false;
-            if (inputScope != null)
-            {
-                inputScope.CancelRequested.RemoveListener(ReturnToStages);
-            }
             if (backButton != null)
             {
                 backButton.onClick.RemoveListener(ReturnToStages);
             }
+
+            if (inputScope != null)
+            {
+                inputScope.CancelRequested.RemoveListener(ReturnToStages);
+            }
         }
 
         /// <summary>
-        /// StageSelectScreen へ同一シーン内で戻る
+        /// ステージ選択 Screen へ戻る
         /// </summary>
         private void ReturnToStages()
         {
@@ -69,7 +70,7 @@ namespace Roll_a_Ball.OutGame
         }
 
         /// <summary>
-        /// Button の入力フレーム終了後に Screen を入れ替え、破棄中の UI と生成中の UI を分離する
+        /// Button の入力フレーム終了後にステージ選択 Screen へ戻る
         /// </summary>
         /// <returns>一フレーム待機する Coroutine</returns>
         private IEnumerator ReturnToStagesAfterInputFrame()
