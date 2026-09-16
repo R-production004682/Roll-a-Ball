@@ -48,15 +48,4 @@ public class Player : MonoBehaviour
             transform.position = respawnPoint;//落下地点以下にいるとリスポーン地点に戻る
 
     }
-  
-    
-  private void OnTriggerEnter(Collider other)//衝突判定
-    {
-        if (other.CompareTag("Goal")&&GameManager.instance.isClear ==false )//ゴールとの衝突かつクリア状態でなかったら
-        {
-            GameManager.instance.Clear();//クリア処理を行う
-        }
-
-    }
-
 }
