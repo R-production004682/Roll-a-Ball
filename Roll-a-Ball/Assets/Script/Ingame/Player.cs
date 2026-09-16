@@ -1,4 +1,6 @@
 using UnityEngine;
+using Roll_a_Ball.OutGame;
+
 
 public class Player : MonoBehaviour
 {
@@ -13,10 +15,17 @@ public class Player : MonoBehaviour
 
     [SerializeField]
     private Vector3 respawnPoint;//リスポーン地点
+ 
+
 
     // Update is called once per frame
     void Update()
     {
+        //if (GameManager.instance.isClear == true)
+        //return;//クリア状態では操作不可
+
+        if (UiInputScope.BlocksPlayer)
+            return;//UI画面では操作不可
 
         if (Input.GetKey(KeyCode.W))//Wキー入力
             transform.position += Playerspeed * transform.forward * Time.deltaTime;//1秒ごとにPlayerspeedの値だけプレイヤーの正面方向に進む
