@@ -1,3 +1,4 @@
+using Roll_a_Ball.OutGame;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -12,6 +13,9 @@ public class GameManager : MonoBehaviour
 
     [SerializeField]//確認用
     private float playTime = 0;//プレイタイム
+
+    [SerializeField]
+    private string stageId;//ステージ識別ID
 
     private void Awake()
     {
@@ -47,8 +51,8 @@ public class GameManager : MonoBehaviour
 
         Debug.Log("クリアタイム：" + playTime.ToString("F2"));//クリアタイムを小数点以下2桁で表示
 
-        PlayerPrefs.SetFloat("ThisPlayTime", playTime);//今回のタイムを記録
-        PlayerPrefs.Save();//保存
+        int rank;//クリアタイムの順位
+        GameDataManager.RecordStageClear(stageId, playTime, out rank);//クリア状態とクリアタイムを保存
         result.SetActive(true);//リザルト出す
     }
 }
