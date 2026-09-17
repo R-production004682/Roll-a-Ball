@@ -399,6 +399,7 @@ GameObject:
   - component: {fileID: 533544813}
   - component: {fileID: 533544816}
   - component: {fileID: 533544817}
+  - component: {fileID: 533544818}
   m_Layer: 5
   m_Name: RetryButton
   m_TagString: Untagged
@@ -544,6 +545,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9834013f291cbe429d1843af9b22daa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ResultButton
+--- !u!114 &533544818
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 533544811}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d1e27950d9025d49977f5ea27fceead, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Roll_a_Ball.OutGame.SceneTransitionButton
+  destination:
+    scenePath: Assets/Scenes/TestScene/Ingametest.unity
+    sceneGuid: 5f4e70f5ababb3f458f96e9e1e7f66c5
 --- !u!1001 &560734340
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6349,6 +6365,7 @@ GameObject:
   - component: {fileID: 1749875610}
   - component: {fileID: 1749875613}
   - component: {fileID: 1749875614}
+  - component: {fileID: 1749875615}
   m_Layer: 5
   m_Name: StageSelectButton
   m_TagString: Untagged
@@ -6489,11 +6506,26 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1749875608}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f9834013f291cbe429d1843af9b22daa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ResultButton
+--- !u!114 &1749875615
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1749875608}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d1e27950d9025d49977f5ea27fceead, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Roll_a_Ball.OutGame.SceneTransitionButton
+  destination:
+    scenePath: Assets/Scenes/StageSelectScene.unity
+    sceneGuid: 2cf7963b28fe83347a2a8221117771a6
 --- !u!1 &1802120594
 GameObject:
   m_ObjectHideFlags: 0
