@@ -5,7 +5,7 @@ public class Coin : MonoBehaviour
     [SerializeField]
     private int coinAmount = 10;//コイン1枚の保有する金額
 
-    private void OnTriggerEnter(Collider other) // 衝突判定
+    private void OnTriggerEnter(Collider other)//衝突判定
     {
         if (other.CompareTag("Player"))//プレイヤーと衝突した場合
         {
@@ -17,5 +17,5 @@ public class Coin : MonoBehaviour
 
             Destroy(gameObject);//コイン消える
         }
-     }    
+    }
 }

@@ -15,7 +15,7 @@ public class Player : MonoBehaviour
 
     [SerializeField]
     private Vector3 respawnPoint;//リスポーン地点
- 
+
     // Update is called once per frame
     void Update()
     {
