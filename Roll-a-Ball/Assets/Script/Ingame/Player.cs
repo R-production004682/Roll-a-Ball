@@ -1,4 +1,5 @@
 using Roll_a_Ball.OutGame;
+using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -14,7 +15,19 @@ public class Player : MonoBehaviour
     private int fall;//落下地点
 
     [SerializeField]
-    private Vector3 respawnPoint;//リスポーン地点
+    private List<Vector3> respawnPoints = new List<Vector3>();//リスポーン地点
+
+    [SerializeField]
+    private List<Quaternion> respawnRotations = new List<Quaternion>();//リスポーンの向き
+
+    [SerializeField]
+    private Vector3 startPoint= Vector3.zero;//(スタート地点)
+
+    private void Start()
+    {
+        respawnPoints.Add(startPoint);//スタート地点をリスポーン地点に追加
+        respawnRotations .Add(transform.rotation );//スタート時の向きをリスポーンの向きに追加
+    }
 
     // Update is called once per frame
     void Update()
@@ -41,6 +54,24 @@ public class Player : MonoBehaviour
         transform.Rotate(Vector3.up * mouseX);//オブジェクトのy軸を中心に回転
 
         if (transform.position.y <= fall)
-            transform.position = respawnPoint;//落下地点以下にいるとリスポーン地点に戻る
+        {
+            if (respawnPoints.Count > 0)
+            {
+                transform.position = respawnPoints [ respawnPoints .Count -1];
+                transform .rotation = respawnRotations [ respawnPoints .Count - 1 ];
+            }
+        }
+    }
+
+    public void SetRespawnPointNumber(int pointNumber,Vector3 position, Quaternion rotation)
+    {
+        while (respawnPoints.Count <= pointNumber)//地点番号の箱がまだない
+        {
+            respawnPoints.Add(startPoint);//スタート地点を入れとく
+            respawnRotations.Add(transform.rotation);//現在の向きを入れとく
+        }
+
+        respawnPoints[pointNumber] = position;//指定した番号に地点座標を登録
+        respawnRotations [pointNumber] = rotation;//指定した番号に向きを登録
     }
 }
