@@ -57,8 +57,8 @@ public class Player : MonoBehaviour
         {
             if (respawnPoints.Count > 0)
             {
-                transform.position = respawnPoints[respawnPoints.Count-1];
-                transform.rotation = respawnRotations[respawnPoints.Count-1];
+                transform.position = respawnPoints[respawnPoints.Count - 1];
+                transform.rotation = respawnRotations[respawnPoints.Count - 1];
             }
         }
     }
