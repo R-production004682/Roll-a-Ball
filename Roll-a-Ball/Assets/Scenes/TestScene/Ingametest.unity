@@ -989,8 +989,7 @@ MonoBehaviour:
   mouseSensitivity: 200
   fall: -5
   respawnPoints: []
-  respawnRotations: []
-  startPoint: {x: 0, y: 0, z: 0}
+  startPoint: {x: 0, y: 0.5, z: 0}
 --- !u!54 &795761522
 Rigidbody:
   m_ObjectHideFlags: 0

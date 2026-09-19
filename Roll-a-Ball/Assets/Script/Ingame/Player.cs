@@ -15,19 +15,10 @@ public class Player : MonoBehaviour
     private int fall;//落下地点
 
     [SerializeField]
-    private List<Vector3> respawnPoints = new List<Vector3>();//リスポーン地点
+    private List<Respawnpoint> respawnPoints = new List<Respawnpoint>();//リスポーン地点
 
     [SerializeField]
-    private List<Quaternion> respawnRotations = new List<Quaternion>();//リスポーンの向き
-
-    [SerializeField]
-    private Vector3 startPoint = Vector3.zero;//(スタート地点)
-
-    private void Start()
-    {
-        respawnPoints.Add(startPoint);//スタート地点をリスポーン地点に追加
-        respawnRotations.Add(transform.rotation);//スタート時の向きをリスポーンの向きに追加
-    }
+    private Vector3 startPoint;//スタート地点
 
     // Update is called once per frame
     void Update()
@@ -55,23 +46,24 @@ public class Player : MonoBehaviour
 
         if (transform.position.y <= fall)
         {
-            if (respawnPoints.Count > 0)
+            if (respawnPoints.Count > 0)//リスポーンポイントがあると最後に解放した地点の位置と向きに戻る
             {
-                transform.position = respawnPoints[respawnPoints.Count - 1];
-                transform.rotation = respawnRotations[respawnPoints.Count - 1];
+                transform.position = respawnPoints[respawnPoints .Count - 1].transform .position;
+                transform.rotation = respawnPoints[respawnPoints .Count - 1].transform .rotation;
+            }
+            else//解放されていない場合はスタート地点
+            {
+                transform.position = startPoint;
             }
         }
     }
 
-    public void SetRespawnPointNumber(int pointNumber, Vector3 position, Quaternion rotation)
+    public void UnlockPoint(Respawnpoint point)
     {
-        while (respawnPoints.Count <= pointNumber)//地点番号の箱がまだない
-        {
-            respawnPoints.Add(startPoint);//スタート地点を入れとく
-            respawnRotations.Add(transform.rotation);//現在の向きを入れとく
-        }
+        if (point==null||respawnPoints.Contains(point))//地点番号がないか解放済みだと処理しない
+            return;
 
-        respawnPoints[pointNumber] = position;//指定した番号に地点座標を登録
-        respawnRotations[pointNumber] = rotation;//指定した番号に向きを登録
+        respawnPoints.Add (point);
+
     }
 }
