@@ -21,12 +21,12 @@ public class Player : MonoBehaviour
     private List<Quaternion> respawnRotations = new List<Quaternion>();//リスポーンの向き
 
     [SerializeField]
-    private Vector3 startPoint= Vector3.zero;//(スタート地点)
+    private Vector3 startPoint = Vector3.zero;//(スタート地点)
 
     private void Start()
     {
         respawnPoints.Add(startPoint);//スタート地点をリスポーン地点に追加
-        respawnRotations .Add(transform.rotation );//スタート時の向きをリスポーンの向きに追加
+        respawnRotations.Add(transform.rotation);//スタート時の向きをリスポーンの向きに追加
     }
 
     // Update is called once per frame
@@ -57,8 +57,8 @@ public class Player : MonoBehaviour
         {
             if (respawnPoints.Count > 0)
             {
-                transform.position = respawnPoints [respawnPoints .Count -1];
-                transform .rotation = respawnRotations [respawnPoints .Count - 1 ];
+                transform.position = respawnPoints[respawnPoints.Count-1];
+                transform.rotation = respawnRotations[respawnPoints.Count-1];
             }
         }
     }
