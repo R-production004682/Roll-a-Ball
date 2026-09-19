@@ -1,5 +1,5 @@
-using Roll_a_Ball.OutGame;
 using System.Collections.Generic;
+using Roll_a_Ball.OutGame;
 using UnityEngine;
 
 
@@ -57,13 +57,13 @@ public class Player : MonoBehaviour
         {
             if (respawnPoints.Count > 0)
             {
-                transform.position = respawnPoints [ respawnPoints .Count -1];
-                transform .rotation = respawnRotations [ respawnPoints .Count - 1 ];
+                transform.position = respawnPoints [respawnPoints .Count -1];
+                transform .rotation = respawnRotations [respawnPoints .Count - 1 ];
             }
         }
     }
 
-    public void SetRespawnPointNumber(int pointNumber,Vector3 position, Quaternion rotation)
+    public void SetRespawnPointNumber(int pointNumber, Vector3 position, Quaternion rotation)
     {
         while (respawnPoints.Count <= pointNumber)//地点番号の箱がまだない
         {
@@ -72,6 +72,6 @@ public class Player : MonoBehaviour
         }
 
         respawnPoints[pointNumber] = position;//指定した番号に地点座標を登録
-        respawnRotations [pointNumber] = rotation;//指定した番号に向きを登録
+        respawnRotations[pointNumber] = rotation;//指定した番号に向きを登録
     }
 }
