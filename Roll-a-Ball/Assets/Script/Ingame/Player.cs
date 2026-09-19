@@ -48,8 +48,8 @@ public class Player : MonoBehaviour
         {
             if (respawnPoints.Count > 0)//リスポーンポイントがあると最後に解放した地点の位置と向きに戻る
             {
-                transform.position = respawnPoints[respawnPoints .Count - 1].transform .position;
-                transform.rotation = respawnPoints[respawnPoints .Count - 1].transform .rotation;
+                transform.position = respawnPoints[respawnPoints.Count - 1].transform .position;
+                transform.rotation = respawnPoints[respawnPoints.Count - 1].transform .rotation;
             }
             else//解放されていない場合はスタート地点
             {
@@ -60,10 +60,10 @@ public class Player : MonoBehaviour
 
     public void UnlockPoint(Respawnpoint point)
     {
-        if (point==null||respawnPoints.Contains(point))//地点番号がないか解放済みだと処理しない
+        if (point==null || respawnPoints.Contains(point))//地点番号がないか解放済みだと処理しない
             return;
 
-        respawnPoints.Add (point);
+        respawnPoints.Add(point);
 
     }
 }
