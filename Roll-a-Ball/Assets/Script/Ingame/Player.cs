@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Roll_a_Ball.OutGame;
 using UnityEngine;
 
@@ -14,7 +15,10 @@ public class Player : MonoBehaviour
     private int fall;//落下地点
 
     [SerializeField]
-    private Vector3 respawnPoint;//リスポーン地点
+    private List<Respawnpoint> respawnPoints = new List<Respawnpoint>();//リスポーン地点
+
+    [SerializeField]
+    private Vector3 startPoint;//スタート地点
 
     // Update is called once per frame
     void Update()
@@ -41,6 +45,25 @@ public class Player : MonoBehaviour
         transform.Rotate(Vector3.up * mouseX);//オブジェクトのy軸を中心に回転
 
         if (transform.position.y <= fall)
-            transform.position = respawnPoint;//落下地点以下にいるとリスポーン地点に戻る
+        {
+            if (respawnPoints.Count > 0)//リスポーンポイントがあると最後に解放した地点の位置と向きに戻る
+            {
+                transform.position = respawnPoints[respawnPoints.Count - 1].transform.position;
+                transform.rotation = respawnPoints[respawnPoints.Count - 1].transform.rotation;
+            }
+            else//解放されていない場合はスタート地点
+            {
+                transform.position = startPoint;
+            }
+        }
+    }
+
+    public void UnlockPoint(Respawnpoint point)
+    {
+        if (point == null || respawnPoints.Contains(point))//地点番号がないか解放済みだと処理しない
+            return;
+
+        respawnPoints.Add(point);
+
     }
 }
