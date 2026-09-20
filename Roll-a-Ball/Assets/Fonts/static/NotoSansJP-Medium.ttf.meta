@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: f4eec857a4fdf2f43be0e9f3d1a984e7
+guid: 80107f5f0463123449a4e9675ce00655
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -9,7 +9,7 @@ TrueTypeFontImporter:
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - Unity
+  - Noto Sans JP
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0

@@ -29,7 +29,7 @@ namespace Roll_a_Ball.OutGame
         }
 
         /// <summary>
-        /// 文字列の表示引数とボタン購読を設定する
+        /// Prefab に設定した文言を維持したままボタン購読を設定する
         /// </summary>
         public override void OnOpen(object arg)
         {
@@ -39,7 +39,6 @@ namespace Roll_a_Ball.OutGame
                 return;
             }
 
-            messageText.text = arg as string ?? "Are you sure?";
             okButton.onClick.AddListener(Accept);
             cancelButton.onClick.AddListener(Decline);
             inputScope.CancelRequested.AddListener(Decline);

@@ -206,7 +206,7 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private void OpenCustomize()
         {
-            ReplaceScreen<CustomizationScreen>();
+            ReplaceScreen<CustomizationScreen>(CustomizationScreen.ReturnDestination.StageSelect);
         }
 
         /// <summary>
@@ -232,11 +232,12 @@ namespace Roll_a_Ball.OutGame
         /// 指定した Screen へ遷移する
         /// </summary>
         /// <typeparam name="T">表示する Screen 型</typeparam>
-        private void ReplaceScreen<T>() where T : ScreenBase
+        /// <param name="arg">表示する Screen に渡す引数</param>
+        private void ReplaceScreen<T>(object arg = null) where T : ScreenBase
         {
             if (inputScope != null && inputScope.CanReceiveInput && GameServices.Screens != null)
             {
-                GameServices.Screens.Replace<T>();
+                GameServices.Screens.Replace<T>(arg);
             }
         }
 

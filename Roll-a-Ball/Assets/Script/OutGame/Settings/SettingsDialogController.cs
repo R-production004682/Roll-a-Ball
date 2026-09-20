@@ -231,7 +231,7 @@ namespace Roll_a_Ball.OutGame
         /// <returns>確認結果が確定するまで待機する Coroutine</returns>
         private IEnumerator WaitForDefaultsConfirmation(ScreenManager screenManager)
         {
-            var confirmation = screenManager.ShowDialogAsync<ConfirmDialog, bool>("Restore default audio settings?");
+            var confirmation = screenManager.ShowDialogAsync<ConfirmDialog, bool>();
             while (!confirmation.IsCompleted)
             {
                 yield return null;
