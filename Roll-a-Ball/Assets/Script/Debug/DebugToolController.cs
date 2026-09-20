@@ -22,6 +22,8 @@ namespace Roll_a_Ball.DebugTools
         private Button cheatUserButton;
         private Button copyJsonButton;
         private Button deleteUserDataButton;
+        private GameObject deleteConfirmationDialogObject;
+        private UiInputScope deleteConfirmationInputScope;
         private Button confirmDeleteUserDataButton;
         private Button cancelDeleteUserDataButton;
         private TMP_Text statusLabel;
@@ -63,7 +65,7 @@ namespace Roll_a_Ball.DebugTools
         private void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
         {
             EnsureEventSystem();
-            if (panelObject != null && panelObject.activeSelf && cheatUserButton != null)
+            if (panelObject != null && panelObject.activeSelf)
             {
                 SelectActiveButton();
             }
@@ -137,15 +139,12 @@ namespace Roll_a_Ball.DebugTools
         private void RequestDeleteUserData()
         {
             if (inputScope == null || !inputScope.CanReceiveInput || deleteUserDataButton == null ||
-                confirmDeleteUserDataButton == null || cancelDeleteUserDataButton == null)
+                deleteConfirmationDialogObject == null || confirmDeleteUserDataButton == null)
             {
                 return;
             }
 
-            deleteUserDataButton.interactable = false;
-            confirmDeleteUserDataButton.gameObject.SetActive(true);
-            cancelDeleteUserDataButton.gameObject.SetActive(true);
-            SetInfoStatus("ユーザーデータを初期状態へ戻します。実行する場合は「削除を確定」を押してください。");
+            deleteConfirmationDialogObject.SetActive(true);
             confirmDeleteUserDataButton.Select();
         }
 
@@ -154,7 +153,8 @@ namespace Roll_a_Ball.DebugTools
         /// </summary>
         private void ConfirmDeleteUserData()
         {
-            if (inputScope == null || !inputScope.CanReceiveInput || confirmDeleteUserDataButton == null ||
+            if (deleteConfirmationInputScope == null || !deleteConfirmationInputScope.CanReceiveInput ||
+                confirmDeleteUserDataButton == null ||
                 cancelDeleteUserDataButton == null)
             {
                 return;
@@ -173,7 +173,8 @@ namespace Roll_a_Ball.DebugTools
         /// </summary>
         private void CancelDeleteUserData()
         {
-            if (inputScope == null || !inputScope.CanReceiveInput || cancelDeleteUserDataButton == null)
+            if (deleteConfirmationInputScope == null || !deleteConfirmationInputScope.CanReceiveInput ||
+                cancelDeleteUserDataButton == null)
             {
                 return;
             }
@@ -221,21 +222,19 @@ namespace Roll_a_Ball.DebugTools
         /// </summary>
         private void HideDeleteConfirmation()
         {
-            if (deleteUserDataButton != null)
-            {
-                deleteUserDataButton.interactable = true;
-            }
-
             if (confirmDeleteUserDataButton != null)
             {
                 confirmDeleteUserDataButton.interactable = true;
-                confirmDeleteUserDataButton.gameObject.SetActive(false);
             }
 
             if (cancelDeleteUserDataButton != null)
             {
                 cancelDeleteUserDataButton.interactable = true;
-                cancelDeleteUserDataButton.gameObject.SetActive(false);
+            }
+
+            if (deleteConfirmationDialogObject != null)
+            {
+                deleteConfirmationDialogObject.SetActive(false);
             }
         }
 
@@ -244,7 +243,8 @@ namespace Roll_a_Ball.DebugTools
         /// </summary>
         private void SelectActiveButton()
         {
-            if (confirmDeleteUserDataButton != null && confirmDeleteUserDataButton.gameObject.activeSelf)
+            if (deleteConfirmationDialogObject != null && deleteConfirmationDialogObject.activeSelf &&
+                confirmDeleteUserDataButton != null)
             {
                 confirmDeleteUserDataButton.Select();
                 return;
@@ -338,23 +338,6 @@ namespace Roll_a_Ball.DebugTools
                 new Vector2(360f, 72f));
             deleteUserDataButton.onClick.AddListener(RequestDeleteUserData);
 
-            confirmDeleteUserDataButton = CreateButton(
-                "ConfirmDeleteUserDataButton",
-                buttonGrid,
-                "削除を確定",
-                Vector2.zero,
-                new Vector2(360f, 72f));
-            confirmDeleteUserDataButton.onClick.AddListener(ConfirmDeleteUserData);
-
-            cancelDeleteUserDataButton = CreateButton(
-                "CancelDeleteUserDataButton",
-                buttonGrid,
-                "削除をキャンセル",
-                Vector2.zero,
-                new Vector2(360f, 72f));
-            cancelDeleteUserDataButton.onClick.AddListener(CancelDeleteUserData);
-            HideDeleteConfirmation();
-
             statusLabel = CreateText(
                 "Status",
                 panelObject.transform,
@@ -366,7 +349,79 @@ namespace Roll_a_Ball.DebugTools
                 new Vector2(0f, 96f),
                 new Vector2(620f, 80f));
 
+            BuildDeleteConfirmationDialog(panelObject.transform);
+
             panelObject.SetActive(false);
+        }
+
+        /// <summary>
+        /// ユーザーデータ削除の確認ダイアログをデバッグパネル内へ構築する
+        /// </summary>
+        /// <param name="parent">ダイアログを追加する親Transform</param>
+        private void BuildDeleteConfirmationDialog(Transform parent)
+        {
+            deleteConfirmationDialogObject = new GameObject(
+                "DeleteUserDataConfirmationDialog",
+                typeof(RectTransform),
+                typeof(Image),
+                typeof(CanvasGroup),
+                typeof(UiInputScope));
+            deleteConfirmationDialogObject.transform.SetParent(parent, false);
+            var dialogRect = deleteConfirmationDialogObject.GetComponent<RectTransform>();
+            SetFullScreenRect(dialogRect);
+
+            var dialogBackground = deleteConfirmationDialogObject.GetComponent<Image>();
+            dialogBackground.color = new Color(0f, 0f, 0f, 0.72f);
+            deleteConfirmationInputScope = deleteConfirmationDialogObject.GetComponent<UiInputScope>();
+            deleteConfirmationInputScope.CancelRequested.AddListener(CancelDeleteUserData);
+
+            var contentObject = new GameObject("Content", typeof(RectTransform), typeof(Image));
+            contentObject.transform.SetParent(deleteConfirmationDialogObject.transform, false);
+            var contentRect = contentObject.GetComponent<RectTransform>();
+            SetCenteredRect(contentRect, new Vector2(760f, 360f));
+            var contentImage = contentObject.GetComponent<Image>();
+            contentImage.color = new Color(0.08f, 0.12f, 0.18f, 1f);
+
+            CreateText(
+                "Title",
+                contentObject.transform,
+                "ユーザーデータを削除しますか？",
+                28f,
+                Color.white,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0f, 112f),
+                new Vector2(680f, 56f));
+            CreateText(
+                "Description",
+                contentObject.transform,
+                "所持金、ステージ進行、クリアタイム、購入状態が初期状態へ戻ります。\nこの操作は元に戻せません。",
+                20f,
+                new Color(0.88f, 0.9f, 0.94f),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0f, 22f),
+                new Vector2(680f, 120f));
+
+            confirmDeleteUserDataButton = CreateButton(
+                "ConfirmButton",
+                contentObject.transform,
+                "削除する",
+                new Vector2(-156f, -108f),
+                new Vector2(272f, 72f));
+            confirmDeleteUserDataButton.GetComponent<Image>().color = new Color(0.78f, 0.2f, 0.22f, 1f);
+            confirmDeleteUserDataButton.onClick.AddListener(ConfirmDeleteUserData);
+
+            cancelDeleteUserDataButton = CreateButton(
+                "CancelButton",
+                contentObject.transform,
+                "キャンセル",
+                new Vector2(156f, -108f),
+                new Vector2(272f, 72f));
+            cancelDeleteUserDataButton.GetComponent<Image>().color = new Color(0.28f, 0.34f, 0.44f, 1f);
+            cancelDeleteUserDataButton.onClick.AddListener(CancelDeleteUserData);
+
+            HideDeleteConfirmation();
         }
 
         /// <summary>
@@ -414,6 +469,20 @@ namespace Roll_a_Ball.DebugTools
             rectTransform.pivot = new Vector2(0.5f, 0.5f);
             rectTransform.offsetMin = Vector2.zero;
             rectTransform.offsetMax = Vector2.zero;
+        }
+
+        /// <summary>
+        /// 親の中央へ固定サイズのRectTransformを設定する
+        /// </summary>
+        /// <param name="rectTransform">設定対象</param>
+        /// <param name="size">表示サイズ</param>
+        private static void SetCenteredRect(RectTransform rectTransform, Vector2 size)
+        {
+            rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
+            rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+            rectTransform.pivot = new Vector2(0.5f, 0.5f);
+            rectTransform.anchoredPosition = Vector2.zero;
+            rectTransform.sizeDelta = size;
         }
 
         /// <summary>
