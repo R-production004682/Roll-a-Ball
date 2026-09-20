@@ -207,10 +207,10 @@ namespace Roll_a_Ball.OutGame
                 return;
             }
 
+            LogDialogTransition("complete-requested", dialog);
             changing = true;
             stack.RemoveAt(stack.Count - 1);
-            dialog.SetResult(result);
-            CloseAndDestroy(dialog);
+            CloseCompletedDialog(dialog, result);
             changing = false;
         }
 
@@ -317,11 +317,16 @@ namespace Roll_a_Ball.OutGame
                 screen.transform.SetParent(screenRoot, false);
                 screen.gameObject.SetActive(true);
                 stack.Add(screen);
+                LogDialogTransition("push-active", screen);
                 if (!OpenScreen(screen, arg))
                 {
                     stack.Remove(screen);
                     CloseAndDestroy(screen);
                     screen = null;
+                }
+                else
+                {
+                    LogDialogTransition("open-complete", screen);
                 }
             }
 
@@ -407,6 +412,56 @@ namespace Roll_a_Ball.OutGame
 
             screen.gameObject.SetActive(false);
             UnityEngine.Object.Destroy(screen.gameObject);
+        }
+
+        /// <summary>
+        /// 確定済みの Dialog を画面から取り除いた後で、呼び出し側へ結果を返す
+        /// </summary>
+        /// <typeparam name="TResult">Dialog が返す結果の型</typeparam>
+        /// <param name="dialog">確定して閉じる Dialog</param>
+        /// <param name="result">呼び出し側へ返す確定結果</param>
+        private void CloseCompletedDialog<TResult>(DialogBase<TResult> dialog, TResult result)
+        {
+            if (dialog == null)
+            {
+                return;
+            }
+
+            LogDialogTransition("close-begin", dialog);
+            dialog.OnClose();
+            LogDialogTransition("close-on-close-complete", dialog);
+            dialog.gameObject.SetActive(false);
+            LogDialogTransition("close-inactive", dialog);
+            dialog.SetResult(result);
+            LogDialogTransition("result-completed", dialog);
+            dialog.ClearOwner();
+            UnityEngine.Object.Destroy(dialog.gameObject);
+        }
+
+        /// <summary>
+        /// Editor 上で Dialog の表示切り替え順序と RectTransform の状態を記録する
+        /// </summary>
+        /// <param name="phase">記録する表示切り替えの段階</param>
+        /// <param name="screen">状態を記録する Screen</param>
+        [System.Diagnostics.Conditional("UNITY_EDITOR")]
+        private void LogDialogTransition(string phase, ScreenBase screen)
+        {
+            if (screen == null || !(screen is IDialog))
+            {
+                return;
+            }
+
+            var rectTransform = screen.transform as RectTransform;
+            var rectSize = rectTransform == null ? Vector2.zero : rectTransform.rect.size;
+            var scale = rectTransform == null ? Vector3.one : rectTransform.localScale;
+            var canvas = screen.GetComponent<Canvas>();
+            var sortingOrder = canvas == null ? 0 : canvas.sortingOrder;
+            Debug.Log(
+                $"[DialogTransition] frame={Time.frameCount} phase={phase} dialog={screen.name} " +
+                $"id={screen.GetInstanceID()} activeSelf={screen.gameObject.activeSelf} " +
+                $"activeInHierarchy={screen.gameObject.activeInHierarchy} rect={rectSize} " +
+                $"scale={scale} sortingOrder={sortingOrder} stackCount={stack.Count}",
+                this);
         }
     }
 }

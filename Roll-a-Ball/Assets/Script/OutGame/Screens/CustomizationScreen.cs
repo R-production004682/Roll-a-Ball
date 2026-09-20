@@ -9,9 +9,21 @@ namespace Roll_a_Ball.OutGame
     /// </summary>
     public sealed class CustomizationScreen : ScreenBase
     {
+        /// <summary>
+        /// カスタマイズ画面から戻る Screen を表す
+        /// </summary>
+        public enum ReturnDestination
+        {
+            StageSelect,
+            Shop
+        }
+
         [SerializeField] private Button backButton;
+        [SerializeField] private GameObject stageSelectBackLabel;
+        [SerializeField] private GameObject shopBackLabel;
         private UiInputScope inputScope;
         private bool returnQueued;
+        private ReturnDestination returnDestination;
 
         /// <summary>
         /// 入力範囲を取得する
@@ -22,19 +34,25 @@ namespace Roll_a_Ball.OutGame
         }
 
         /// <summary>
-        /// 戻る操作を登録する
+        /// 遷移元に応じた戻る先と操作を設定する
         /// </summary>
+        /// <param name="arg">カスタマイズ画面から戻る Screen</param>
         public override void OnOpen(object arg)
         {
             returnQueued = false;
-            if (inputScope == null || backButton == null)
+            returnDestination = arg is ReturnDestination destination
+                ? destination
+                : ReturnDestination.StageSelect;
+            if (inputScope == null || backButton == null ||
+                stageSelectBackLabel == null || shopBackLabel == null)
             {
-                Debug.LogError("CustomizationScreen の戻るボタンまたは UiInputScope が設定されていません。", this);
+                Debug.LogError("CustomizationScreen の戻るボタン、ラベル、または UiInputScope が設定されていません。", this);
                 return;
             }
 
-            backButton.onClick.AddListener(ReturnToStages);
-            inputScope.CancelRequested.AddListener(ReturnToStages);
+            RefreshBackLabel();
+            backButton.onClick.AddListener(ReturnToSource);
+            inputScope.CancelRequested.AddListener(ReturnToSource);
             backButton.Select();
         }
 
@@ -46,19 +64,19 @@ namespace Roll_a_Ball.OutGame
             returnQueued = false;
             if (backButton != null)
             {
-                backButton.onClick.RemoveListener(ReturnToStages);
+                backButton.onClick.RemoveListener(ReturnToSource);
             }
 
             if (inputScope != null)
             {
-                inputScope.CancelRequested.RemoveListener(ReturnToStages);
+                inputScope.CancelRequested.RemoveListener(ReturnToSource);
             }
         }
 
         /// <summary>
-        /// ステージ選択 Screen へ戻る
+        /// 遷移元の Screen へ戻る
         /// </summary>
-        private void ReturnToStages()
+        private void ReturnToSource()
         {
             if (returnQueued || inputScope == null || !inputScope.CanReceiveInput)
             {
@@ -66,23 +84,39 @@ namespace Roll_a_Ball.OutGame
             }
 
             returnQueued = true;
-            StartCoroutine(ReturnToStagesAfterInputFrame());
+            StartCoroutine(ReturnToSourceAfterInputFrame());
         }
 
         /// <summary>
-        /// Button の入力フレーム終了後にステージ選択 Screen へ戻る
+        /// 戻るボタンのラベルを遷移元に合わせて切り替える
+        /// </summary>
+        private void RefreshBackLabel()
+        {
+            var returnsToShop = returnDestination == ReturnDestination.Shop;
+            stageSelectBackLabel.SetActive(!returnsToShop);
+            shopBackLabel.SetActive(returnsToShop);
+        }
+
+        /// <summary>
+        /// Button の入力フレーム終了後に遷移元の Screen へ戻る
         /// </summary>
         /// <returns>一フレーム待機する Coroutine</returns>
-        private IEnumerator ReturnToStagesAfterInputFrame()
+        private IEnumerator ReturnToSourceAfterInputFrame()
         {
             yield return null;
             if (GameServices.Screens != null)
             {
+                if (returnDestination == ReturnDestination.Shop)
+                {
+                    GameServices.Screens.Replace<ShopScreen>();
+                    yield break;
+                }
+
                 GameServices.Screens.Replace<StageSelectScreen>();
                 yield break;
             }
 
-            Debug.LogError("ScreenManager がないため StageSelectScreen に戻れません。", this);
+            Debug.LogError("ScreenManager がないため遷移元の Screen に戻れません。", this);
             returnQueued = false;
         }
     }
