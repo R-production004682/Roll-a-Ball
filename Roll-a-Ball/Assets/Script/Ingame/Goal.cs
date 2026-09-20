@@ -11,6 +11,8 @@ public class Goal : MonoBehaviour
         {
             goalEffect.Play();//ゴールエフェクトを再生
             GameManager.instance.StageCompleted();//クリア処理を行う
+
+            Debug.Log("ゲームクリア");
         }
     }
 }
