@@ -18,6 +18,10 @@
 *.obj filter=lfs diff=lfs merge=lfs -text
 *.blend filter=lfs diff=lfs merge=lfs -text
 
+# UnityのYAML形式アセットはテキストとして管理する（LFSポインタ化しない）
+# 明示的な例外（日本語フォントのSDF）は下段でLFSに戻す
+*.asset text -filter diff merge
+
 # 音声・動画
 *.wav filter=lfs diff=lfs merge=lfs -text
 *.mp3 filter=lfs diff=lfs merge=lfs -text
