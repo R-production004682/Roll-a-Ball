@@ -21,6 +21,9 @@ namespace Roll_a_Ball.DebugTools
         private UiInputScope inputScope;
         private Button cheatUserButton;
         private Button copyJsonButton;
+        private Button deleteUserDataButton;
+        private Button confirmDeleteUserDataButton;
+        private Button cancelDeleteUserDataButton;
         private TMP_Text statusLabel;
 
         /// <summary>
@@ -62,7 +65,7 @@ namespace Roll_a_Ball.DebugTools
             EnsureEventSystem();
             if (panelObject != null && panelObject.activeSelf && cheatUserButton != null)
             {
-                cheatUserButton.Select();
+                SelectActiveButton();
             }
         }
 
@@ -81,11 +84,15 @@ namespace Roll_a_Ball.DebugTools
             {
                 EnsureEventSystem();
             }
+            else
+            {
+                HideDeleteConfirmation();
+            }
 
             panelObject.SetActive(shouldOpen);
-            if (shouldOpen && cheatUserButton != null)
+            if (shouldOpen)
             {
-                cheatUserButton.Select();
+                SelectActiveButton();
             }
         }
 
@@ -125,6 +132,58 @@ namespace Roll_a_Ball.DebugTools
         }
 
         /// <summary>
+        /// ユーザーデータ削除の確認操作を表示する
+        /// </summary>
+        private void RequestDeleteUserData()
+        {
+            if (inputScope == null || !inputScope.CanReceiveInput || deleteUserDataButton == null ||
+                confirmDeleteUserDataButton == null || cancelDeleteUserDataButton == null)
+            {
+                return;
+            }
+
+            deleteUserDataButton.interactable = false;
+            confirmDeleteUserDataButton.gameObject.SetActive(true);
+            cancelDeleteUserDataButton.gameObject.SetActive(true);
+            SetInfoStatus("ユーザーデータを初期状態へ戻します。実行する場合は「削除を確定」を押してください。");
+            confirmDeleteUserDataButton.Select();
+        }
+
+        /// <summary>
+        /// 確認済みのユーザーデータ削除を実行する
+        /// </summary>
+        private void ConfirmDeleteUserData()
+        {
+            if (inputScope == null || !inputScope.CanReceiveInput || confirmDeleteUserDataButton == null ||
+                cancelDeleteUserDataButton == null)
+            {
+                return;
+            }
+
+            confirmDeleteUserDataButton.interactable = false;
+            cancelDeleteUserDataButton.interactable = false;
+            var succeeded = DebugUserDataResetService.TryReset(out var message);
+            HideDeleteConfirmation();
+            SetStatus(message, succeeded);
+            SelectActiveButton();
+        }
+
+        /// <summary>
+        /// ユーザーデータ削除の確認操作をキャンセルする
+        /// </summary>
+        private void CancelDeleteUserData()
+        {
+            if (inputScope == null || !inputScope.CanReceiveInput || cancelDeleteUserDataButton == null)
+            {
+                return;
+            }
+
+            HideDeleteConfirmation();
+            SetInfoStatus("ユーザーデータ削除をキャンセルしました。データは変更されていません。");
+            SelectActiveButton();
+        }
+
+        /// <summary>
         /// デバッグメニューのステータス表示を更新する
         /// </summary>
         /// <param name="message">表示するメッセージ</param>
@@ -140,6 +199,61 @@ namespace Roll_a_Ball.DebugTools
             statusLabel.color = succeeded
                 ? new Color(0.55f, 1f, 0.7f)
                 : new Color(1f, 0.55f, 0.55f);
+        }
+
+        /// <summary>
+        /// デバッグメニューの情報表示を更新する
+        /// </summary>
+        /// <param name="message">表示するメッセージ</param>
+        private void SetInfoStatus(string message)
+        {
+            if (statusLabel == null)
+            {
+                return;
+            }
+
+            statusLabel.text = message;
+            statusLabel.color = new Color(0.68f, 0.76f, 0.86f);
+        }
+
+        /// <summary>
+        /// ユーザーデータ削除の確認操作を非表示に戻す
+        /// </summary>
+        private void HideDeleteConfirmation()
+        {
+            if (deleteUserDataButton != null)
+            {
+                deleteUserDataButton.interactable = true;
+            }
+
+            if (confirmDeleteUserDataButton != null)
+            {
+                confirmDeleteUserDataButton.interactable = true;
+                confirmDeleteUserDataButton.gameObject.SetActive(false);
+            }
+
+            if (cancelDeleteUserDataButton != null)
+            {
+                cancelDeleteUserDataButton.interactable = true;
+                cancelDeleteUserDataButton.gameObject.SetActive(false);
+            }
+        }
+
+        /// <summary>
+        /// 確認操作中かどうかに応じてデバッグボタンを選択する
+        /// </summary>
+        private void SelectActiveButton()
+        {
+            if (confirmDeleteUserDataButton != null && confirmDeleteUserDataButton.gameObject.activeSelf)
+            {
+                confirmDeleteUserDataButton.Select();
+                return;
+            }
+
+            if (cheatUserButton != null)
+            {
+                cheatUserButton.Select();
+            }
         }
 
         /// <summary>
@@ -215,6 +329,31 @@ namespace Roll_a_Ball.DebugTools
                 Vector2.zero,
                 new Vector2(360f, 72f));
             copyJsonButton.onClick.AddListener(CopySavedJson);
+
+            deleteUserDataButton = CreateButton(
+                "DeleteUserDataButton",
+                buttonGrid,
+                "ユーザーデータを削除",
+                Vector2.zero,
+                new Vector2(360f, 72f));
+            deleteUserDataButton.onClick.AddListener(RequestDeleteUserData);
+
+            confirmDeleteUserDataButton = CreateButton(
+                "ConfirmDeleteUserDataButton",
+                buttonGrid,
+                "削除を確定",
+                Vector2.zero,
+                new Vector2(360f, 72f));
+            confirmDeleteUserDataButton.onClick.AddListener(ConfirmDeleteUserData);
+
+            cancelDeleteUserDataButton = CreateButton(
+                "CancelDeleteUserDataButton",
+                buttonGrid,
+                "削除をキャンセル",
+                Vector2.zero,
+                new Vector2(360f, 72f));
+            cancelDeleteUserDataButton.onClick.AddListener(CancelDeleteUserData);
+            HideDeleteConfirmation();
 
             statusLabel = CreateText(
                 "Status",
