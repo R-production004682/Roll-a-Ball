@@ -285,11 +285,28 @@ namespace Roll_a_Ball.OutGame
         /// <returns>購入状態と所持金を保存できた場合は true</returns>
         public static bool TryPurchaseItem(string itemId, int price, out int currencyAfterPurchase)
         {
+            return TryPurchaseItem(itemId, price, 1, out currencyAfterPurchase);
+        }
+
+        /// <summary>
+        /// 商品の購入可能数を確認し、購入数を一つ増やして保存する
+        /// </summary>
+        /// <param name="itemId">商品を識別する安定 ID</param>
+        /// <param name="price">購入に必要な0以上の金額</param>
+        /// <param name="purchaseLimit">商品ごとの購入可能数</param>
+        /// <param name="currencyAfterPurchase">購入後の所持金。失敗時は変更前の値</param>
+        /// <returns>購入状態と所持金を保存できた場合は true</returns>
+        public static bool TryPurchaseItem(
+            string itemId,
+            int price,
+            int purchaseLimit,
+            out int currencyAfterPurchase)
+        {
             EnsureInitialized();
             currencyAfterPurchase = saveData.currency;
 
-            if (string.IsNullOrWhiteSpace(itemId) || price < 0 ||
-                price > saveData.currency || IsItemPurchased(itemId))
+            if (string.IsNullOrWhiteSpace(itemId) || price < 0 || purchaseLimit <= 0 ||
+                price > saveData.currency || GetItemPurchaseCount(itemId) >= purchaseLimit)
             {
                 return false;
             }
@@ -313,8 +330,32 @@ namespace Roll_a_Ball.OutGame
         /// <returns>購入済みの場合は true</returns>
         public static bool IsItemPurchased(string itemId)
         {
+            return GetItemPurchaseCount(itemId) > 0;
+        }
+
+        /// <summary>
+        /// 商品の購入済み個数を返す
+        /// </summary>
+        /// <param name="itemId">商品を識別する安定 ID</param>
+        /// <returns>購入済み個数</returns>
+        public static int GetItemPurchaseCount(string itemId)
+        {
             EnsureInitialized();
-            return !string.IsNullOrWhiteSpace(itemId) && saveData.purchasedItemIds.Contains(itemId);
+            if (string.IsNullOrWhiteSpace(itemId))
+            {
+                return 0;
+            }
+
+            var purchasedCount = 0;
+            for (var index = 0; index < saveData.purchasedItemIds.Count; index++)
+            {
+                if (string.Equals(saveData.purchasedItemIds[index], itemId, System.StringComparison.Ordinal))
+                {
+                    purchasedCount++;
+                }
+            }
+
+            return purchasedCount;
         }
 
         /// <summary>
@@ -324,11 +365,21 @@ namespace Roll_a_Ball.OutGame
         public static string[] GetPurchasedItemIds()
         {
             EnsureInitialized();
-            return saveData.purchasedItemIds.ToArray();
+            var uniqueItemIds = new List<string>();
+            for (var index = 0; index < saveData.purchasedItemIds.Count; index++)
+            {
+                var itemId = saveData.purchasedItemIds[index];
+                if (!uniqueItemIds.Contains(itemId))
+                {
+                    uniqueItemIds.Add(itemId);
+                }
+            }
+
+            return uniqueItemIds.ToArray();
         }
 
         /// <summary>
-        /// 現在のゲームデータを JSON ファイルへ保存する
+        /// 現在のゲームデータを PlayerPrefs へ保存する
         /// </summary>
         /// <returns>保存に成功した場合は true</returns>
         public static bool Save()
@@ -343,7 +394,7 @@ namespace Roll_a_Ball.OutGame
         }
 
         /// <summary>
-        /// 初期所持金と最初のステージ解放状態に戻して保存する
+        /// 初期所持金と最初のステージ解放状態に戻して PlayerPrefs へ保存する
         /// </summary>
         /// <returns>初期状態の保存に成功した場合は true</returns>
         public static bool ResetToDefaults()
@@ -364,7 +415,7 @@ namespace Roll_a_Ball.OutGame
         }
 
         /// <summary>
-        /// 保存ファイルを読み込み、初回データを作成する
+        /// PlayerPrefs または移行前の保存データを読み込み、初回データを作成する
         /// </summary>
         private static void EnsureInitialized()
         {
@@ -392,13 +443,18 @@ namespace Roll_a_Ball.OutGame
             {
                 saveData = normalizedData;
                 saveAllowed = true;
+                if (!GameDataStorage.HasPlayerPrefsData)
+                {
+                    TryPersist(saveData);
+                }
+
                 return;
             }
 
             saveData = GameDataAlgorithm.CreateDefault(InitialStageId);
             saveAllowed = false;
             hasLoadFailure = true;
-            Debug.LogError($"保存データを読み込めないため初期値を使用します。既存ファイルは上書きしません: {GameDataStorage.SavePath}{Environment.NewLine}{loadError}");
+            Debug.LogError($"保存データを読み込めないため初期値を使用します。既存の PlayerPrefs は上書きしません: {GameDataStorage.SavePath}{Environment.NewLine}{loadError}");
         }
 
         /// <summary>

@@ -5,18 +5,23 @@ using UnityEngine;
 namespace Roll_a_Ball.OutGame
 {
     /// <summary>
-    /// バージョン付きゲームデータを JSON ファイルへ読み書きする
+    /// バージョン付きゲームデータを PlayerPrefs へ読み書きする
     /// </summary>
     internal static class GameDataStorage
     {
-        private const string SaveFileName = "roll-a-ball-save.json";
-        private const string TemporaryFileSuffix = ".tmp";
-        private const string BackupFileSuffix = ".backup";
+        private const string SaveDataKey = "RollABall.GameData.SaveData";
+        private const string LegacyCurrencyKey = "HasCoin";
+        private const string LegacySaveFileName = "roll-a-ball-save.json";
 
         /// <summary>
-        /// ゲームデータの保存先 JSON ファイル
+        /// ゲームデータを保存する PlayerPrefs のキー
         /// </summary>
-        internal static string SavePath => GetSavePath();
+        internal static string SavePath => $"PlayerPrefs:{SaveDataKey}";
+
+        /// <summary>
+        /// PlayerPrefs に新しい保存データが存在するか
+        /// </summary>
+        internal static bool HasPlayerPrefsData => PlayerPrefs.HasKey(SaveDataKey);
 
         /// <summary>
         /// 保存ファイルを読み込み、未作成と読み込み失敗を区別して返す
@@ -26,34 +31,89 @@ namespace Roll_a_Ball.OutGame
         /// <returns>保存ファイルがない場合は Missing、正常読込時は Loaded、それ以外は Failed</returns>
         internal static GameDataLoadStatus Load(out GameSaveData saveData, out string error)
         {
-            return Load(GetSavePath(), out saveData, out error);
+            saveData = null;
+            error = string.Empty;
+
+            if (PlayerPrefs.HasKey(SaveDataKey))
+            {
+                return LoadFromPlayerPrefs(out saveData, out error);
+            }
+
+            var legacySavePath = GetLegacySavePath();
+            if (File.Exists(legacySavePath))
+            {
+                return LoadFromLegacyFile(legacySavePath, out saveData, out error);
+            }
+
+            if (PlayerPrefs.HasKey(LegacyCurrencyKey))
+            {
+                saveData = new GameSaveData
+                {
+                    version = GameSaveData.CurrentVersion,
+                    currency = Mathf.Max(0, PlayerPrefs.GetInt(LegacyCurrencyKey, 0))
+                };
+                saveData.stages.Add(new StageProgressData
+                {
+                    stageId = "stage-1",
+                    isUnlocked = true
+                });
+                return GameDataLoadStatus.Loaded;
+            }
+
+            return GameDataLoadStatus.Missing;
         }
 
         /// <summary>
-        /// 指定ファイルを読み込み、未作成と読み込み失敗を区別して返す
+        /// PlayerPrefs の JSON を読み込み、未作成と読み込み失敗を区別して返す
         /// </summary>
-        /// <param name="savePath">読み込む JSON ファイルの絶対パス</param>
-        /// <param name="saveData">読み込んだデータ。未作成または失敗時は null</param>
+        /// <param name="saveData">読み込んだデータ。失敗時は null</param>
         /// <param name="error">読み込み失敗時の理由</param>
-        /// <returns>保存ファイルがない場合は Missing、正常読込時は Loaded、それ以外は Failed</returns>
-        internal static GameDataLoadStatus Load(
+        /// <returns>正常読込時は Loaded、それ以外は Failed</returns>
+        private static GameDataLoadStatus LoadFromPlayerPrefs(out GameSaveData saveData, out string error)
+        {
+            saveData = null;
+            error = string.Empty;
+
+            var json = PlayerPrefs.GetString(SaveDataKey, string.Empty);
+            if (string.IsNullOrWhiteSpace(json))
+            {
+                error = $"{SavePath}: 保存データが空です。";
+                return GameDataLoadStatus.Failed;
+            }
+
+            try
+            {
+                saveData = JsonUtility.FromJson<GameSaveData>(json);
+            }
+            catch (Exception exception)
+            {
+                error = $"{SavePath}: {exception.Message}";
+                return GameDataLoadStatus.Failed;
+            }
+
+            if (saveData == null)
+            {
+                error = $"{SavePath}: JSON から保存データを復元できません。";
+                return GameDataLoadStatus.Failed;
+            }
+
+            return GameDataLoadStatus.Loaded;
+        }
+
+        /// <summary>
+        /// 移行前の JSON ファイルを読み込み、PlayerPrefs へ移行可能なデータとして返す
+        /// </summary>
+        /// <param name="savePath">移行前 JSON ファイルの絶対パス</param>
+        /// <param name="saveData">読み込んだデータ。失敗時は null</param>
+        /// <param name="error">読み込み失敗時の理由</param>
+        /// <returns>正常読込時は Loaded、それ以外は Failed</returns>
+        private static GameDataLoadStatus LoadFromLegacyFile(
             string savePath,
             out GameSaveData saveData,
             out string error)
         {
             saveData = null;
             error = string.Empty;
-
-            if (string.IsNullOrWhiteSpace(savePath))
-            {
-                error = "保存先のパスが空です。";
-                return GameDataLoadStatus.Failed;
-            }
-
-            if (!File.Exists(savePath))
-            {
-                return GameDataLoadStatus.Missing;
-            }
 
             try
             {
@@ -69,77 +129,49 @@ namespace Roll_a_Ball.OutGame
             }
             catch (Exception exception)
             {
-                // ファイル読み込みと JSON 解析の失敗を境界で返し、元ファイルを上書きしない。
+                // 移行前ファイルの読み込みと JSON 解析の失敗を境界で返し、元ファイルを変更しない。
                 error = $"{savePath}: {exception.Message}";
                 return GameDataLoadStatus.Failed;
             }
         }
 
         /// <summary>
-        /// 新しい JSON を一時ファイルへ書き、既存保存を保ったまま置き換える
+        /// ゲームデータを JSON 化して PlayerPrefs へ保存する
         /// </summary>
         /// <param name="saveData">保存するゲームデータ</param>
         /// <param name="error">保存失敗時の理由</param>
-        /// <returns>ファイルの置き換えに成功した場合は true</returns>
+        /// <returns>PlayerPrefs への保存に成功した場合は true</returns>
         internal static bool TrySave(GameSaveData saveData, out string error)
-        {
-            return TrySave(saveData, GetSavePath(), out error);
-        }
-
-        /// <summary>
-        /// 指定ファイルへ JSON を安全に置き換える
-        /// </summary>
-        /// <param name="saveData">保存するゲームデータ</param>
-        /// <param name="savePath">保存先 JSON ファイルの絶対パス</param>
-        /// <param name="error">保存失敗時の理由</param>
-        /// <returns>ファイルの置き換えに成功した場合は true</returns>
-        internal static bool TrySave(GameSaveData saveData, string savePath, out string error)
         {
             error = string.Empty;
 
-            if (saveData == null || string.IsNullOrWhiteSpace(savePath))
+            if (saveData == null)
             {
-                error = "保存データまたは保存先のパスが空です。";
+                error = "保存データが空です。";
                 return false;
             }
 
-            var temporaryPath = savePath + TemporaryFileSuffix;
-            var backupPath = savePath + BackupFileSuffix;
-
             try
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(savePath));
-                File.WriteAllText(temporaryPath, JsonUtility.ToJson(saveData, true));
-
-                if (File.Exists(savePath))
-                {
-                    if (File.Exists(backupPath))
-                    {
-                        File.Delete(backupPath);
-                    }
-
-                    File.Replace(temporaryPath, savePath, backupPath);
-                    return true;
-                }
-
-                File.Move(temporaryPath, savePath);
+                PlayerPrefs.SetString(SaveDataKey, JsonUtility.ToJson(saveData));
+                PlayerPrefs.Save();
                 return true;
             }
             catch (Exception exception)
             {
-                // ストレージ API の失敗を呼び出し元へ伝え、既存ファイルは直接削除しない。
-                error = $"{savePath}: {exception.Message}";
+                // PlayerPrefs の保存失敗を呼び出し元へ返し、ランタイムの共有データは呼び出し元で更新しない。
+                error = $"{SavePath}: {exception.Message}";
                 return false;
             }
         }
 
         /// <summary>
-        /// Unity の永続データ領域にある保存ファイルのパスを返す
+        /// 移行前の JSON 保存ファイルのパスを返す
         /// </summary>
-        /// <returns>ゲームデータ JSON の絶対パス</returns>
-        private static string GetSavePath()
+        /// <returns>移行前ゲームデータ JSON の絶対パス</returns>
+        private static string GetLegacySavePath()
         {
-            return Path.Combine(Application.persistentDataPath, SaveFileName);
+            return Path.Combine(Application.persistentDataPath, LegacySaveFileName);
         }
     }
 

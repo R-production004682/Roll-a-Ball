@@ -15,6 +15,7 @@ namespace Roll_a_Ball.OutGame
         [SerializeField] private string displayName;
         [SerializeField, TextArea] private string description;
         [SerializeField] private int price;
+        [SerializeField, Min(1)] private int purchaseLimit = 1;
         [SerializeField] private Sprite icon;
 
         /// <summary>
@@ -48,6 +49,11 @@ namespace Roll_a_Ball.OutGame
         public int Price => price;
 
         /// <summary>
+        /// 商品ごとの購入可能数を取得する
+        /// </summary>
+        public int PurchaseLimit => Mathf.Max(1, purchaseLimit);
+
+        /// <summary>
         /// 商品アイコンを取得する
         /// </summary>
         public Sprite Icon => icon;
@@ -70,6 +76,30 @@ namespace Roll_a_Ball.OutGame
             string itemDescription,
             int itemPrice,
             Sprite itemIcon)
+            : this(itemId, order, itemCategory, name, itemDescription, itemPrice, 1, itemIcon)
+        {
+        }
+
+        /// <summary>
+        /// 商品表示に必要な値と購入可能数を初期化する
+        /// </summary>
+        /// <param name="itemId">商品を識別する安定 ID</param>
+        /// <param name="order">商品の表示順</param>
+        /// <param name="itemCategory">商品カテゴリ</param>
+        /// <param name="name">商品名</param>
+        /// <param name="itemDescription">商品説明</param>
+        /// <param name="itemPrice">商品価格</param>
+        /// <param name="itemPurchaseLimit">商品ごとの購入可能数</param>
+        /// <param name="itemIcon">商品アイコン</param>
+        public ShopItemDefinition(
+            string itemId,
+            int order,
+            string itemCategory,
+            string name,
+            string itemDescription,
+            int itemPrice,
+            int itemPurchaseLimit,
+            Sprite itemIcon)
         {
             id = itemId;
             displayOrder = order;
@@ -77,6 +107,7 @@ namespace Roll_a_Ball.OutGame
             displayName = name;
             description = itemDescription;
             price = itemPrice;
+            purchaseLimit = Mathf.Max(1, itemPurchaseLimit);
             icon = itemIcon;
         }
     }
