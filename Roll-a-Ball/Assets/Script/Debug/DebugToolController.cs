@@ -22,6 +22,9 @@ namespace Roll_a_Ball.DebugTools
         private Button cheatUserButton;
         private Button copyJsonButton;
         private Button deleteUserDataButton;
+        private TMP_InputField currencyGrantInputField;
+        private Button clearCurrencyGrantInputButton;
+        private Button grantCurrencyButton;
         private GameObject deleteConfirmationDialogObject;
         private UiInputScope deleteConfirmationInputScope;
         private Button confirmDeleteUserDataButton;
@@ -131,6 +134,40 @@ namespace Roll_a_Ball.DebugTools
             SetStatus(message, succeeded);
             copyJsonButton.interactable = true;
             copyJsonButton.Select();
+        }
+
+        /// <summary>
+        /// 入力欄のコイン付与額を保存データへ反映する
+        /// </summary>
+        private void GrantCurrency()
+        {
+            if (inputScope == null || !inputScope.CanReceiveInput || currencyGrantInputField == null ||
+                grantCurrencyButton == null)
+            {
+                return;
+            }
+
+            grantCurrencyButton.interactable = false;
+            var succeeded = DebugCurrencyGrantService.TryGrant(currencyGrantInputField.text, out var message);
+            SetStatus(message, succeeded);
+            grantCurrencyButton.interactable = true;
+            currencyGrantInputField.Select();
+        }
+
+        /// <summary>
+        /// コイン付与額の入力欄を空にする
+        /// </summary>
+        private void ClearCurrencyGrantInput()
+        {
+            if (inputScope == null || !inputScope.CanReceiveInput || currencyGrantInputField == null ||
+                clearCurrencyGrantInputButton == null)
+            {
+                return;
+            }
+
+            currencyGrantInputField.text = string.Empty;
+            SetInfoStatus("コイン付与額の入力をクリアしました。");
+            currencyGrantInputField.Select();
         }
 
         /// <summary>
@@ -338,6 +375,8 @@ namespace Roll_a_Ball.DebugTools
                 new Vector2(360f, 72f));
             deleteUserDataButton.onClick.AddListener(RequestDeleteUserData);
 
+            BuildCurrencyGrantControls(buttonGrid);
+
             statusLabel = CreateText(
                 "Status",
                 panelObject.transform,
@@ -352,6 +391,106 @@ namespace Roll_a_Ball.DebugTools
             BuildDeleteConfirmationDialog(panelObject.transform);
 
             panelObject.SetActive(false);
+        }
+
+        /// <summary>
+        /// コイン付与額の入力欄と操作ボタンをデバッググリッドへ追加する
+        /// </summary>
+        /// <param name="parent">入力欄とボタンを追加するグリッドのTransform</param>
+        private void BuildCurrencyGrantControls(Transform parent)
+        {
+            var controlsObject = new GameObject(
+                "CurrencyGrantControls",
+                typeof(RectTransform),
+                typeof(HorizontalLayoutGroup));
+            controlsObject.transform.SetParent(parent, false);
+
+            var controlsLayout = controlsObject.GetComponent<HorizontalLayoutGroup>();
+            controlsLayout.spacing = 8f;
+            controlsLayout.childControlWidth = true;
+            controlsLayout.childControlHeight = true;
+            controlsLayout.childForceExpandWidth = false;
+            controlsLayout.childForceExpandHeight = true;
+
+            currencyGrantInputField = CreateCurrencyGrantInputField(controlsObject.transform);
+
+            clearCurrencyGrantInputButton = CreateButton(
+                "ClearCurrencyGrantInputButton",
+                controlsObject.transform,
+                "クリア",
+                Vector2.zero,
+                new Vector2(72f, 72f));
+            var clearButtonLayout = clearCurrencyGrantInputButton.gameObject.AddComponent<LayoutElement>();
+            clearButtonLayout.preferredWidth = 72f;
+            clearCurrencyGrantInputButton.onClick.AddListener(ClearCurrencyGrantInput);
+
+            grantCurrencyButton = CreateButton(
+                "GrantCurrencyButton",
+                controlsObject.transform,
+                "コインを付与",
+                Vector2.zero,
+                new Vector2(132f, 72f));
+            var grantButtonLayout = grantCurrencyButton.gameObject.AddComponent<LayoutElement>();
+            grantButtonLayout.preferredWidth = 132f;
+            grantCurrencyButton.onClick.AddListener(GrantCurrency);
+        }
+
+        /// <summary>
+        /// 初期値付きの整数入力欄を生成する
+        /// </summary>
+        /// <param name="parent">入力欄を追加する親Transform</param>
+        /// <returns>生成した整数入力欄</returns>
+        private static TMP_InputField CreateCurrencyGrantInputField(Transform parent)
+        {
+            var inputObject = new GameObject(
+                "CurrencyGrantInputField",
+                typeof(RectTransform),
+                typeof(Image),
+                typeof(TMP_InputField),
+                typeof(LayoutElement));
+            inputObject.transform.SetParent(parent, false);
+
+            var inputImage = inputObject.GetComponent<Image>();
+            inputImage.color = new Color(0.95f, 0.97f, 1f, 1f);
+
+            var inputLayout = inputObject.GetComponent<LayoutElement>();
+            inputLayout.preferredWidth = 140f;
+
+            var inputField = inputObject.GetComponent<TMP_InputField>();
+            inputField.contentType = TMP_InputField.ContentType.IntegerNumber;
+            inputField.characterLimit = 10;
+            inputField.targetGraphic = inputImage;
+            inputField.textViewport = inputObject.GetComponent<RectTransform>();
+
+            var text = CreateText(
+                "Text",
+                inputObject.transform,
+                string.Empty,
+                22f,
+                new Color(0.08f, 0.12f, 0.18f),
+                Vector2.zero,
+                Vector2.one,
+                Vector2.zero,
+                Vector2.zero);
+            text.alignment = TextAlignmentOptions.MidlineLeft;
+            text.margin = new Vector4(16f, 0f, 8f, 0f);
+            inputField.textComponent = text as TextMeshProUGUI;
+
+            var placeholder = CreateText(
+                "Placeholder",
+                inputObject.transform,
+                "付与額",
+                22f,
+                new Color(0.38f, 0.44f, 0.54f),
+                Vector2.zero,
+                Vector2.one,
+                Vector2.zero,
+                Vector2.zero);
+            placeholder.alignment = TextAlignmentOptions.MidlineLeft;
+            placeholder.margin = new Vector4(16f, 0f, 8f, 0f);
+            inputField.placeholder = placeholder;
+            inputField.text = "1000";
+            return inputField;
         }
 
         /// <summary>
