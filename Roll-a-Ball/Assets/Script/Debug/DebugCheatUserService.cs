@@ -17,7 +17,7 @@ namespace Roll_a_Ball.DebugTools
         private const string StageFourId = "stage-4";
 
         /// <summary>
-        /// 所持金、ステージ解放、購入済み商品を開発用プリセットへ置き換える
+        /// 所持金、ステージの解放・クリア状態、購入済み商品を開発用プリセットへ置き換える
         /// </summary>
         /// <param name="message">画面へ表示する実行結果</param>
         /// <returns>プリセットを最後まで保存できた場合は true</returns>
@@ -44,9 +44,12 @@ namespace Roll_a_Ball.DebugTools
                 return false;
             }
 
-            if (!UnlockStage(StageTwoId) || !UnlockStage(StageThreeId) || !UnlockStage(StageFourId))
+            if (!UnlockAndMarkStageCleared(GameDataManager.InitialStageId) ||
+                !UnlockAndMarkStageCleared(StageTwoId) ||
+                !UnlockAndMarkStageCleared(StageThreeId) ||
+                !UnlockAndMarkStageCleared(StageFourId))
             {
-                message = "チートユーザー作成に失敗しました。ステージ解放状態を保存できません。";
+                message = "チートユーザー作成に失敗しました。ステージの解放・クリア状態を保存できません。";
                 UnityEngine.Debug.LogError(message);
                 return false;
             }
@@ -74,7 +77,7 @@ namespace Roll_a_Ball.DebugTools
 
             message =
                 $"チートユーザーを作成しました。 \n" +
-                $"所持金: {currencyAfterChange:N0}、解放: stage-1～stage-4、取得商品数: {purchasedItemCount}";
+                $"所持金: {currencyAfterChange:N0}、解放・クリア: stage-1～stage-4、取得商品数: {purchasedItemCount}";
             UnityEngine.Debug.Log(message);
             return true;
         }
@@ -116,18 +119,24 @@ namespace Roll_a_Ball.DebugTools
         }
 
         /// <summary>
-        /// 指定したステージを解放し、保存に失敗した場合は原因をログへ残す
+        /// 指定したステージを解放済みかつクリア済みにし、保存に失敗した場合は原因をログへ残す
         /// </summary>
-        /// <param name="stageId">解放するステージ ID</param>
-        /// <returns>解放状態を保存できた場合は true</returns>
-        private static bool UnlockStage(string stageId)
+        /// <param name="stageId">解放・クリアするステージ ID</param>
+        /// <returns>解放・クリア状態を保存できた場合は true</returns>
+        private static bool UnlockAndMarkStageCleared(string stageId)
         {
-            if (GameDataManager.UnlockStage(stageId))
+            if (!GameDataManager.UnlockStage(stageId))
+            {
+                UnityEngine.Debug.LogError($"チートユーザー作成でステージを解放できませんでした: {stageId}");
+                return false;
+            }
+
+            if (GameDataManager.TryMarkStageCleared(stageId))
             {
                 return true;
             }
 
-            UnityEngine.Debug.LogError($"チートユーザー作成でステージを解放できませんでした: {stageId}");
+            UnityEngine.Debug.LogError($"チートユーザー作成でステージをクリア済みにできませんでした: {stageId}");
             return false;
         }
     }
