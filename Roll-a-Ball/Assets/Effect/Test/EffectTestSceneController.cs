@@ -12,10 +12,16 @@ public sealed class EffectTestSceneController : MonoBehaviour
     private CurrencyPickupEffect largeRewardEffect;
 
     [SerializeField]
+    private GoalHighlightEffect goalHighlightEffect;
+
+    [SerializeField]
     private UnityEngine.UI.Button smallRewardButton;
 
     [SerializeField]
     private UnityEngine.UI.Button largeRewardButton;
+
+    [SerializeField]
+    private UnityEngine.UI.Button goalEffectButton;
 
     /// <summary>
     /// テストボタンのクリック処理を登録
@@ -30,6 +36,11 @@ public sealed class EffectTestSceneController : MonoBehaviour
         if (largeRewardButton != null)
         {
             largeRewardButton.onClick.AddListener(PlayLargeRewardEffect);
+        }
+
+        if (goalEffectButton != null)
+        {
+            goalEffectButton.onClick.AddListener(PlayGoalEffect);
         }
     }
 
@@ -47,6 +58,11 @@ public sealed class EffectTestSceneController : MonoBehaviour
         {
             largeRewardButton.onClick.RemoveListener(PlayLargeRewardEffect);
         }
+
+        if (goalEffectButton != null)
+        {
+            goalEffectButton.onClick.RemoveListener(PlayGoalEffect);
+        }
     }
 
     /// <summary>
@@ -60,6 +76,7 @@ public sealed class EffectTestSceneController : MonoBehaviour
             return;
         }
 
+        smallRewardEffect.gameObject.SetActive(true);
         smallRewardEffect.Play(false);
     }
 
@@ -74,6 +91,22 @@ public sealed class EffectTestSceneController : MonoBehaviour
             return;
         }
 
+        largeRewardEffect.gameObject.SetActive(true);
         largeRewardEffect.Play(true);
+    }
+
+    /// <summary>
+    /// ゴールエフェクトを有効化して再生
+    /// </summary>
+    private void PlayGoalEffect()
+    {
+        if (goalHighlightEffect == null)
+        {
+            Debug.LogWarning("ゴールエフェクトが設定されていません。", this);
+            return;
+        }
+
+        goalHighlightEffect.gameObject.SetActive(true);
+        goalHighlightEffect.Play();
     }
 }
