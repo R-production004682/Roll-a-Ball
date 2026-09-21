@@ -16,12 +16,21 @@ namespace Roll_a_Ball.DebugTools
     {
         private const int CanvasSortingOrder = 30000;
         private const int DebugButtonColumnCount = 4;
+        private const string DefaultCurrencyGrantAmount = "1000";
 
         private GameObject panelObject;
         private UiInputScope inputScope;
         private Button cheatUserButton;
         private Button copyJsonButton;
         private Button deleteUserDataButton;
+        private Button openCurrencyGrantDialogButton;
+        private GameObject currencyGrantDialogObject;
+        private UiInputScope currencyGrantDialogInputScope;
+        private TMP_InputField currencyGrantInputField;
+        private Button clearCurrencyGrantInputButton;
+        private Button grantCurrencyButton;
+        private Button cancelCurrencyGrantButton;
+        private TMP_Text currencyGrantDialogMessageLabel;
         private GameObject deleteConfirmationDialogObject;
         private UiInputScope deleteConfirmationInputScope;
         private Button confirmDeleteUserDataButton;
@@ -89,6 +98,7 @@ namespace Roll_a_Ball.DebugTools
             else
             {
                 HideDeleteConfirmation();
+                HideCurrencyGrantDialog();
             }
 
             panelObject.SetActive(shouldOpen);
@@ -131,6 +141,83 @@ namespace Roll_a_Ball.DebugTools
             SetStatus(message, succeeded);
             copyJsonButton.interactable = true;
             copyJsonButton.Select();
+        }
+
+        /// <summary>
+        /// コイン付与ダイアログを表示する
+        /// </summary>
+        private void RequestCurrencyGrant()
+        {
+            if (inputScope == null || !inputScope.CanReceiveInput || openCurrencyGrantDialogButton == null ||
+                currencyGrantDialogObject == null || currencyGrantInputField == null)
+            {
+                return;
+            }
+
+            currencyGrantInputField.text = DefaultCurrencyGrantAmount;
+            SetCurrencyGrantDialogMessage("付与額を入力して「コインを付与」を押してください。", false);
+            currencyGrantDialogObject.SetActive(true);
+            currencyGrantInputField.Select();
+        }
+
+        /// <summary>
+        /// コイン付与ダイアログで入力したコイン付与額を保存データへ反映する
+        /// </summary>
+        private void GrantCurrency()
+        {
+            if (currencyGrantDialogInputScope == null || !currencyGrantDialogInputScope.CanReceiveInput ||
+                currencyGrantInputField == null || grantCurrencyButton == null ||
+                clearCurrencyGrantInputButton == null || cancelCurrencyGrantButton == null)
+            {
+                return;
+            }
+
+            SetCurrencyGrantDialogButtonsInteractable(false);
+            var succeeded = DebugCurrencyGrantService.TryGrant(currencyGrantInputField.text, out var message);
+            if (succeeded)
+            {
+                HideCurrencyGrantDialog();
+                SetStatus(message, true);
+                SelectActiveButton();
+                return;
+            }
+
+            SetCurrencyGrantDialogMessage(message, true);
+            SetCurrencyGrantDialogButtonsInteractable(true);
+            currencyGrantInputField.Select();
+        }
+
+        /// <summary>
+        /// コイン付与額の入力欄を空にする
+        /// </summary>
+        private void ClearCurrencyGrantInput()
+        {
+            if (currencyGrantDialogInputScope == null || !currencyGrantDialogInputScope.CanReceiveInput ||
+                currencyGrantInputField == null ||
+                clearCurrencyGrantInputButton == null)
+            {
+                return;
+            }
+
+            currencyGrantInputField.text = string.Empty;
+            SetCurrencyGrantDialogMessage("コイン付与額の入力をクリアしました。", false);
+            currencyGrantInputField.Select();
+        }
+
+        /// <summary>
+        /// コイン付与ダイアログをキャンセルする
+        /// </summary>
+        private void CancelCurrencyGrant()
+        {
+            if (currencyGrantDialogInputScope == null || !currencyGrantDialogInputScope.CanReceiveInput ||
+                cancelCurrencyGrantButton == null)
+            {
+                return;
+            }
+
+            HideCurrencyGrantDialog();
+            SetInfoStatus("コイン付与をキャンセルしました。データは変更されていません。");
+            SelectActiveButton();
         }
 
         /// <summary>
@@ -239,6 +326,59 @@ namespace Roll_a_Ball.DebugTools
         }
 
         /// <summary>
+        /// コイン付与ダイアログを非表示に戻す
+        /// </summary>
+        private void HideCurrencyGrantDialog()
+        {
+            SetCurrencyGrantDialogButtonsInteractable(true);
+
+            if (currencyGrantDialogObject != null)
+            {
+                currencyGrantDialogObject.SetActive(false);
+            }
+        }
+
+        /// <summary>
+        /// コイン付与ダイアログ内の操作ボタンの有効状態をまとめて設定する
+        /// </summary>
+        /// <param name="interactable">ボタンを操作可能にする場合は true</param>
+        private void SetCurrencyGrantDialogButtonsInteractable(bool interactable)
+        {
+            if (clearCurrencyGrantInputButton != null)
+            {
+                clearCurrencyGrantInputButton.interactable = interactable;
+            }
+
+            if (grantCurrencyButton != null)
+            {
+                grantCurrencyButton.interactable = interactable;
+            }
+
+            if (cancelCurrencyGrantButton != null)
+            {
+                cancelCurrencyGrantButton.interactable = interactable;
+            }
+        }
+
+        /// <summary>
+        /// コイン付与ダイアログ内の案内またはエラーを表示する
+        /// </summary>
+        /// <param name="message">表示するメッセージ</param>
+        /// <param name="isError">エラー表示にする場合は true</param>
+        private void SetCurrencyGrantDialogMessage(string message, bool isError)
+        {
+            if (currencyGrantDialogMessageLabel == null)
+            {
+                return;
+            }
+
+            currencyGrantDialogMessageLabel.text = message;
+            currencyGrantDialogMessageLabel.color = isError
+                ? new Color(1f, 0.55f, 0.55f)
+                : new Color(0.68f, 0.76f, 0.86f);
+        }
+
+        /// <summary>
         /// 確認操作中かどうかに応じてデバッグボタンを選択する
         /// </summary>
         private void SelectActiveButton()
@@ -247,6 +387,13 @@ namespace Roll_a_Ball.DebugTools
                 confirmDeleteUserDataButton != null)
             {
                 confirmDeleteUserDataButton.Select();
+                return;
+            }
+
+            if (currencyGrantDialogObject != null && currencyGrantDialogObject.activeSelf &&
+                currencyGrantInputField != null)
+            {
+                currencyGrantInputField.Select();
                 return;
             }
 
@@ -338,6 +485,14 @@ namespace Roll_a_Ball.DebugTools
                 new Vector2(360f, 72f));
             deleteUserDataButton.onClick.AddListener(RequestDeleteUserData);
 
+            openCurrencyGrantDialogButton = CreateButton(
+                "OpenCurrencyGrantDialogButton",
+                buttonGrid,
+                "コイン付与",
+                Vector2.zero,
+                new Vector2(360f, 72f));
+            openCurrencyGrantDialogButton.onClick.AddListener(RequestCurrencyGrant);
+
             statusLabel = CreateText(
                 "Status",
                 panelObject.transform,
@@ -350,8 +505,164 @@ namespace Roll_a_Ball.DebugTools
                 new Vector2(620f, 80f));
 
             BuildDeleteConfirmationDialog(panelObject.transform);
+            BuildCurrencyGrantDialog(panelObject.transform);
 
             panelObject.SetActive(false);
+        }
+
+        /// <summary>
+        /// コイン付与操作用のダイアログをデバッグパネル内へ構築する
+        /// </summary>
+        /// <param name="parent">ダイアログを追加する親Transform</param>
+        private void BuildCurrencyGrantDialog(Transform parent)
+        {
+            currencyGrantDialogObject = new GameObject(
+                "CurrencyGrantDialog",
+                typeof(RectTransform),
+                typeof(Image),
+                typeof(CanvasGroup),
+                typeof(UiInputScope));
+            currencyGrantDialogObject.transform.SetParent(parent, false);
+            var dialogRect = currencyGrantDialogObject.GetComponent<RectTransform>();
+            SetFullScreenRect(dialogRect);
+
+            var dialogBackground = currencyGrantDialogObject.GetComponent<Image>();
+            dialogBackground.color = new Color(0f, 0f, 0f, 0.72f);
+            currencyGrantDialogInputScope = currencyGrantDialogObject.GetComponent<UiInputScope>();
+            currencyGrantDialogInputScope.CancelRequested.AddListener(CancelCurrencyGrant);
+
+            var contentObject = new GameObject("Content", typeof(RectTransform), typeof(Image));
+            contentObject.transform.SetParent(currencyGrantDialogObject.transform, false);
+            var contentRect = contentObject.GetComponent<RectTransform>();
+            SetCenteredRect(contentRect, new Vector2(760f, 440f));
+            var contentImage = contentObject.GetComponent<Image>();
+            contentImage.color = new Color(0.08f, 0.12f, 0.18f, 1f);
+
+            CreateText(
+                "Title",
+                contentObject.transform,
+                "コインを付与",
+                28f,
+                Color.white,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0f, 166f),
+                new Vector2(680f, 56f));
+            CreateText(
+                "Description",
+                contentObject.transform,
+                "付与したいコイン数を入力してください。\n1以上の整数だけを付与できます。",
+                20f,
+                new Color(0.88f, 0.9f, 0.94f),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0f, 104f),
+                new Vector2(680f, 80f));
+
+            currencyGrantInputField = CreateCurrencyGrantInputField(
+                contentObject.transform,
+                new Vector2(0f, 28f),
+                new Vector2(440f, 72f));
+            currencyGrantDialogMessageLabel = CreateText(
+                "Message",
+                contentObject.transform,
+                string.Empty,
+                17f,
+                new Color(0.68f, 0.76f, 0.86f),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0f, -44f),
+                new Vector2(680f, 52f));
+
+            clearCurrencyGrantInputButton = CreateButton(
+                "ClearCurrencyGrantInputButton",
+                contentObject.transform,
+                "クリア",
+                new Vector2(-208f, -146f),
+                new Vector2(176f, 72f));
+            clearCurrencyGrantInputButton.GetComponent<Image>().color = new Color(0.28f, 0.34f, 0.44f, 1f);
+            clearCurrencyGrantInputButton.onClick.AddListener(ClearCurrencyGrantInput);
+
+            grantCurrencyButton = CreateButton(
+                "GrantCurrencyButton",
+                contentObject.transform,
+                "コインを付与",
+                new Vector2(0f, -146f),
+                new Vector2(208f, 72f));
+            grantCurrencyButton.onClick.AddListener(GrantCurrency);
+
+            cancelCurrencyGrantButton = CreateButton(
+                "CancelCurrencyGrantButton",
+                contentObject.transform,
+                "キャンセル",
+                new Vector2(224f, -146f),
+                new Vector2(176f, 72f));
+            cancelCurrencyGrantButton.GetComponent<Image>().color = new Color(0.28f, 0.34f, 0.44f, 1f);
+            cancelCurrencyGrantButton.onClick.AddListener(CancelCurrencyGrant);
+
+            HideCurrencyGrantDialog();
+        }
+
+        /// <summary>
+        /// 初期値付きの整数入力欄を指定位置に生成する
+        /// </summary>
+        /// <param name="parent">入力欄を追加する親Transform</param>
+        /// <param name="position">親の中央からの表示位置</param>
+        /// <param name="size">入力欄の表示サイズ</param>
+        /// <returns>生成した整数入力欄</returns>
+        private static TMP_InputField CreateCurrencyGrantInputField(
+            Transform parent,
+            Vector2 position,
+            Vector2 size)
+        {
+            var inputObject = new GameObject(
+                "CurrencyGrantInputField",
+                typeof(RectTransform),
+                typeof(Image),
+                typeof(TMP_InputField));
+            inputObject.transform.SetParent(parent, false);
+            var inputRect = inputObject.GetComponent<RectTransform>();
+            SetCenteredRect(inputRect, size);
+            inputRect.anchoredPosition = position;
+
+            var inputImage = inputObject.GetComponent<Image>();
+            inputImage.color = new Color(0.95f, 0.97f, 1f, 1f);
+
+            var inputField = inputObject.GetComponent<TMP_InputField>();
+            inputField.contentType = TMP_InputField.ContentType.IntegerNumber;
+            inputField.characterLimit = 10;
+            inputField.targetGraphic = inputImage;
+            inputField.textViewport = inputRect;
+
+            var text = CreateText(
+                "Text",
+                inputObject.transform,
+                string.Empty,
+                22f,
+                new Color(0.08f, 0.12f, 0.18f),
+                Vector2.zero,
+                Vector2.one,
+                Vector2.zero,
+                Vector2.zero);
+            text.alignment = TextAlignmentOptions.MidlineLeft;
+            text.margin = new Vector4(16f, 0f, 8f, 0f);
+            inputField.textComponent = text as TextMeshProUGUI;
+
+            var placeholder = CreateText(
+                "Placeholder",
+                inputObject.transform,
+                "付与額",
+                22f,
+                new Color(0.38f, 0.44f, 0.54f),
+                Vector2.zero,
+                Vector2.one,
+                Vector2.zero,
+                Vector2.zero);
+            placeholder.alignment = TextAlignmentOptions.MidlineLeft;
+            placeholder.margin = new Vector4(16f, 0f, 8f, 0f);
+            inputField.placeholder = placeholder;
+            inputField.text = DefaultCurrencyGrantAmount;
+            return inputField;
         }
 
         /// <summary>
