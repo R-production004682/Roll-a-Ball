@@ -65,8 +65,9 @@ namespace Roll_a_Ball.OutGame
             categoryLabel.text = item.Category;
             nameLabel.text = item.DisplayName;
             descriptionLabel.text = item.Description;
-            priceValueLabel.text = item.Price.ToString("N0");
-            purchaseButton.interactable = GameDataManager.Currency >= item.Price;
+            var isSoldOut = GameDataManager.GetItemPurchaseCount(item.Id) >= item.PurchaseLimit;
+            priceValueLabel.text = isSoldOut ? "売り切れ" : item.Price.ToString("N0");
+            purchaseButton.interactable = !isSoldOut && GameDataManager.Currency >= item.Price;
             purchaseButton.onClick.AddListener(Accept);
             cancelButton.onClick.AddListener(Cancel);
             inputScope.CancelRequested.AddListener(Cancel);

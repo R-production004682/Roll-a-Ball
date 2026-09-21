@@ -272,7 +272,8 @@ namespace Roll_a_Ball.OutGame
         /// <param name="item">押下された商品</param>
         private void HandleItemClicked(ShopItemDefinition item)
         {
-            if (item == null || purchaseQueued || inputScope == null || !inputScope.CanReceiveInput)
+            if (item == null || purchaseQueued || inputScope == null || !inputScope.CanReceiveInput ||
+                GameDataManager.GetItemPurchaseCount(item.Id) >= item.PurchaseLimit)
             {
                 return;
             }
@@ -319,12 +320,26 @@ namespace Roll_a_Ball.OutGame
                 yield break;
             }
 
-            int currencyAfterPurchase;
-            if (!GameDataManager.TryPurchaseItem(item.Id, item.Price, out currencyAfterPurchase))
+            if (GameDataManager.GetItemPurchaseCount(item.Id) >= item.PurchaseLimit)
             {
-                Debug.LogWarning($"商品を購入できませんでした: {item.Id}", this);
+                RefreshPage();
+                purchaseQueued = false;
+                yield break;
             }
 
+            int currencyAfterPurchase;
+            if (!GameDataManager.TryPurchaseItem(
+                    item.Id,
+                    item.Price,
+                    item.PurchaseLimit,
+                    out currencyAfterPurchase))
+            {
+                Debug.LogWarning($"商品を購入できませんでした: {item.Id}", this);
+                purchaseQueued = false;
+                yield break;
+            }
+
+            RefreshPage();
             purchaseQueued = false;
         }
 
