@@ -9,7 +9,7 @@ using UnityEngine.Rendering.Universal;
 /// </summary>
 public static class DappledLightAssetBuilder
 {
-    private const string Root = "Assets/Effect/Stage1";
+    private const string Root = "Assets/Effect/Stage1/FX-S1-LIGHT-01";
     private const string PrefabPath = Root + "/FX-S1-LIGHT-01_dappled_light.prefab";
 
     /// <summary>
