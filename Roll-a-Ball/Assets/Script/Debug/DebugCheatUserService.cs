@@ -17,13 +17,19 @@ namespace Roll_a_Ball.DebugTools
         private const string StageFourId = "stage-4";
 
         /// <summary>
-        /// 所持金、ステージ解放、購入済み商品を開発用プリセットへ置き換える
+        /// 所持金、ステージの解放・クリア状態、購入済み商品を開発用プリセットへ置き換える
         /// </summary>
         /// <param name="message">画面へ表示する実行結果</param>
         /// <returns>プリセットを最後まで保存できた場合は true</returns>
         internal static bool TryCreate(out string message)
         {
             message = string.Empty;
+            if (!TryLoadItemCatalog(out var itemCatalog, out message))
+            {
+                UnityEngine.Debug.LogError(message);
+                return false;
+            }
+
             if (!GameDataManager.ResetToDefaults())
             {
                 message = "チートユーザー作成に失敗しました。初期データを保存できません。";
@@ -38,35 +44,20 @@ namespace Roll_a_Ball.DebugTools
                 return false;
             }
 
-            if (!UnlockStage(StageTwoId) || !UnlockStage(StageThreeId) || !UnlockStage(StageFourId))
+            if (!UnlockAndMarkStageCleared(GameDataManager.InitialStageId) ||
+                !UnlockAndMarkStageCleared(StageTwoId) ||
+                !UnlockAndMarkStageCleared(StageThreeId) ||
+                !UnlockAndMarkStageCleared(StageFourId))
             {
-                message = "チートユーザー作成に失敗しました。ステージ解放状態を保存できません。";
+                message = "チートユーザー作成に失敗しました。ステージの解放・クリア状態を保存できません。";
                 UnityEngine.Debug.LogError(message);
                 return false;
             }
 
-            var itemCatalog = Resources.Load<ShopItemCatalog>(ShopItemCatalogResourcePath);
-            if (itemCatalog == null || itemCatalog.Items == null)
-            {
-                message = "チートユーザー作成に失敗しました。\n" +
-                          "ショップ商品マスターを読み込めないまたは、\n" +
-                          "すでに全商品が登録されています。";
-                UnityEngine.Debug.LogError(message);
-                return false;
-            }
-
-            var catalogItemIds = new HashSet<string>();
             var purchasedItemCount = 0;
             for (var index = 0; index < itemCatalog.Items.Count; index++)
             {
                 var item = itemCatalog.Items[index];
-                if (item == null || string.IsNullOrWhiteSpace(item.Id) || !catalogItemIds.Add(item.Id))
-                {
-                    message = "チートユーザー作成に失敗しました。ショップ商品マスターの商品 ID が不正です。";
-                    UnityEngine.Debug.LogError(message);
-                    return false;
-                }
-
                 for (var purchaseIndex = 0; purchaseIndex < item.PurchaseLimit; purchaseIndex++)
                 {
                     if (!GameDataManager.TryPurchaseItem(
@@ -86,24 +77,66 @@ namespace Roll_a_Ball.DebugTools
 
             message =
                 $"チートユーザーを作成しました。 \n" +
-                $"所持金: {currencyAfterChange:N0}、解放: stage-1～stage-4、取得商品数: {purchasedItemCount}";
+                $"所持金: {currencyAfterChange:N0}、解放・クリア: stage-1～stage-4、取得商品数: {purchasedItemCount}";
             UnityEngine.Debug.Log(message);
             return true;
         }
 
         /// <summary>
-        /// 指定したステージを解放し、保存に失敗した場合は原因をログへ残す
+        /// Resourcesに登録されたショップ商品マスターを読み込み、チートユーザー作成に必要な内容を検証する
         /// </summary>
-        /// <param name="stageId">解放するステージ ID</param>
-        /// <returns>解放状態を保存できた場合は true</returns>
-        private static bool UnlockStage(string stageId)
+        /// <param name="itemCatalog">読み込みに成功したショップ商品マスター</param>
+        /// <param name="message">読み込みまたは検証に失敗した場合の理由</param>
+        /// <returns>全商品を安全に取得できる場合は true</returns>
+        private static bool TryLoadItemCatalog(out ShopItemCatalog itemCatalog, out string message)
         {
-            if (GameDataManager.UnlockStage(stageId))
+            itemCatalog = Resources.Load<ShopItemCatalog>(ShopItemCatalogResourcePath);
+            message = string.Empty;
+            if (itemCatalog == null)
+            {
+                message = "チートユーザー作成に失敗しました。ショップ商品マスターを読み込めません。";
+                return false;
+            }
+
+            if (itemCatalog.Items == null || itemCatalog.Items.Count == 0)
+            {
+                message = "チートユーザー作成に失敗しました。ショップ商品マスターに商品が登録されていません。";
+                return false;
+            }
+
+            var catalogItemIds = new HashSet<string>();
+            for (var index = 0; index < itemCatalog.Items.Count; index++)
+            {
+                var item = itemCatalog.Items[index];
+                if (item == null || string.IsNullOrWhiteSpace(item.Id) || !catalogItemIds.Add(item.Id))
+                {
+                    message = $"チートユーザー作成に失敗しました。ショップ商品マスターの {index} 番目の商品 ID が不正です。";
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// 指定したステージを解放済みかつクリア済みにし、保存に失敗した場合は原因をログへ残す
+        /// </summary>
+        /// <param name="stageId">解放・クリアするステージ ID</param>
+        /// <returns>解放・クリア状態を保存できた場合は true</returns>
+        private static bool UnlockAndMarkStageCleared(string stageId)
+        {
+            if (!GameDataManager.UnlockStage(stageId))
+            {
+                UnityEngine.Debug.LogError($"チートユーザー作成でステージを解放できませんでした: {stageId}");
+                return false;
+            }
+
+            if (GameDataManager.TryMarkStageCleared(stageId))
             {
                 return true;
             }
 
-            UnityEngine.Debug.LogError($"チートユーザー作成でステージを解放できませんでした: {stageId}");
+            UnityEngine.Debug.LogError($"チートユーザー作成でステージをクリア済みにできませんでした: {stageId}");
             return false;
         }
     }
