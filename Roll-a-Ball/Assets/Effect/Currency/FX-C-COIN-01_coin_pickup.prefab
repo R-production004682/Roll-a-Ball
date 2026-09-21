@@ -29616,7 +29616,7 @@ GameObject:
   - component: {fileID: 1689237900470815151}
   - component: {fileID: 471889597018139232}
   m_Layer: 0
-  m_Name: FX-C-COIN-01
+  m_Name: FX-C-COIN-01_coin_pickup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

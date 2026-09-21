@@ -5020,7 +5020,7 @@ GameObject:
   - component: {fileID: 4556124497997215316}
   - component: {fileID: 4155227185211933586}
   m_Layer: 0
-  m_Name: FX-C-GOAL-01
+  m_Name: FX-C-GOAL-01_clear_celebration
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

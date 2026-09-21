@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7193591875694181085}
   - component: {fileID: 4047301121456685060}
   m_Layer: 0
-  m_Name: FX-G-GOAL-01
+  m_Name: FX-C-GOAL-02_goal_marker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

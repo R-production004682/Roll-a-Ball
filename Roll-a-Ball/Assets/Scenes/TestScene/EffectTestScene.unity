@@ -323,7 +323,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1051027200733017859, guid: 1987e7b2a985e7d4b9e9d2c253afce23, type: 3}
       propertyPath: m_Name
-      value: FX-G-GOAL-01 Preview
+      value: FX-C-GOAL-02_goal_marker Preview
       objectReference: {fileID: 0}
     - target: {fileID: 1051027200733017859, guid: 1987e7b2a985e7d4b9e9d2c253afce23, type: 3}
       propertyPath: m_IsActive
@@ -522,7 +522,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5169257246855283030, guid: 1f3c863e9c12fd94c93e20b8ddbaa1a3, type: 3}
       propertyPath: m_Name
-      value: FX-C-COIN-01 Large Preview
+      value: FX-C-COIN-01_coin_pickup Large Preview
       objectReference: {fileID: 0}
     - target: {fileID: 5169257246855283030, guid: 1f3c863e9c12fd94c93e20b8ddbaa1a3, type: 3}
       propertyPath: m_IsActive
@@ -554,7 +554,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4133713731810867052, guid: 7fd91c35fd0c7b04c84233db94d999fc, type: 3}
       propertyPath: m_Name
-      value: FX-C-GOAL-01 Preview
+      value: FX-C-GOAL-01_clear_celebration Preview
       objectReference: {fileID: 0}
     - target: {fileID: 4133713731810867052, guid: 7fd91c35fd0c7b04c84233db94d999fc, type: 3}
       propertyPath: m_IsActive
@@ -1320,7 +1320,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5169257246855283030, guid: 1f3c863e9c12fd94c93e20b8ddbaa1a3, type: 3}
       propertyPath: m_Name
-      value: FX-C-COIN-01 Small Preview
+      value: FX-C-COIN-01_coin_pickup Small Preview
       objectReference: {fileID: 0}
     - target: {fileID: 5169257246855283030, guid: 1f3c863e9c12fd94c93e20b8ddbaa1a3, type: 3}
       propertyPath: m_IsActive
