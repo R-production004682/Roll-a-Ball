@@ -161,6 +161,8 @@ public sealed class GoalHighlightEffect : MonoBehaviour
             var transform = renderer.transform;
             transform.localPosition = basePositions[i] + Vector3.up * Mathf.Lerp(-height * 0.5f, height * 0.5f, progress);
             transform.localScale = baseScales[i] * Mathf.Lerp(0.86f, 1.08f, visibility);
+
+            // 回転しながら上がってってほしい場合は以下のコメントアウトを外す
             // transform.localRotation = Quaternion.Euler(0f, rotationSpeed * elapsedTime + i * 18f, 0f);
 
             var color = GetSquareColor(i);
