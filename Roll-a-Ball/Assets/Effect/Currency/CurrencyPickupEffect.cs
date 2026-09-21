@@ -141,7 +141,11 @@ public sealed class CurrencyPickupEffect : MonoBehaviour
 
         if (impactFlash != null)
         {
-            impactFlash.Play();
+            impactFlash.gameObject.SetActive(largeReward);
+            if (largeReward)
+            {
+                impactFlash.Play();
+            }
         }
 
         if (sparkleBurst != null)
@@ -160,22 +164,28 @@ public sealed class CurrencyPickupEffect : MonoBehaviour
 
         if (crossSpark != null)
         {
-            crossSpark.gameObject.SetActive(true);
-            crossSpark.localScale = Vector3.one * 0.1f;
+            crossSpark.gameObject.SetActive(largeReward);
+            if (largeReward)
+            {
+                crossSpark.localScale = Vector3.one * 0.1f;
+            }
         }
 
         if (crossSparkAccent != null)
         {
-            crossSparkAccent.gameObject.SetActive(true);
-            crossSparkAccent.localScale = Vector3.one * 0.1f;
+            crossSparkAccent.gameObject.SetActive(largeReward);
+            if (largeReward)
+            {
+                crossSparkAccent.localScale = Vector3.one * 0.1f;
+            }
         }
 
-        SetCrossSparkColor(0.78f);
+        SetCrossSparkColor(largeReward ? 0.78f : 0f);
 
         if (pulseLight != null)
         {
-            pulseLight.enabled = true;
-            pulseLight.intensity = pulseLightIntensity;
+            pulseLight.enabled = largeReward;
+            pulseLight.intensity = largeReward ? pulseLightIntensity : 0f;
         }
     }
 
@@ -224,7 +234,7 @@ public sealed class CurrencyPickupEffect : MonoBehaviour
     /// <param name="normalizedTime">再生時間の進行度です。</param>
     private void UpdateCrossSpark(float normalizedTime)
     {
-        if (crossSpark == null && crossSparkAccent == null)
+        if (!isLargeReward || (crossSpark == null && crossSparkAccent == null))
         {
             return;
         }
@@ -255,7 +265,7 @@ public sealed class CurrencyPickupEffect : MonoBehaviour
     /// <param name="normalizedTime">再生時間の進行度です。</param>
     private void UpdatePulseLight(float normalizedTime)
     {
-        if (pulseLight == null)
+        if (!isLargeReward || pulseLight == null)
         {
             return;
         }

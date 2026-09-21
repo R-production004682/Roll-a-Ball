@@ -15,6 +15,9 @@ public sealed class EffectTestSceneController : MonoBehaviour
     private GoalHighlightEffect goalHighlightEffect;
 
     [SerializeField]
+    private GoalClearEffect goalClearEffect;
+
+    [SerializeField]
     private UnityEngine.UI.Button smallRewardButton;
 
     [SerializeField]
@@ -22,6 +25,9 @@ public sealed class EffectTestSceneController : MonoBehaviour
 
     [SerializeField]
     private UnityEngine.UI.Button goalEffectButton;
+
+    [SerializeField]
+    private UnityEngine.UI.Button goalClearEffectButton;
 
     /// <summary>
     /// テストボタンのクリック処理を登録
@@ -41,6 +47,11 @@ public sealed class EffectTestSceneController : MonoBehaviour
         if (goalEffectButton != null)
         {
             goalEffectButton.onClick.AddListener(PlayGoalEffect);
+        }
+
+        if (goalClearEffectButton != null)
+        {
+            goalClearEffectButton.onClick.AddListener(PlayGoalClearEffect);
         }
     }
 
@@ -62,6 +73,11 @@ public sealed class EffectTestSceneController : MonoBehaviour
         if (goalEffectButton != null)
         {
             goalEffectButton.onClick.RemoveListener(PlayGoalEffect);
+        }
+
+        if (goalClearEffectButton != null)
+        {
+            goalClearEffectButton.onClick.RemoveListener(PlayGoalClearEffect);
         }
     }
 
@@ -108,5 +124,20 @@ public sealed class EffectTestSceneController : MonoBehaviour
 
         goalHighlightEffect.gameObject.SetActive(true);
         goalHighlightEffect.Play();
+    }
+
+    /// <summary>
+    /// クリアセレブレーションを有効化して再生
+    /// </summary>
+    private void PlayGoalClearEffect()
+    {
+        if (goalClearEffect == null)
+        {
+            Debug.LogWarning("クリアセレブレーションが設定されていません。", this);
+            return;
+        }
+
+        goalClearEffect.gameObject.SetActive(true);
+        goalClearEffect.Play();
     }
 }
