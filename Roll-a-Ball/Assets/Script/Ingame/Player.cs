@@ -20,7 +20,9 @@ public class Player : MonoBehaviour
     [SerializeField]
     private Vector3 startPoint;//スタート地点
 
-    // Update is called once per frame
+    /// <summary>
+    /// プレイヤーの入力と落下によるリスポーンを更新
+    /// </summary>
     void Update()
     {
         if (GameManager.instance.isStageCompleted == true)
@@ -46,18 +48,50 @@ public class Player : MonoBehaviour
 
         if (transform.position.y <= fall)
         {
-            if (respawnPoints.Count > 0)//リスポーンポイントがあると最後に解放した地点の位置と向きに戻る
-            {
-                transform.position = respawnPoints[respawnPoints.Count - 1].transform.position;
-                transform.rotation = respawnPoints[respawnPoints.Count - 1].transform.rotation;
-            }
-            else//解放されていない場合はスタート地点
-            {
-                transform.position = startPoint;
-            }
+            Respawn();
         }
     }
 
+    /// <summary>
+    /// トゲなどの即時死亡ギミックからプレイヤーをリスポーン
+    /// </summary>
+    public void RespawnFromHazard()
+    {
+        Respawn();
+    }
+
+    /// <summary>
+    /// 最後に解放した地点、またはスタート地点へプレイヤーを戻す
+    /// </summary>
+    private void Respawn()
+    {
+        var respawnPosition = startPoint;
+        var respawnRotation = transform.rotation;
+
+        if (respawnPoints.Count > 0)
+        {
+            var respawnPoint = respawnPoints[respawnPoints.Count - 1];
+            respawnPosition = respawnPoint.transform.position;
+            respawnRotation = respawnPoint.transform.rotation;
+        }
+
+        var rigidbody = GetComponent<Rigidbody>();
+        if (rigidbody != null)
+        {
+            rigidbody.position = respawnPosition;
+            rigidbody.rotation = respawnRotation;
+            rigidbody.linearVelocity = Vector3.zero;
+            rigidbody.angularVelocity = Vector3.zero;
+            return;
+        }
+
+        transform.position = respawnPosition;
+        transform.rotation = respawnRotation;
+    }
+
+    /// <summary>
+    /// 指定したリスポーン地点を解放済み地点として登録
+    /// </summary>
     public void UnlockPoint(Respawnpoint point)
     {
         if (point == null || respawnPoints.Contains(point))//地点番号がないか解放済みだと処理しない
