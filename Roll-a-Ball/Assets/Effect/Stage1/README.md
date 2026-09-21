@@ -1,3 +1,12 @@
+# Stage 1 エフェクト一覧
+
+Prefabは各エフェクトIDのフォルダ直下に置いています。使いたいPrefabをそのままHierarchyへドラッグしてください。
+
+- `FX-S1-LIGHT-01/FX-S1-LIGHT-01_dappled_light.prefab` — 木漏れ日
+- `FX-S1-LEAF-01/FX-S1-LEAF-01_leaf_particles.prefab` — そよ風の葉・光粒
+
+---
+
 # 木漏れ日 — FX-S1-LIGHT-01
 
 森のステージ向けの、葉の隙間から差す日光です。今回は個別の依頼に合わせ、共通の青いクリスタル演出ではなく、暖かい光と自然な散乱を狙っています。
@@ -15,7 +24,7 @@ Hierarchyの `DappledLightTestPreview` は、保存時には非アクティブ�
 
 ## ステージに置く
 
-1. `Assets/Effect/Stage1/FX-S1-LIGHT-01_dappled_light.prefab` をHierarchyへドラッグします。
+1. `Assets/Effect/Stage1/FX-S1-LIGHT-01/FX-S1-LIGHT-01_dappled_light.prefab` をHierarchyへドラッグします。
 2. Prefabの原点を、日差しを当てたい地面の位置に合わせます。最初はScaleを `(1, 1, 1)` にしてください。
 3. Prefab全体をY軸で回すと、日差しの方向が変わります。カメラの正面・背面の両方から確認してください。
 
@@ -100,3 +109,79 @@ Unity 6000.3.20f1 / URP 17.3、Windows Editorで実施:
 未実施: 実機ビルドとGPU負荷計測、ゲーム本番のステージ全体での最終ルック確認。
 
 `Editor/DappledLightAssetBuilder.cs` は初期アセット作成用です。通常の利用で実行する必要はありません。作成済みPrefabのパラメータを再生成で上書きせず、Inspectorから調整してください。
+
+---
+
+# そよ風の葉・光粒 — FX-S1-LEAF-01
+
+木漏れ日の林道で、葉と淡い光粒が風に運ばれていく環境エフェクトです。画面全体を飾るのではなく、プレイヤーが「森に風が通っている」と感じられる密度にしています。
+
+## まず見てみる
+
+1. `Assets/Scenes/TestScene/EffectTestScene.unity` を開き、Playします。
+2. 必要なら先に **木漏れ日 ON / OFF** を押して、木漏れ日の展示を表示します。
+3. **そよ風の葉 ON / OFF** を押します。
+4. 葉がゆっくり不規則に回転しながら流れ、淡い光粒が少し遅れて同じ風に乗ることを確認します。
+5. もう一度押すと展示が消えます。長時間再生しても同じ範囲を循環します。
+
+`LeafWindTestPreview` は保存時には非アクティブです。テスト用の木・地面・木漏れ日を一緒に表示するための展示で、本番ステージへ自動追加されません。`WindDemoTree` と `WindDemoGrass` は、風による揺れを確認するためだけの簡易モデルです。
+
+## ステージに置く
+
+1. `Assets/Effect/Stage1/FX-S1-LEAF-01/FX-S1-LEAF-01_leaf_particles.prefab` をHierarchyへドラッグします。
+2. Prefabの原点を、木漏れ日を置いた林道の中心付近へ合わせます。
+3. 有効にするだけで常時再生します。接触判定やインゲームコードへの追記は不要です。
+
+構成:
+
+```text
+FX-S1-LEAF-01_leaf_particles
+├─ LeafWindEffect        風向き・範囲循環・再生を制御
+├─ Leaves                低ポリの葉を不規則に回転させて運ぶ
+├─ LightMotes            葉の動きを補助する淡い光粒
+└─ WindZone              対応した植生モデルへ風を渡すDirectional Wind Zone
+```
+
+葉は画像の板ではなく、折れを持つ小さな低ポリメッシュです。粒子の寿命でフェードしながら、風向き側の端へ出た粒子は反対側へ循環します。そのため、一定時間ごとに全粒子が同じ場所から出てくる見え方になりません。
+
+コードから制御する場合は、Prefabの `LeafWindEffect` を参照して `Play()`、`Stop()`、`SetVisible(bool)` を呼びます。ステージ固有の処理を `LeafWindEffect` へ追加せず、風向きだけ変える場合は `SetWind(direction, speed)` を使います。
+
+## Inspectorで調整する値
+
+| 変えたいこと | 操作 |
+|---|---|
+| 風が進む向き | `Wind Direction`。XZ平面を中心に指定します。Yを少しだけ正にすると自然に浮きます |
+| 葉が流れる速さ | `Wind Speed`。初期値は0.34。上げすぎるとそよ風ではなく強風に見えます |
+| 動きの不規則さ | `Turbulence`。初期値は0.16。葉の軌道を少しだけ揺らします |
+| 風が届く範囲 | `Local Volume Size`。葉と光粒の発生・循環範囲です |
+| 木や草へ渡す風 | 子オブジェクト `WindZone` の `Wind Main`、`Turbulence`。SpeedTreeやWind Zone対応の植生モデルで使用します |
+| 葉の密度 | `Leaves > Emission > Rate over Time` と `Max Particles` |
+| 光粒の密度 | `LightMotes > Emission > Rate over Time` と `Max Particles` |
+| 葉を大きく／小さく | `Leaves > Main > Start Size`。クォータービューで見えない場合だけ少し上げます |
+
+初期値は葉42枚、光粒72個、葉の寿命8〜15秒です。葉と光粒を合わせても、コイン取得やクリアセレブレーションのような一時的な演出より目立たないように設定しています。
+
+## トンマナと見え方の注意
+
+- 緑〜黄緑を基本にし、光粒だけ淡いシアン寄りにしています。
+- クリスタル感は縁の淡い発光だけに留め、ネオン色や画面全体を覆う光にはしていません。
+- リングや円形の衝撃波は使わず、葉の面の回転と粒子の流れで風を見せます。
+- クォータービューで見えるサイズを確保しつつ、プレイヤーの操作視認性を優先します。
+- 既存の木漏れ日Prefabとは独立しています。木漏れ日をOFFにして葉だけを確認することもできます。
+- `WindZone` はSpeedTreeや対応した植生Shaderへ風を渡す共通設定です。通常のURP/LitのCubeやSphereはWind Zoneだけでは変形しません。
+- EffectTestSceneの簡易樹冠は、Wind Zoneの値を使うテスト用コンポーネントで揺れを見えるようにしています。本番の木・草モデルへ同じコンポーネントを持ち込む必要はありません。
+
+## 確認記録
+
+Unity 6000.3.20f1 / URP 17.3、Windows Editorで確認:
+
+- そよ風の葉テストボタンで表示／非表示。
+- 木漏れ日展示と同時に表示して、葉・光粒が日差しの空気感を邪魔しないこと。
+- クォータービューから見た葉の立体感、不規則な回転、風向きの連続性。
+- EffectTestSceneの樹冠がWind Zoneの強さに合わせてゆっくり揺れること。
+- ON/OFFと長時間再生で粒子が枯れず、画面外へ消え続けないこと。
+- 既存の木漏れ日、コイン、ゴールのPrefabとコードを変更していないこと。
+
+未実施: 実機ビルド、ステージ1本番地形での最終ルック確認、GPU負荷計測。
+
+`Editor/LeafWindAssetBuilder.cs` は初期アセットとテスト展示の生成用です。作成済みPrefabの設定を再生成で上書きせず、Inspectorから調整してください。
