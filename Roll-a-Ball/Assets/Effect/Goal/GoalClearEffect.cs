@@ -42,6 +42,7 @@ public sealed class GoalClearEffect : MonoBehaviour
     private Vector3 baseAreaScale;
     private float elapsedTime;
     private bool isPlaying;
+    private bool isFinishing;
 
     /// <summary>
     /// クリア演出の再生時間を取得
@@ -77,19 +78,27 @@ public sealed class GoalClearEffect : MonoBehaviour
     /// </summary>
     private void Update()
     {
-        if (!isPlaying)
+        if (!isPlaying && !isFinishing)
         {
             return;
         }
 
-        elapsedTime += Time.deltaTime;
-        var normalizedTime = Mathf.Clamp01(elapsedTime / Duration);
-        UpdateAreaPulse(normalizedTime);
-        UpdateGlowLight(normalizedTime);
-
-        if (elapsedTime >= Duration)
+        if (isPlaying)
         {
-            Stop();
+            elapsedTime += Time.deltaTime;
+            var normalizedTime = Mathf.Clamp01(elapsedTime / Duration);
+            UpdateAreaPulse(normalizedTime);
+            UpdateGlowLight(normalizedTime);
+
+            if (elapsedTime >= Duration)
+            {
+                BeginParticleFinish();
+            }
+        }
+
+        if (isFinishing && !HasAliveParticles())
+        {
+            FinishPlayback();
         }
     }
 
@@ -101,6 +110,7 @@ public sealed class GoalClearEffect : MonoBehaviour
         StopParticles();
         elapsedTime = 0f;
         isPlaying = true;
+        isFinishing = false;
 
         if (areaPulseRenderer != null)
         {
@@ -132,6 +142,7 @@ public sealed class GoalClearEffect : MonoBehaviour
     public void Stop()
     {
         isPlaying = false;
+        isFinishing = false;
         StopParticles();
 
         if (areaPulseRenderer != null)
@@ -183,6 +194,81 @@ public sealed class GoalClearEffect : MonoBehaviour
 
         var fade = 1f - Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(normalizedTime / 0.82f));
         glowLight.intensity = glowLightIntensity * fade;
+    }
+
+    /// <summary>
+    /// エリア演出を終え、粒子の自然な消滅だけを待つ
+    /// </summary>
+    private void BeginParticleFinish()
+    {
+        isPlaying = false;
+        isFinishing = true;
+        StopParticleEmission();
+
+        if (areaPulseRenderer != null)
+        {
+            areaPulseRenderer.enabled = false;
+        }
+
+        if (glowLight != null)
+        {
+            glowLight.intensity = 0f;
+            glowLight.enabled = false;
+        }
+    }
+
+    /// <summary>
+    /// 全粒子が消えた後に演出を初期状態へ戻す
+    /// </summary>
+    private void FinishPlayback()
+    {
+        isFinishing = false;
+        StopParticles();
+
+        if (areaPulseRenderer != null)
+        {
+            areaPulseRenderer.transform.localScale = baseAreaScale;
+        }
+    }
+
+    /// <summary>
+    /// 粒子の新規発生だけを止め、表示中の粒子を残す
+    /// </summary>
+    private void StopParticleEmission()
+    {
+        StopEmission(crystalBurst);
+        StopEmission(sparkleBurst);
+    }
+
+    /// <summary>
+    /// 指定した粒子システムの新規発生を止める
+    /// </summary>
+    /// <param name="particleSystem">発生を止める粒子システムです。</param>
+    private static void StopEmission(ParticleSystem particleSystem)
+    {
+        if (particleSystem != null)
+        {
+            particleSystem.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+        }
+    }
+
+    /// <summary>
+    /// 管理している粒子がまだ表示中か確認する
+    /// </summary>
+    /// <returns>粒子が残っている場合はtrueです。</returns>
+    private bool HasAliveParticles()
+    {
+        return IsAlive(crystalBurst) || IsAlive(sparkleBurst);
+    }
+
+    /// <summary>
+    /// 指定した粒子システムに表示中の粒子があるか確認する
+    /// </summary>
+    /// <param name="particleSystem">確認する粒子システムです。</param>
+    /// <returns>粒子が残っている場合はtrueです。</returns>
+    private static bool IsAlive(ParticleSystem particleSystem)
+    {
+        return particleSystem != null && particleSystem.IsAlive(true);
     }
 
     /// <summary>
