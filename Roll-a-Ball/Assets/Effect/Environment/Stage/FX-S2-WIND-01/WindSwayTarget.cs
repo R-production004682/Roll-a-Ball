@@ -60,9 +60,20 @@ public sealed class WindSwayTarget : MonoBehaviour
     /// </summary>
     public void SetWind(Vector3 direction, float strength, float turbulenceAmount)
     {
-        windDirection = direction.sqrMagnitude > 0.0001f ? direction.normalized : Vector3.forward;
-        windStrength = Mathf.Max(0f, strength);
-        turbulence = Mathf.Clamp01(turbulenceAmount);
+        var nextDirection = direction.sqrMagnitude > 0.0001f ? direction.normalized : Vector3.forward;
+        var nextStrength = Mathf.Max(0f, strength);
+        var nextTurbulence = Mathf.Clamp01(turbulenceAmount);
+        if (hasWind
+            && nextDirection == windDirection
+            && Mathf.Approximately(nextStrength, windStrength)
+            && Mathf.Approximately(nextTurbulence, turbulence))
+        {
+            return;
+        }
+
+        windDirection = nextDirection;
+        windStrength = nextStrength;
+        turbulence = nextTurbulence;
         hasWind = true;
     }
 

@@ -17,6 +17,15 @@ public sealed class Stage2WindEffect : MonoBehaviour
 
     private ParticleSystem.Particle[] leafBuffer;
     private ParticleSystem.Particle[] lightBuffer;
+    private Vector3 appliedDirection;
+    private float appliedStrength;
+    private float appliedTurbulence;
+    private Vector3 appliedVolumeSize;
+    private bool hasAppliedSettings;
+    private Vector3 pushedDirection;
+    private float pushedStrength;
+    private float pushedTurbulence;
+    private bool hasPushedWind;
     private bool initialized;
 
     /// <summary>
@@ -51,6 +60,8 @@ public sealed class Stage2WindEffect : MonoBehaviour
             swayTargets = GetComponentsInChildren<WindSwayTarget>(true);
         }
 
+        hasAppliedSettings = false;
+        hasPushedWind = false;
         initialized = true;
         ApplyWind();
         PushWindToTargets();
@@ -70,6 +81,8 @@ public sealed class Stage2WindEffect : MonoBehaviour
         localVolumeSize.z = Mathf.Max(0.5f, localVolumeSize.z);
         windStrength = Mathf.Max(0f, windStrength);
         turbulence = Mathf.Clamp01(turbulence);
+        hasAppliedSettings = false;
+        hasPushedWind = false;
         ApplyWind();
     }
 
@@ -83,8 +96,6 @@ public sealed class Stage2WindEffect : MonoBehaviour
             return;
         }
 
-        ApplyWind();
-        PushWindToTargets();
         if (!Application.isPlaying)
         {
             return;
@@ -105,9 +116,23 @@ public sealed class Stage2WindEffect : MonoBehaviour
         }
 
         var direction = windDirection.sqrMagnitude > 0.0001f ? windDirection.normalized : Vector3.forward;
+        if (hasAppliedSettings
+            && direction == appliedDirection
+            && Mathf.Approximately(windStrength, appliedStrength)
+            && Mathf.Approximately(turbulence, appliedTurbulence)
+            && localVolumeSize == appliedVolumeSize)
+        {
+            return;
+        }
+
         ApplyWindToParticleSystem(leafParticles, direction, windStrength, turbulence, 0.24f);
         ApplyWindToParticleSystem(wetLightParticles, direction, windStrength * 0.82f, turbulence * 0.9f, 0.32f);
         UpdateWindZone(direction);
+        appliedDirection = direction;
+        appliedStrength = windStrength;
+        appliedTurbulence = turbulence;
+        appliedVolumeSize = localVolumeSize;
+        hasAppliedSettings = true;
     }
 
     /// <summary>
@@ -167,6 +192,15 @@ public sealed class Stage2WindEffect : MonoBehaviour
             return;
         }
 
+        var direction = windDirection.sqrMagnitude > 0.0001f ? windDirection.normalized : Vector3.forward;
+        if (hasPushedWind
+            && direction == pushedDirection
+            && Mathf.Approximately(windStrength, pushedStrength)
+            && Mathf.Approximately(turbulence, pushedTurbulence))
+        {
+            return;
+        }
+
         for (var i = 0; i < swayTargets.Length; i++)
         {
             if (swayTargets[i] != null)
@@ -174,6 +208,11 @@ public sealed class Stage2WindEffect : MonoBehaviour
                 swayTargets[i].SetWind(windDirection, windStrength, turbulence);
             }
         }
+
+        pushedDirection = direction;
+        pushedStrength = windStrength;
+        pushedTurbulence = turbulence;
+        hasPushedWind = true;
     }
 
     /// <summary>
@@ -250,6 +289,8 @@ public sealed class Stage2WindEffect : MonoBehaviour
                 }
             }
         }
+
+        hasPushedWind = false;
     }
 
     /// <summary>
@@ -259,6 +300,8 @@ public sealed class Stage2WindEffect : MonoBehaviour
     {
         windDirection = direction;
         windStrength = Mathf.Max(0f, strength);
+        hasAppliedSettings = false;
+        hasPushedWind = false;
         ApplyWind();
         PushWindToTargets();
     }
@@ -269,6 +312,8 @@ public sealed class Stage2WindEffect : MonoBehaviour
     public void SetTurbulence(float turbulenceAmount)
     {
         turbulence = Mathf.Clamp01(turbulenceAmount);
+        hasAppliedSettings = false;
+        hasPushedWind = false;
         ApplyWind();
         PushWindToTargets();
     }
@@ -282,6 +327,7 @@ public sealed class Stage2WindEffect : MonoBehaviour
             Mathf.Max(0.5f, range.x),
             Mathf.Max(0.5f, range.y),
             Mathf.Max(0.5f, range.z));
+        hasAppliedSettings = false;
         ApplyWind();
     }
 
