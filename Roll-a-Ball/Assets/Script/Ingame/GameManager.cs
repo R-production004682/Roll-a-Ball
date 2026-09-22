@@ -33,7 +33,6 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// ゲーム開始時リザルト画面(クリアやゲームオーバー画面)を隠す処理
     /// </summary>
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         result.SetActive(false);//リザルトオフ
@@ -42,7 +41,6 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// 毎フレームタイマーが時間を計測、ゴールに触れたら止まる処理
     /// </summary>
-    // Update is called once per frame
     void Update()
     {
         if (GameManager.instance.isStageCompleted)//クリアしている場合

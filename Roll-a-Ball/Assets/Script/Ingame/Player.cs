@@ -23,7 +23,6 @@ public class Player : MonoBehaviour
     /// <summary>
     /// プレイヤーとカメラを動かし、クリア状態、UI画面では操作できないようにする。倒れた場合スタート地点か行き解放されたリスポーン位置にワープする。
     /// </summary>
-    // Update is called once per frame
     void Update()
     {
         if (GameManager.instance.isStageCompleted == true)
