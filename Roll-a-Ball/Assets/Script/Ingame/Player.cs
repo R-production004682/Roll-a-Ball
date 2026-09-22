@@ -49,15 +49,7 @@ public class Player : MonoBehaviour
 
         if (transform.position.y <= fall)
         {
-            if (respawnPoints.Count > 0)//リスポーンポイントがあると最後に解放した地点の位置と向きに戻る
-            {
-                transform.position = respawnPoints[respawnPoints.Count - 1].transform.position;
-                transform.rotation = respawnPoints[respawnPoints.Count - 1].transform.rotation;
-            }
-            else//解放されていない場合はスタート地点
-            {
-                transform.position = startPoint;
-            }
+            Respawn();
         }
     }
 

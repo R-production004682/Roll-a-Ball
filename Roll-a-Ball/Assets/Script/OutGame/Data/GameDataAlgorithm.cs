@@ -68,7 +68,6 @@ namespace Roll_a_Ball.OutGame
             var sourceStages = source.stages ?? new List<StageProgressData>();
             var sourceItems = source.purchasedItemIds ?? new List<string>();
             var stageIds = new HashSet<string>();
-            var itemIds = new HashSet<string>();
             var stages = new List<StageProgressData>(sourceStages.Count);
             var purchasedItemIds = new List<string>(sourceItems.Count);
 
@@ -110,10 +109,7 @@ namespace Roll_a_Ball.OutGame
                     return false;
                 }
 
-                if (itemIds.Add(itemId))
-                {
-                    purchasedItemIds.Add(itemId);
-                }
+                purchasedItemIds.Add(itemId);
             }
 
             if (!stageIds.Contains(initialStageId))
