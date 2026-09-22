@@ -6,6 +6,10 @@ public class Respawnpoint : MonoBehaviour
     [Min(0)]
     private int pointNumber;//リスポーン地点の番号
 
+    /// <summary>
+    /// 中間地点で復活するための処理
+    /// </summary>
+    /// <param name="other"></param>
     private void OnTriggerEnter(Collider other)//衝突判定
     {
         if (other.CompareTag("Player"))//プレイヤーとの衝突

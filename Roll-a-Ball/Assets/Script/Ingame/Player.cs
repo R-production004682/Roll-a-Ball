@@ -20,6 +20,9 @@ public class Player : MonoBehaviour
     [SerializeField]
     private Vector3 startPoint;//スタート地点
 
+    /// <summary>
+    /// プレイヤーとカメラを動かし、クリア状態、UI画面では操作できないようにする。倒れた場合スタート地点か行き解放されたリスポーン位置にワープする。
+    /// </summary>
     // Update is called once per frame
     void Update()
     {
@@ -58,6 +61,10 @@ public class Player : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// プレイヤーが中間地点に触れたときに、復活位置を中間地点に登録する
+    /// </summary>
+    /// <param name="point"></param>
     public void UnlockPoint(Respawnpoint point)
     {
         if (point == null || respawnPoints.Contains(point))//地点番号がないか解放済みだと処理しない
