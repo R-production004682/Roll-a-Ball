@@ -93,8 +93,5 @@ public sealed class SpikeHazard : MonoBehaviour
 
             contactEffect.PlayAt(contactPosition, contactNormal.normalized);
         }
-
-        player.RespawnFromHazard();
-        isProcessing = false;
     }
 }

@@ -5,6 +5,10 @@ public class Coin : MonoBehaviour
     [SerializeField]
     private int coinAmount = 10;//コイン1枚の保有する金額
 
+    /// <summary>
+    /// プレイヤーがコインに衝突した際に所持コインを加算し、衝突したコインは消える処理
+    /// </summary>
+    /// <param name="other"></param>
     private void OnTriggerEnter(Collider other)//衝突判定
     {
         if (other.CompareTag("Player"))//プレイヤーと衝突した場合

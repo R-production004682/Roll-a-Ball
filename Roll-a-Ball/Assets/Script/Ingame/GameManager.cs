@@ -17,6 +17,9 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private string stageId;//ステージ識別ID
 
+    /// <summary>
+    /// ゲーム開始時に呼び出され、GameManagerが重複しないようにチェックした上で、instanceに登録
+    /// </summary>
     private void Awake()
     {
         if (instance != null && instance != this)
@@ -27,13 +30,17 @@ public class GameManager : MonoBehaviour
         instance = this;//このGameManagerをinstanceに登録
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    /// <summary>
+    /// ゲーム開始時リザルト画面(クリアやゲームオーバー画面)を隠す処理
+    /// </summary>
     void Start()
     {
         result.SetActive(false);//リザルトオフ
     }
 
-    // Update is called once per frame
+    /// <summary>
+    /// 毎フレームタイマーが時間を計測、ゴールに触れたら止まる処理
+    /// </summary>
     void Update()
     {
         if (GameManager.instance.isStageCompleted)//クリアしている場合
@@ -42,6 +49,9 @@ public class GameManager : MonoBehaviour
         playTime += Time.deltaTime;//プレイタイム→１秒に１のペースで増える
     }
 
+    /// <summary>
+    /// ステージクリア後にクリアタイムと表示し、順位をつけてリザルトを出す処理
+    /// </summary>
     public void StageCompleted()//ステージ完了処理
     {
         if (isStageCompleted)//すでにクリアしている場合
