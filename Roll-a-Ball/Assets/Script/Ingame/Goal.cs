@@ -6,12 +6,6 @@ public class Goal : MonoBehaviour
     [SerializeField]
     private ParticleSystem goalEffect;//旧ゴールエフェクト
 
-    /// <summary>
-    /// ゴールに衝突した際にゴールエフェクトが再生しゲームをクリアをする
-    /// </summary>
-    /// <param name="other"></param>
-    private void OnTriggerEnter(Collider other)//衝突判定
-    
     [SerializeField]
     private GoalClearEffect clearEffect;
 

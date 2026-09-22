@@ -46,11 +46,6 @@ public class Player : MonoBehaviour
 
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;//マウスの左右移動量を取得
         transform.Rotate(Vector3.up * mouseX);//オブジェクトのy軸を中心に回転
-
-        if (transform.position.y <= fall)
-        {
-            Respawn();
-        }
     }
 
     /// <summary>
