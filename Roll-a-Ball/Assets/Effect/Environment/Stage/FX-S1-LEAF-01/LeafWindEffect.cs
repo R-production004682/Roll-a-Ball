@@ -16,6 +16,10 @@ public sealed class LeafWindEffect : MonoBehaviour
 
     private ParticleSystem.Particle[] leafBuffer;
     private ParticleSystem.Particle[] lightBuffer;
+    private Vector3 appliedDirection;
+    private float appliedSpeed;
+    private float appliedTurbulence;
+    private bool hasAppliedSettings;
     private bool initialized;
 
     /// <summary>
@@ -30,6 +34,7 @@ public sealed class LeafWindEffect : MonoBehaviour
             return;
         }
 
+        hasAppliedSettings = false;
         initialized = true;
         ApplyWind();
         if (Application.isPlaying)
@@ -46,6 +51,7 @@ public sealed class LeafWindEffect : MonoBehaviour
         localVolumeSize.x = Mathf.Max(0.5f, localVolumeSize.x);
         localVolumeSize.y = Mathf.Max(0.5f, localVolumeSize.y);
         localVolumeSize.z = Mathf.Max(0.5f, localVolumeSize.z);
+        hasAppliedSettings = false;
         ApplyWind();
     }
 
@@ -59,7 +65,6 @@ public sealed class LeafWindEffect : MonoBehaviour
             return;
         }
 
-        ApplyWind();
         if (!Application.isPlaying)
         {
             return;
@@ -80,6 +85,14 @@ public sealed class LeafWindEffect : MonoBehaviour
         }
 
         var direction = windDirection.sqrMagnitude > 0.0001f ? windDirection.normalized : Vector3.forward;
+        if (hasAppliedSettings
+            && direction == appliedDirection
+            && Mathf.Approximately(windSpeed, appliedSpeed)
+            && Mathf.Approximately(turbulence, appliedTurbulence))
+        {
+            return;
+        }
+
         ApplyWindToParticleSystem(leafParticles, direction, windSpeed, turbulence);
         ApplyWindToParticleSystem(lightParticles, direction, windSpeed * 0.8f, turbulence * 0.8f);
         if (windZone != null)
@@ -87,6 +100,11 @@ public sealed class LeafWindEffect : MonoBehaviour
             windZone.windMain = Mathf.Clamp(windSpeed, 0f, 1f);
             windZone.windTurbulence = turbulence;
         }
+
+        appliedDirection = direction;
+        appliedSpeed = windSpeed;
+        appliedTurbulence = turbulence;
+        hasAppliedSettings = true;
     }
 
     /// <summary>

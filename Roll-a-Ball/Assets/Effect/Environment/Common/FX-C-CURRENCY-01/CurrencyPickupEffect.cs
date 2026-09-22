@@ -58,6 +58,7 @@ public sealed class CurrencyPickupEffect : MonoBehaviour
 
     private float elapsedTime;
     private bool isPlaying;
+    private bool isFinishing;
     private MaterialPropertyBlock crossSparkPropertyBlock;
 
     /// <summary>
@@ -76,26 +77,27 @@ public sealed class CurrencyPickupEffect : MonoBehaviour
     /// </summary>
     private void Update()
     {
-        if (!isPlaying)
+        if (!isPlaying && !isFinishing)
         {
             return;
         }
 
-        elapsedTime += Time.deltaTime;
-        var normalizedTime = Mathf.Clamp01(elapsedTime / duration);
-        UpdateCrossSpark(normalizedTime);
-        UpdatePulseLight(normalizedTime);
-
-        if (elapsedTime < duration)
+        if (isPlaying)
         {
-            return;
+            elapsedTime += Time.deltaTime;
+            var normalizedTime = Mathf.Clamp01(elapsedTime / Mathf.Max(0.1f, duration));
+            UpdateCrossSpark(normalizedTime);
+            UpdatePulseLight(normalizedTime);
+
+            if (elapsedTime >= Mathf.Max(0.1f, duration))
+            {
+                BeginParticleFinish();
+            }
         }
 
-        Stop();
-
-        if (destroyOnComplete)
+        if (isFinishing && !HasAliveParticles())
         {
-            Destroy(gameObject);
+            FinishPlayback();
         }
     }
 
@@ -116,6 +118,7 @@ public sealed class CurrencyPickupEffect : MonoBehaviour
         isLargeReward = largeReward;
         elapsedTime = 0f;
         isPlaying = true;
+        isFinishing = false;
 
         StopParticles();
 
@@ -195,6 +198,7 @@ public sealed class CurrencyPickupEffect : MonoBehaviour
     public void Stop()
     {
         isPlaying = false;
+        isFinishing = false;
         StopParticles();
 
         if (largeRewardBurst != null)
@@ -272,6 +276,85 @@ public sealed class CurrencyPickupEffect : MonoBehaviour
 
         var fade = 1f - Mathf.SmoothStep(0f, 1f, normalizedTime);
         pulseLight.intensity = pulseLightIntensity * fade;
+    }
+
+    /// <summary>
+    /// 本体演出を終え、粒子の自然な消滅だけを待つ
+    /// </summary>
+    private void BeginParticleFinish()
+    {
+        isPlaying = false;
+        isFinishing = true;
+        StopParticleEmission();
+
+        if (pulseLight != null)
+        {
+            pulseLight.intensity = 0f;
+            pulseLight.enabled = false;
+        }
+    }
+
+    /// <summary>
+    /// 全粒子が消えた後の後始末を行う
+    /// </summary>
+    private void FinishPlayback()
+    {
+        var shouldDestroy = destroyOnComplete;
+        Stop();
+
+        if (shouldDestroy)
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    /// <summary>
+    /// 粒子の新規発生だけを止め、表示中の粒子を残す
+    /// </summary>
+    private void StopParticleEmission()
+    {
+        StopEmission(crystalBurst);
+        StopEmission(corePulse);
+        StopEmission(largeRewardBurst);
+        StopEmission(impactFlash);
+        StopEmission(sparkleBurst);
+        StopEmission(largeSparkleBurst);
+    }
+
+    /// <summary>
+    /// 指定した粒子システムの新規発生を止める
+    /// </summary>
+    /// <param name="particleSystem">発生を止める粒子システムです。</param>
+    private static void StopEmission(ParticleSystem particleSystem)
+    {
+        if (particleSystem != null)
+        {
+            particleSystem.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+        }
+    }
+
+    /// <summary>
+    /// 管理している粒子がまだ表示中か確認する
+    /// </summary>
+    /// <returns>粒子が残っている場合はtrueです。</returns>
+    private bool HasAliveParticles()
+    {
+        return IsAlive(crystalBurst)
+            || IsAlive(corePulse)
+            || IsAlive(largeRewardBurst)
+            || IsAlive(impactFlash)
+            || IsAlive(sparkleBurst)
+            || IsAlive(largeSparkleBurst);
+    }
+
+    /// <summary>
+    /// 指定した粒子システムに表示中の粒子があるか確認する
+    /// </summary>
+    /// <param name="particleSystem">確認する粒子システムです。</param>
+    /// <returns>粒子が残っている場合はtrueです。</returns>
+    private static bool IsAlive(ParticleSystem particleSystem)
+    {
+        return particleSystem != null && particleSystem.IsAlive(true);
     }
 
     /// <summary>
