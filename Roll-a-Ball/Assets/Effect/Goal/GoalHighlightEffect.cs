@@ -38,6 +38,7 @@ public sealed class GoalHighlightEffect : MonoBehaviour
     private MaterialPropertyBlock propertyBlock;
     private Vector3[] basePositions;
     private Vector3[] baseScales;
+    private Quaternion[] baseRotations;
     private float elapsedTime;
     private bool isPlaying;
 
@@ -100,6 +101,7 @@ public sealed class GoalHighlightEffect : MonoBehaviour
     {
         isPlaying = false;
         SetRenderersEnabled(false);
+        ResetSquareTransforms();
 
         if (glowLight != null)
         {
@@ -117,11 +119,13 @@ public sealed class GoalHighlightEffect : MonoBehaviour
         {
             basePositions = new Vector3[0];
             baseScales = new Vector3[0];
+            baseRotations = new Quaternion[0];
             return;
         }
 
         basePositions = new Vector3[squareRenderers.Length];
         baseScales = new Vector3[squareRenderers.Length];
+        baseRotations = new Quaternion[squareRenderers.Length];
         for (var i = 0; i < squareRenderers.Length; i++)
         {
             var renderer = squareRenderers[i];
@@ -132,6 +136,7 @@ public sealed class GoalHighlightEffect : MonoBehaviour
 
             basePositions[i] = renderer.transform.localPosition;
             baseScales[i] = renderer.transform.localScale;
+            baseRotations[i] = renderer.transform.localRotation;
         }
     }
 
@@ -161,9 +166,8 @@ public sealed class GoalHighlightEffect : MonoBehaviour
             var transform = renderer.transform;
             transform.localPosition = basePositions[i] + Vector3.up * Mathf.Lerp(-height * 0.5f, height * 0.5f, progress);
             transform.localScale = baseScales[i] * Mathf.Lerp(0.86f, 1.08f, visibility);
-
-            // 回転しながら上がってってほしい場合は以下のコメントアウトを外す
-            // transform.localRotation = Quaternion.Euler(0f, rotationSpeed * elapsedTime + i * 18f, 0f);
+            var rotationAmount = Mathf.Sin(phase * Mathf.PI * 2f + i * 0.7f) * rotationSpeed * 0.08f;
+            transform.localRotation = baseRotations[i] * Quaternion.Euler(0f, rotationAmount, rotationAmount * 0.15f);
 
             var color = GetSquareColor(i);
             color.a *= visibility * 0.92f;
@@ -239,6 +243,30 @@ public sealed class GoalHighlightEffect : MonoBehaviour
             {
                 renderer.enabled = enabled;
             }
+        }
+    }
+
+    /// <summary>
+    /// 四角形を保存した初期Transformへ戻す
+    /// </summary>
+    private void ResetSquareTransforms()
+    {
+        if (squareRenderers == null)
+        {
+            return;
+        }
+
+        for (var i = 0; i < squareRenderers.Length; i++)
+        {
+            var renderer = squareRenderers[i];
+            if (renderer == null || basePositions == null || i >= basePositions.Length)
+            {
+                continue;
+            }
+
+            renderer.transform.localPosition = basePositions[i];
+            renderer.transform.localScale = baseScales[i];
+            renderer.transform.localRotation = baseRotations[i];
         }
     }
 }
