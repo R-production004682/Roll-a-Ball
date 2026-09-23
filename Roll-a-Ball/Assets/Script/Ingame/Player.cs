@@ -53,14 +53,14 @@ public class Player : MonoBehaviour
             moveDirection -= transform.forward;//後方
 
         if (Input.GetKey(KeyCode.D))//Dキー入力
-           moveDirection += transform.right;//右
+            moveDirection += transform.right;//右
 
         if (Input.GetKey(KeyCode.A))//Aキー入力
             moveDirection -= transform.right;//左
 
-        if(moveDirection != Vector3.zero)//入力がある
+        if (moveDirection != Vector3.zero)//入力がある
         {
-            moveDirection.Normalize ();//斜め移動が速くならない
+            moveDirection.Normalize();//斜め移動が速くならない
         }
 
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;//マウスの左右移動量を取得
@@ -79,9 +79,9 @@ public class Player : MonoBehaviour
         if (isGoal == true)
             return;//ゴールに触れると操作不可
 
-        if (moveDirection  != Vector3.zero)//入力がある
+        if (moveDirection != Vector3.zero)//入力がある
         {
-            rb.AddForce (moveDirection * acceleration, ForceMode.Acceleration);//入力方向に加速度分力を加える(質量依存なし)
+            rb.AddForce(moveDirection * acceleration, ForceMode.Acceleration);//入力方向に加速度分力を加える(質量依存なし)
         }
 
         Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);//水平方向の速度取得
@@ -107,7 +107,7 @@ public class Player : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag ("Goal"))
+        if (other.CompareTag("Goal"))
         {
             isGoal = true;
             Debug.Log("ゴールに触れた");
