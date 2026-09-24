@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7dfe22befa8151e4ab8028cab3040fde, type: 3}
+  m_Name: GrassMovementSurface
+  m_EditorClassIdentifier: Assembly-CSharp::MovementSurfaceProfile
+  dustColor: {r: 0.64, g: 0.6, b: 0.43, a: 0.4}
+  accentColor: {r: 0.75, g: 0.72, b: 0.56, a: 0.3}
+  particlesPerSecond: {x: 8, y: 20}
+  particleSize: {x: 0.16, y: 0.28}
+  lifetime: {x: 0.35, y: 0.55}
+  lateralSpeed: 0.35
+  liftSpeed: 0.25
+  sparkleRatio: 0.02
+  surfaceDetail: 1
+  detailColor: {r: 0, g: 1, b: 0.39309883, a: 1}
+  detailParticlesPerSecond: {x: 4, y: 12}
+  detailSize: {x: 0.14, y: 0.24}
+  detailLifetime: {x: 0.36, y: 0.55}
+  detailLateralSpeed: 0.5
+  detailLiftSpeed: 0.62
+  detailGravity: 0.18
