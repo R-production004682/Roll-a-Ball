@@ -65,16 +65,16 @@ public class Player : MonoBehaviour
         moveDirection = Vector3.zero;//移動リセット
 
         if (Input.GetKey(KeyCode.W))//Wキー入力
-            moveDirection += cameraForward ;//正面方向
+            moveDirection += cameraForward;//正面方向
 
         if (Input.GetKey(KeyCode.S))//Sキー入力
-            moveDirection -= cameraForward ;//後方
+            moveDirection -= cameraForward;//後方
 
         if (Input.GetKey(KeyCode.D))//Dキー入力
             moveDirection += cameraRight;//右
 
         if (Input.GetKey(KeyCode.A))//Aキー入力
-            moveDirection -= cameraRight ;//左
+            moveDirection -= cameraRight;//左
 
         if (moveDirection != Vector3.zero)//入力がある
         {
