@@ -16,9 +16,6 @@ public class Player : MonoBehaviour
     private float acceleration = 50;//加速度
 
     [SerializeField]
-    private float mouseSensitivity = 200;//マウス視点操作の感度
-
-    [SerializeField]
     private int fall;//落下地点
 
     [SerializeField]
@@ -28,7 +25,10 @@ public class Player : MonoBehaviour
     private Respawnpoint startPoint;//スタート地点
 
     [SerializeField]
-    private bool isGoal = false;
+    private bool isGoal = false;//ゴールしたか
+
+    [SerializeField]
+    private Transform cameraTransform;//カメラ（インスペクターから指定）
 
     private void Start()
     {
@@ -41,36 +41,44 @@ public class Player : MonoBehaviour
     /// </summary>
     void Update()
     {
-        if (UiInputScope.BlocksPlayer)
-            return;//UI画面では操作不可
-
-        moveDirection = Vector3.zero;
-
-        if (Input.GetKey(KeyCode.W))//Wキー入力
-            moveDirection += transform.forward;//正面方向
-
-        if (Input.GetKey(KeyCode.S))//Sキー入力
-            moveDirection -= transform.forward;//後方
-
-        if (Input.GetKey(KeyCode.D))//Dキー入力
-            moveDirection += transform.right;//右
-
-        if (Input.GetKey(KeyCode.A))//Aキー入力
-            moveDirection -= transform.right;//左
-
-        if (moveDirection != Vector3.zero)//入力がある
-        {
-            moveDirection.Normalize();//斜め移動が速くならない
-        }
-
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;//マウスの左右移動量を取得
-        transform.Rotate(Vector3.up * mouseX);//オブジェクトのy軸を中心に回転
-
         if (transform.position.y <= fall)//リスポーンポイントがあると最後に解放した地点の位置と向きに戻る、移動を0にする
         {
             transform.position = respawnPoints[respawnPoints.Count - 1].transform.position;
             transform.rotation = respawnPoints[respawnPoints.Count - 1].transform.rotation;
-            rb.linearVelocity = Vector3.zero;//移動をリセット
+            rb.linearVelocity = Vector3.zero;//速度をリセット
+            moveDirection = Vector3.zero;//方向をリセット
+            rb.angularVelocity = Vector3.zero;//回転をリセット
+        }
+
+        if (UiInputScope.BlocksPlayer)
+            return;//UI画面では操作不可
+
+        if (isGoal == true)
+            return;//ゴールに触れると操作不可
+
+        Vector3 cameraForward = cameraTransform.forward;//カメラの前方向を取得
+        Vector3 cameraRight = cameraTransform.right;//カメラの右方向を取得
+
+        cameraForward.y = 0f;//上下を無視
+        cameraRight.y = 0f;
+
+        moveDirection = Vector3.zero;//移動リセット
+
+        if (Input.GetKey(KeyCode.W))//Wキー入力
+            moveDirection += cameraForward ;//正面方向
+
+        if (Input.GetKey(KeyCode.S))//Sキー入力
+            moveDirection -= cameraForward ;//後方
+
+        if (Input.GetKey(KeyCode.D))//Dキー入力
+            moveDirection += cameraRight;//右
+
+        if (Input.GetKey(KeyCode.A))//Aキー入力
+            moveDirection -= cameraRight ;//左
+
+        if (moveDirection != Vector3.zero)//入力がある
+        {
+            moveDirection.Normalize();//斜め移動が速くならない
         }
     }
 
@@ -101,7 +109,7 @@ public class Player : MonoBehaviour
         if (point == null || respawnPoints.Contains(point))//地点番号がないか解放済みだと処理しない
             return;
 
-        respawnPoints.Add(point);
+        respawnPoints.Add(point);//リスポーンポイントを追加する
 
     }
 
@@ -111,7 +119,7 @@ public class Player : MonoBehaviour
         {
             isGoal = true;
             Debug.Log("ゴールに触れた");
-            rb.linearVelocity = Vector3.zero;//移動をリセット
+            rb.isKinematic = true;//物理演算を止める
         }
     }
 }
