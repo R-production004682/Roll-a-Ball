@@ -21,7 +21,7 @@ public class Player : MonoBehaviour
     private Vector3 startPoint;//スタート地点
 
     /// <summary>
-    /// プレイヤーの入力と落下によるリスポーンを更新
+    /// プレイヤーとカメラを動かし、クリア状態、UI画面では操作できないようにする。倒れた場合スタート地点か行き解放されたリスポーン位置にワープする。
     /// </summary>
     void Update()
     {
@@ -45,53 +45,12 @@ public class Player : MonoBehaviour
 
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;//マウスの左右移動量を取得
         transform.Rotate(Vector3.up * mouseX);//オブジェクトのy軸を中心に回転
-
-        if (transform.position.y <= fall)
-        {
-            Respawn();
-        }
     }
 
     /// <summary>
-    /// トゲなどの即時死亡ギミックからプレイヤーをリスポーン
+    /// プレイヤーが中間地点に触れたときに、復活位置を中間地点に登録する
     /// </summary>
-    public void RespawnFromHazard()
-    {
-        Respawn();
-    }
-
-    /// <summary>
-    /// 最後に解放した地点、またはスタート地点へプレイヤーを戻す
-    /// </summary>
-    private void Respawn()
-    {
-        var respawnPosition = startPoint;
-        var respawnRotation = transform.rotation;
-
-        if (respawnPoints.Count > 0)
-        {
-            var respawnPoint = respawnPoints[respawnPoints.Count - 1];
-            respawnPosition = respawnPoint.transform.position;
-            respawnRotation = respawnPoint.transform.rotation;
-        }
-
-        var rigidbody = GetComponent<Rigidbody>();
-        if (rigidbody != null)
-        {
-            rigidbody.position = respawnPosition;
-            rigidbody.rotation = respawnRotation;
-            rigidbody.linearVelocity = Vector3.zero;
-            rigidbody.angularVelocity = Vector3.zero;
-            return;
-        }
-
-        transform.position = respawnPosition;
-        transform.rotation = respawnRotation;
-    }
-
-    /// <summary>
-    /// 指定したリスポーン地点を解放済み地点として登録
-    /// </summary>
+    /// <param name="point"></param>
     public void UnlockPoint(Respawnpoint point)
     {
         if (point == null || respawnPoints.Contains(point))//地点番号がないか解放済みだと処理しない
