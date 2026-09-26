@@ -770,7 +770,7 @@ RectTransform:
   m_GameObject: {fileID: 2659105124900041914}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1932382100666745624}
@@ -778,7 +778,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -460, y: 106}
+  m_AnchoredPosition: {x: -460, y: -27}
   m_SizeDelta: {x: 92, y: 140}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8592873204371299665
@@ -891,7 +891,7 @@ RectTransform:
   m_GameObject: {fileID: 2973268124339991201}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 5824633424997325918}
@@ -899,7 +899,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 460, y: 106}
+  m_AnchoredPosition: {x: 460, y: -27}
   m_SizeDelta: {x: 92, y: 140}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5581910894452395671
@@ -1520,7 +1520,7 @@ MonoBehaviour:
   stages:
   - stageId: stage-1
     stageNumber: 1
-    displayName: SKYLINE ROLL
+    displayName: "\u6728\u6F0F\u308C\u65E5\u306E\u6797\u9053"
     difficulty: NORMAL
     previewTexture: {fileID: 2800000, guid: 7982052847398a94993f5d0f3ba59024, type: 2}
     playScene:
@@ -1529,7 +1529,7 @@ MonoBehaviour:
     nextStageId: stage-2
   - stageId: stage-2
     stageNumber: 2
-    displayName: AZURE RUN
+    displayName: "\u8FF7\u3044\u306E\u5BC6\u96C6\u6797"
     difficulty: HARD
     previewTexture: {fileID: 2800000, guid: 7982052847398a94993f5d0f3ba59024, type: 2}
     playScene:
@@ -1538,7 +1538,7 @@ MonoBehaviour:
     nextStageId: stage-3
   - stageId: stage-3
     stageNumber: 3
-    displayName: Comming Soon....
+    displayName: "\u305B\u305B\u3089\u304E\u306E\u4E38\u592A\u6A4B"
     difficulty: EXPERT
     previewTexture: {fileID: 2800000, guid: 7982052847398a94993f5d0f3ba59024, type: 2}
     playScene:
@@ -2324,7 +2324,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &608002774932202957
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2945,7 +2945,7 @@ RectTransform:
   m_GameObject: {fileID: 8307435543610863868}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
+  m_LocalScale: {x: 1.04, y: 1.04, z: 1.04}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 2983962124284662120}
@@ -2956,7 +2956,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 101}
+  m_AnchoredPosition: {x: 0, y: -32}
   m_SizeDelta: {x: 800, y: 518.8628}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8849042303669122146
