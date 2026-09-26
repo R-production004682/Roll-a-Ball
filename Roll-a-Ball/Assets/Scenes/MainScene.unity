@@ -9307,8 +9307,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   isStageCompleted: 0
   result: {fileID: 478365706}
-  playTime: 0
-  stageId: 
+  outGameClearController: {fileID: 1301688228}
 --- !u!114 &1977749573 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4155227185211933586, guid: 7fd91c35fd0c7b04c84233db94d999fc, type: 3}

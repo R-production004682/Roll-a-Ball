@@ -11,11 +11,8 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private GameObject result;//リザルト画面
 
-    [SerializeField]//確認用
-    private float playTime = 0;//プレイタイム
-
     [SerializeField]
-    private string stageId;//ステージ識別ID
+    private OutGameClearController outGameClearController;
 
     /// <summary>
     /// ゲーム開始時に呼び出され、GameManagerが重複しないようにチェックした上で、instanceに登録
@@ -39,18 +36,7 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 毎フレームタイマーが時間を計測、ゴールに触れたら止まる処理
-    /// </summary>
-    void Update()
-    {
-        if (GameManager.instance.isStageCompleted)//クリアしている場合
-            return;//タイマーを止める
-
-        playTime += Time.deltaTime;//プレイタイム→１秒に１のペースで増える
-    }
-
-    /// <summary>
-    /// ステージクリア後にクリアタイムと表示し、順位をつけてリザルトを出す処理
+    /// ステージをクリア済みにし、リザルト画面を表示する処理
     /// </summary>
     public void StageCompleted()//ステージ完了処理
     {
@@ -59,10 +45,15 @@ public class GameManager : MonoBehaviour
 
         isStageCompleted = true;//ステージ完了
 
-        Debug.Log("クリアタイム：" + playTime.ToString("F2"));//クリアタイムを小数点以下2桁で表示
+        if (outGameClearController == null)
+        {
+            Debug.LogError("GameManager に OutGameClearController が設定されていません。", this);
+        }
+        else
+        {
+            outGameClearController.MarkStageCleared();
+        }
 
-        int rank;//クリアタイムの順位
-        GameDataManager.RecordStageClear(stageId, playTime, out rank);//クリア状態とクリアタイムを保存
         result.SetActive(true);//リザルト出す
     }
 }
