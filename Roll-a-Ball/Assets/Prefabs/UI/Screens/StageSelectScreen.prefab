@@ -1002,7 +1002,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2823190949064982944
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1123,7 +1123,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &8949493789390253167
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1524,8 +1524,8 @@ MonoBehaviour:
     difficulty: NORMAL
     previewTexture: {fileID: 2800000, guid: 7982052847398a94993f5d0f3ba59024, type: 2}
     playScene:
-      scenePath: Assets/Scenes/TestScene/OutGameTestScene.unity
-      sceneGuid: 182c64d0ad3833a4f8b52af92f904e1c
+      scenePath: Assets/Scenes/MainScene.unity
+      sceneGuid: a214e2a22156b4a43ab298b90d0eebf6
     nextStageId: stage-2
   - stageId: stage-2
     stageNumber: 2
@@ -1533,26 +1533,17 @@ MonoBehaviour:
     difficulty: HARD
     previewTexture: {fileID: 2800000, guid: 7982052847398a94993f5d0f3ba59024, type: 2}
     playScene:
-      scenePath: Assets/Scenes/TestScene/OutGameTestScene.unity
-      sceneGuid: 182c64d0ad3833a4f8b52af92f904e1c
+      scenePath: Assets/Scenes/MainScene.unity
+      sceneGuid: a214e2a22156b4a43ab298b90d0eebf6
     nextStageId: stage-3
   - stageId: stage-3
     stageNumber: 3
-    displayName: NIGHT ORBIT
+    displayName: Comming Soon....
     difficulty: EXPERT
     previewTexture: {fileID: 2800000, guid: 7982052847398a94993f5d0f3ba59024, type: 2}
     playScene:
-      scenePath: Assets/Scenes/TestScene/OutGameTestScene.unity
-      sceneGuid: 182c64d0ad3833a4f8b52af92f904e1c
-    nextStageId: stage-4
-  - stageId: stage-4
-    stageNumber: 4
-    displayName: TEST_TEST
-    difficulty: EXPERT
-    previewTexture: {fileID: 2800000, guid: 7982052847398a94993f5d0f3ba59024, type: 2}
-    playScene:
-      scenePath: Assets/Scenes/TestScene/OutGameTestScene.unity
-      sceneGuid: 182c64d0ad3833a4f8b52af92f904e1c
+      scenePath: Assets/Scenes/MainScene.unity
+      sceneGuid: a214e2a22156b4a43ab298b90d0eebf6
     nextStageId: 
   currencyLabel: {fileID: 8568741073877715868}
   stageNumberLabel: {fileID: 6438619756663074822}
