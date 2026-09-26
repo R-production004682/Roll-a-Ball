@@ -3,7 +3,7 @@ using UnityEngine;
 namespace Roll_a_Ball.OutGame
 {
     /// <summary>
-    /// プレイ中のステージのクリア状態とタイムを共通ゲームデータへ通知する
+    /// プレイ中のステージのクリア状態を共通ゲームデータへ通知する
     /// </summary>
     public sealed class OutGameClearController : MonoBehaviour
     {
@@ -26,7 +26,7 @@ namespace Roll_a_Ball.OutGame
         }
 
         /// <summary>
-        /// ステージをクリア済みにし、上位タイムと次の解放状態を保存する
+        /// ステージをクリア済みにし、次のステージを解放する
         /// </summary>
         public void MarkStageCleared()
         {
@@ -35,9 +35,9 @@ namespace Roll_a_Ball.OutGame
                 return;
             }
 
-            if (!GameDataManager.RecordStageClear(stageId, Time.timeSinceLevelLoad, out _))
+            if (!GameDataManager.TryMarkStageCleared(stageId))
             {
-                Debug.LogError($"ステージのクリア記録を保存できませんでした: {stageId}", this);
+                Debug.LogError($"ステージをクリア済みに保存できませんでした: {stageId}", this);
                 return;
             }
 

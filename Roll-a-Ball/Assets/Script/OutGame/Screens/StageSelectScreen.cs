@@ -41,6 +41,14 @@ namespace Roll_a_Ball.OutGame
         }
 
         /// <summary>
+        /// シーン破棄時にもゲームデータ通知の購読を解除する
+        /// </summary>
+        private void OnDestroy()
+        {
+            GameDataManager.Changed -= Refresh;
+        }
+
+        /// <summary>
         /// ステージ選択を開き、ゲームデータと操作を購読する
         /// </summary>
         public override void OnOpen(object arg)
