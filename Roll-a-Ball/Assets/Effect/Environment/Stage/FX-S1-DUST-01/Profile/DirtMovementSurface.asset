@@ -12,19 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7dfe22befa8151e4ab8028cab3040fde, type: 3}
   m_Name: DirtMovementSurface
   m_EditorClassIdentifier: Assembly-CSharp::MovementSurfaceProfile
-  dustColor: {r: 0.69, g: 0.56, b: 0.39, a: 0.46}
-  accentColor: {r: 0.81, g: 0.69, b: 0.5, a: 0.32}
-  particlesPerSecond: {x: 10, y: 24}
-  particleSize: {x: 0.18, y: 0.34}
-  lifetime: {x: 0.35, y: 0.55}
-  lateralSpeed: 0.35
-  liftSpeed: 0.25
-  sparkleRatio: 0.02
+  dustColor: {r: 0.69, g: 0.56, b: 0.39, a: 0.62}
+  accentColor: {r: 0.81, g: 0.69, b: 0.5, a: 0.5}
+  particlesPerSecond: {x: 14, y: 32}
+  particleSize: {x: 0.24, y: 0.42}
+  lifetime: {x: 0.42, y: 0.65}
+  lateralSpeed: 0.45
+  liftSpeed: 0.4
+  sparkleRatio: 0.045
   surfaceDetail: 2
   detailColor: {r: 0.48, g: 0.38, b: 0.27, a: 1}
-  detailParticlesPerSecond: {x: 3, y: 8}
-  detailSize: {x: 0.06, y: 0.11}
-  detailLifetime: {x: 0.32, y: 0.48}
-  detailLateralSpeed: 0.62
-  detailLiftSpeed: 1.15
+  detailParticlesPerSecond: {x: 5, y: 13}
+  detailSize: {x: 0.09, y: 0.16}
+  detailLifetime: {x: 0.38, y: 0.6}
+  detailLateralSpeed: 0.78
+  detailLiftSpeed: 1.35
   detailGravity: 0.65
