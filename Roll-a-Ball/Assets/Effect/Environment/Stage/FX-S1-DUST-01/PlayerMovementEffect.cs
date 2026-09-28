@@ -79,7 +79,9 @@ public sealed class PlayerMovementEffect : MonoBehaviour
             return;
         }
 
-        var velocity = displacement / deltaTime;
+        // 物理更新のない描画フレームを停止と誤判定しないよう、動的Bodyは物理速度を使う
+        var body = playerCollider.attachedRigidbody;
+        var velocity = body != null && !body.isKinematic ? body.linearVelocity : displacement / deltaTime;
         var bounds = playerCollider.bounds;
         var count = Physics.RaycastNonAlloc(bounds.center, Vector3.down, hits,
             bounds.extents.y + groundTolerance, groundLayers, QueryTriggerInteraction.Ignore);

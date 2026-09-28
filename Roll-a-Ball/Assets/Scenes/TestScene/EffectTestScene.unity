@@ -7219,8 +7219,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   isStageCompleted: 0
   result: {fileID: 2112459095}
-  playTime: 0
-  stageId: effect-test-spike
+  outGameClearController: {fileID: 0}
 --- !u!1 &842229519
 GameObject:
   m_ObjectHideFlags: 0
@@ -14348,10 +14347,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
   playerSpeed: 0
-  mouseSensitivity: 0
+  acceleration: 50
   fall: -10
   respawnPoints: []
-  startPoint: {x: -2.2, y: 0.35, z: 0}
+  startPoint: {fileID: 0}
+  isGoal: 0
+  cameraTransform: {fileID: 0}
 --- !u!54 &1701536052
 Rigidbody:
   m_ObjectHideFlags: 0
