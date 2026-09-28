@@ -13,7 +13,7 @@ public sealed class GroundDustEffect : MonoBehaviour
     [SerializeField] private Mesh grassBladeMesh;
     [SerializeField] private Mesh pebbleMesh;
     [SerializeField, Min(0.01f)] private float minimumSpeed = 0.35f;
-    [SerializeField, Min(0.02f)] private float fullEffectSpeed = 6f;
+    [SerializeField, Min(0.02f)] private float fullEffectSpeed = 5f;
     [SerializeField, Min(0f)] private float contactOffset = 0.045f;
     [SerializeField, Min(0f)] private float trailingOffset = 0.4f;
 
@@ -89,17 +89,12 @@ public sealed class GroundDustEffect : MonoBehaviour
 
         var amount = Mathf.SmoothStep(0f, 1f,
             Mathf.InverseLerp(minimumSpeed, Mathf.Max(minimumSpeed + 0.01f, fullEffectSpeed), speed));
-        var rate = Mathf.Max(0f, Mathf.Lerp(surface.ParticlesPerSecond.x, surface.ParticlesPerSecond.y, amount));
-        if (rate <= 0f)
-        {
-            Stop();
-            return;
-        }
+        var rate = amount * Mathf.Max(0f, Mathf.Lerp(surface.ParticlesPerSecond.x, surface.ParticlesPerSecond.y, amount));
 
         if (!IsEmitting)
         {
-            dustRemainder = 1f;
-            detailRemainder = 0.75f;
+            dustRemainder = 0f;
+            detailRemainder = 0f;
             dust.Play(false);
             sparkles.Play(false);
             if (surfaceDetails != null)
@@ -205,7 +200,7 @@ public sealed class GroundDustEffect : MonoBehaviour
         // 草と小石を別Systemに保持し、境界を越えても既存の草粒子を小石へ変形させない
         if (previousDetail != surface.SurfaceDetail)
         {
-            detailRemainder = 0.75f;
+            detailRemainder = 0f;
             previousDetail = surface.SurfaceDetail;
         }
 
@@ -215,11 +210,12 @@ public sealed class GroundDustEffect : MonoBehaviour
             detailMain.gravityModifier = surface.DetailGravity;
         }
 
-        var rate = Mathf.Max(0f, Mathf.Lerp(surface.DetailParticlesPerSecond.x,
+        var rate = speedAmount * Mathf.Max(0f, Mathf.Lerp(surface.DetailParticlesPerSecond.x,
             surface.DetailParticlesPerSecond.y, speedAmount));
         detailRemainder += rate * Mathf.Min(deltaTime, 0.1f);
-        var count = Mathf.Min(2, Mathf.FloorToInt(detailRemainder));
-        detailRemainder -= count;
+        var count = Mathf.Min(8, Mathf.FloorToInt(detailRemainder));
+        // 低FPSでも通常の放出量を保ち、停止後の追い出しが起きないよう整数の余剰は捨てる
+        detailRemainder -= Mathf.Floor(detailRemainder);
         var lift = Mathf.Max(0f, surface.DetailLiftSpeed);
         var lateral = Mathf.Max(0f, surface.DetailLateralSpeed);
 
@@ -240,7 +236,7 @@ public sealed class GroundDustEffect : MonoBehaviour
             var particle = new ParticleSystem.EmitParams
             {
                 position = origin + side * Mathf.Lerp(-0.16f, 0.16f, NextValue()),
-                velocity = -direction * Mathf.Lerp(0.12f, isPebble ? 0.48f : 0.3f, speedAmount)
+                velocity = -direction * Mathf.Lerp(0.12f, isPebble ? 0.48f : 0.65f, speedAmount)
                     + side * Mathf.Lerp(-lateral, lateral, NextValue())
                     + normal * upwardSpeed,
                 startSize = Mathf.Max(0.01f, Mathf.Lerp(surface.DetailSize.x,

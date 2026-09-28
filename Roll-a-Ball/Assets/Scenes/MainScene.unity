@@ -148,7 +148,7 @@ Transform:
   m_GameObject: {fileID: 9809833}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 6.74, y: 2.21, z: -7.23}
+  m_LocalPosition: {x: -10.15, y: 4.96, z: -16.45}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2006,7 +2006,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &478365707
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2100,6 +2100,7 @@ GameObject:
   m_Component:
   - component: {fileID: 478707554}
   - component: {fileID: 478707555}
+  - component: {fileID: 478707556}
   m_Layer: 0
   m_Name: Test_BlockBuilder_v1|1|16|0_Collider|BBChunk|Group|Mesh-03152d8fd26c4576862fbd66bbf7dd39
   m_TagString: Untagged
@@ -2144,6 +2145,19 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 270065278}
+--- !u!114 &478707556
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 478707553}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7dc9aec9dd1581f4d8bb5da983f52b81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MovementSurface
+  profile: {fileID: 11400000, guid: 2a8e83a1a4de5a2489248f12b6b45273, type: 2}
 --- !u!1 &527876638
 GameObject:
   m_ObjectHideFlags: 0
@@ -3401,7 +3415,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7193591875694181085, guid: 1987e7b2a985e7d4b9e9d2c253afce23, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.15
       objectReference: {fileID: 0}
     - target: {fileID: 7193591875694181085, guid: 1987e7b2a985e7d4b9e9d2c253afce23, type: 3}
       propertyPath: m_LocalPosition.z
@@ -5150,7 +5164,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   isStageCompleted: 0
   result: {fileID: 478365706}
-  outGameClearController: {fileID: 0}
+  outGameClearController: {fileID: 1301688234}
 --- !u!114 &1977749573 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4155227185211933586, guid: 7fd91c35fd0c7b04c84233db94d999fc, type: 3}

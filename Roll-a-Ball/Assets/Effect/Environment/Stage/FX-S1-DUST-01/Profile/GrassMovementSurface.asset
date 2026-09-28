@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7dfe22befa8151e4ab8028cab3040fde, type: 3}
   m_Name: GrassMovementSurface
   m_EditorClassIdentifier: Assembly-CSharp::MovementSurfaceProfile
-  dustColor: {r: 0.64, g: 0.6, b: 0.43, a: 0.58}
+  dustColor: {r: 0.764151, g: 0.5565608, b: 0.34242615, a: 0.58}
   accentColor: {r: 0.75, g: 0.72, b: 0.56, a: 0.48}
   particlesPerSecond: {x: 12, y: 28}
   particleSize: {x: 0.22, y: 0.36}
@@ -21,10 +21,10 @@ MonoBehaviour:
   liftSpeed: 0.38
   sparkleRatio: 0.045
   surfaceDetail: 1
-  detailColor: {r: 0, g: 1, b: 0.39309883, a: 1}
-  detailParticlesPerSecond: {x: 7, y: 18}
-  detailSize: {x: 0.2, y: 0.34}
-  detailLifetime: {x: 0.42, y: 0.65}
-  detailLateralSpeed: 0.65
-  detailLiftSpeed: 0.8
-  detailGravity: 0.18
+  detailColor: {r: 0.09243703, g: 1, b: 0, a: 1}
+  detailParticlesPerSecond: {x: 28, y: 60}
+  detailSize: {x: 0.38, y: 0.58}
+  detailLifetime: {x: 0.55, y: 0.85}
+  detailLateralSpeed: 1.25
+  detailLiftSpeed: 1.45
+  detailGravity: 0.3

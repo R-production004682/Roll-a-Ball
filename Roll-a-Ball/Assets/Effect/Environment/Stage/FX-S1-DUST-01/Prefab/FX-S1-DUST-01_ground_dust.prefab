@@ -604,7 +604,7 @@ ParticleSystem:
         m_RotationOrder: 4
     randomizeRotationDirection: 0
     gravitySource: 0
-    maxNumParticles: 6
+    maxNumParticles: 12
     customEmitterVelocity: {x: 0, y: 0, z: 0}
     size3D: 0
     rotation3D: 1
@@ -10312,7 +10312,7 @@ ParticleSystem:
         m_RotationOrder: 4
     randomizeRotationDirection: 0
     gravitySource: 0
-    maxNumParticles: 8
+    maxNumParticles: 40
     customEmitterVelocity: {x: 0, y: 0, z: 0}
     size3D: 0
     rotation3D: 1
@@ -19471,6 +19471,6 @@ MonoBehaviour:
   grassBladeMesh: {fileID: 4300000, guid: 6084b44348a62c84080dca15cb867ea6, type: 2}
   pebbleMesh: {fileID: -328364686207790668, guid: ba1d9be41492a004ab97fc461f501ee4, type: 3}
   minimumSpeed: 0.35
-  fullEffectSpeed: 6
+  fullEffectSpeed: 5
   contactOffset: 0.045
   trailingOffset: 0.4
