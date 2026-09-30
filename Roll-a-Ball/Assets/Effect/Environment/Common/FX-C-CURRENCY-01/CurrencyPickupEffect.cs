@@ -115,6 +115,16 @@ public sealed class CurrencyPickupEffect : MonoBehaviour
     /// <param name="largeReward">大きい報酬の場合は豪華版の粒子を追加します。</param>
     public void Play(bool largeReward)
     {
+        Play(largeReward, transform.rotation);
+    }
+
+    /// <summary>
+    /// 閃光を指定した正面方向へ向け、報酬サイズに応じて再生する
+    /// </summary>
+    /// <param name="largeReward">大きい報酬では追加の光と粒子を再生する</param>
+    /// <param name="flashRotation">閃光の正面を示すワールド回転</param>
+    public void Play(bool largeReward, Quaternion flashRotation)
+    {
         isLargeReward = largeReward;
         elapsedTime = 0f;
         isPlaying = true;
@@ -134,6 +144,7 @@ public sealed class CurrencyPickupEffect : MonoBehaviour
 
         if (corePulse != null)
         {
+            corePulse.transform.rotation = flashRotation;
             corePulse.Play();
         }
 
@@ -144,6 +155,7 @@ public sealed class CurrencyPickupEffect : MonoBehaviour
 
         if (impactFlash != null)
         {
+            impactFlash.transform.rotation = flashRotation;
             impactFlash.gameObject.SetActive(largeReward);
             if (largeReward)
             {
@@ -167,6 +179,7 @@ public sealed class CurrencyPickupEffect : MonoBehaviour
 
         if (crossSpark != null)
         {
+            crossSpark.rotation = flashRotation;
             crossSpark.gameObject.SetActive(largeReward);
             if (largeReward)
             {
@@ -176,6 +189,7 @@ public sealed class CurrencyPickupEffect : MonoBehaviour
 
         if (crossSparkAccent != null)
         {
+            crossSparkAccent.rotation = flashRotation * Quaternion.Euler(0f, 0f, 45f);
             crossSparkAccent.gameObject.SetActive(largeReward);
             if (largeReward)
             {
@@ -245,7 +259,7 @@ public sealed class CurrencyPickupEffect : MonoBehaviour
 
         var burstProgress = Mathf.Clamp01(normalizedTime / 0.22f);
         var burst = Mathf.SmoothStep(0f, 1f, burstProgress);
-        var maxScale = isLargeReward ? 0.95f : 0.78f;
+        var maxScale = 0.665f;
         var settle = 1f - Mathf.SmoothStep(0.22f, 1f, normalizedTime) * 0.35f;
         var scale = Mathf.Lerp(0.1f, maxScale, burst) * settle;
 
