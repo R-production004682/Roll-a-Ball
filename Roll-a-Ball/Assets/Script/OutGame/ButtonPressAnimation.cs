@@ -17,25 +17,36 @@ namespace Roll_a_Ball.OutGame
         IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler,
         ISelectHandler, IDeselectHandler
     {
-        [SerializeField, Tooltip("Optional visual child. If omitted, animates this Button. Use a visual child to keep the hit area stationary.")]
+        [SerializeField, Tooltip("拡大する見た目のオブジェクトです。未設定ならこのボタンを拡大します。")]
         private Transform animationTarget;
 
-        [Header("Scale (relative to the original size)")]
-        [SerializeField, Range(1f, 1.1f)] private float hoverScale = 1.025f;
-        [SerializeField] private Vector2 pressedScale = new Vector2(0.96f, 0.9f);
-        [SerializeField, Range(1f, 1.15f)] private float clickOvershootScale = 1.055f;
-        [SerializeField] private bool animateSelection = true;
+        [Header("大きさの倍率")]
+        [SerializeField, Range(1f, 1.1f), Tooltip("ポインターを重ねたときの拡大倍率です。")]
+        private float hoverScale = 1.025f;
+        [SerializeField, Tooltip("押している間の横幅と高さの倍率です。")]
+        private Vector2 pressedScale = new Vector2(0.96f, 0.9f);
+        [SerializeField, Range(1f, 1.15f), Tooltip("クリック後に一瞬だけ使う拡大倍率です。")]
+        private float clickOvershootScale = 1.055f;
+        [SerializeField, Tooltip("選択中のボタンも少し大きくします。")]
+        private bool animateSelection = true;
 
-        [Header("Timing")]
-        [SerializeField, Min(0.01f)] private float hoverDuration = 0.12f;
-        [SerializeField, Min(0.01f)] private float pressDuration = 0.075f;
-        [SerializeField, Min(0.01f)] private float releaseDuration = 0.16f;
-        [SerializeField] private bool useUnscaledTime = true;
+        [Header("動く時間")]
+        [SerializeField, Min(0.01f), Tooltip("ポインターを重ねたときの変化にかける秒数です。")]
+        private float hoverDuration = 0.12f;
+        [SerializeField, Min(0.01f), Tooltip("ボタンを押したときの変化にかける秒数です。")]
+        private float pressDuration = 0.075f;
+        [SerializeField, Min(0.01f), Tooltip("クリック成立後、通常の大きさに戻る秒数です。その前の拡大にはこの値の0.55倍かかります。")]
+        private float releaseDuration = 0.16f;
+        [SerializeField, Tooltip("ゲーム停止中も演出を動かします。")]
+        private bool useUnscaledTime = true;
 
-        [Header("Easing")]
-        [SerializeField] private Ease hoverEase = Ease.OutQuad;
-        [SerializeField] private Ease pressEase = Ease.OutCubic;
-        [SerializeField] private Ease releaseEase = Ease.OutCubic;
+        [Header("動き方")]
+        [SerializeField, Tooltip("ポインターを重ねたときの動き方です。")]
+        private Ease hoverEase = Ease.OutQuad;
+        [SerializeField, Tooltip("ボタンを押したときの動き方です。")]
+        private Ease pressEase = Ease.OutCubic;
+        [SerializeField, Tooltip("クリック成立後、通常の大きさに戻るときの動き方です。")]
+        private Ease releaseEase = Ease.OutCubic;
 
         private readonly HashSet<int> hoveringPointers = new HashSet<int>();
         private Button button;

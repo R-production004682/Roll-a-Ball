@@ -9,9 +9,12 @@ namespace Roll_a_Ball.OutGame
     /// </summary>
     public sealed class ConfirmDialog : DialogBase<bool>
     {
-        [SerializeField] private TMP_Text messageText;
-        [SerializeField] private Button okButton;
-        [SerializeField] private Button cancelButton;
+        [SerializeField, Tooltip("確認内容を表示するテキストです。")]
+        private TMP_Text messageText;
+        [SerializeField, Tooltip("確認したときに押すボタンです。")]
+        private Button okButton;
+        [SerializeField, Tooltip("取り消すときに押すボタンです。")]
+        private Button cancelButton;
         private UiInputScope inputScope;
         private bool isReady;
 

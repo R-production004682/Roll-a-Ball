@@ -11,11 +11,14 @@ namespace Roll_a_Ball.OutGame
     /// </summary>
     public sealed class ScreenManager : MonoBehaviour
     {
-        [SerializeField] private Transform screenRoot;
-        [SerializeField] private List<ScreenBase> screenPrefabs = new List<ScreenBase>();
-        [SerializeField, Tooltip("最初に開く Screen の Prefab。Scene 上の Screen は指定しません")]
+        [SerializeField, Tooltip("画面を表示する場所です。未設定ならこのオブジェクトの下に表示します。")]
+        private Transform screenRoot;
+        [SerializeField, Tooltip("切り替え先として使う画面のプレハブを登録します。")]
+        private List<ScreenBase> screenPrefabs = new List<ScreenBase>();
+        [SerializeField, Tooltip("ゲーム開始時に表示する画面のプレハブです。")]
         private ScreenBase initialScreen;
-        [SerializeField] private FadeTransition screenTransition;
+        [SerializeField, Tooltip("画面を切り替えるときに使うフェードです。")]
+        private FadeTransition screenTransition;
 
         private readonly List<ScreenBase> stack = new List<ScreenBase>();
         private bool changing;

@@ -12,12 +12,18 @@ namespace Roll_a_Ball.OutGame
     [RequireComponent(typeof(Button))]
     public sealed class ShopItemView : MonoBehaviour
     {
-        [SerializeField] private Image iconImage;
-        [SerializeField] private TMP_Text categoryLabel;
-        [SerializeField] private TMP_Text nameLabel;
-        [SerializeField] private TMP_Text priceValueLabel;
-        [SerializeField] private TMP_Text stockLabel;
-        [SerializeField] private TMP_Text soldOutLabel;
+        [SerializeField, Tooltip("商品の画像を表示します。")]
+        private Image iconImage;
+        [SerializeField, Tooltip("商品のカテゴリを表示します。")]
+        private TMP_Text categoryLabel;
+        [SerializeField, Tooltip("商品名を表示します。")]
+        private TMP_Text nameLabel;
+        [SerializeField, Tooltip("商品価格を表示します。")]
+        private TMP_Text priceValueLabel;
+        [SerializeField, Tooltip("購入できる残り回数を表示します。")]
+        private TMP_Text stockLabel;
+        [SerializeField, Tooltip("在庫が0になったときに表示する売り切れの案内です。所持金不足では表示されません。")]
+        private TMP_Text soldOutLabel;
         private Button itemButton;
         private ShopItemDefinition boundItem;
         private UnityEngine.UI.Graphic[] cardGraphics = Array.Empty<UnityEngine.UI.Graphic>();

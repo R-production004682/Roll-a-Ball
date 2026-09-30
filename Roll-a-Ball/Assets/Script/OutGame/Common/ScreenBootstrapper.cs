@@ -8,8 +8,10 @@ namespace Roll_a_Ball.OutGame
     [DisallowMultipleComponent]
     public sealed class ScreenBootstrapper : MonoBehaviour
     {
-        [SerializeField] private ScreenManager screenManager;
-        [SerializeField] private ScreenBase initialScreen;
+        [SerializeField, Tooltip("最初の画面を表示する管理役です。未設定なら同じオブジェクトから探します。")]
+        private ScreenManager screenManager;
+        [SerializeField, Tooltip("ゲーム開始時に表示する画面のプレハブです。")]
+        private ScreenBase initialScreen;
 
         /// <summary>
         /// Inspector の設定を確認し、初期 Screen を表示する

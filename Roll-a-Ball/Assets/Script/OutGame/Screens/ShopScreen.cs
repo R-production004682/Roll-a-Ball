@@ -11,18 +11,30 @@ namespace Roll_a_Ball.OutGame
     /// </summary>
     public sealed class ShopScreen : ScreenBase
     {
-        [SerializeField] private Button backButton;
-        [SerializeField] private Button customizeButton;
-        [SerializeField] private Button previousPageButton;
-        [SerializeField] private Button nextPageButton;
-        [SerializeField] private TMP_Text currencyValueLabel;
-        [SerializeField] private TMP_Text pageIndicatorLabel;
-        [SerializeField] private RectTransform itemGrid;
-        [SerializeField] private ShopItemView itemViewPrefab;
-        [SerializeField] private ShopItemCatalog itemCatalog;
-        [SerializeField, Min(1)] private int columnCount = 5;
-        [SerializeField, Min(1)] private int itemsPerPage = 10;
-        [SerializeField] private string pageIndicatorFormat = "{0} / {1}";
+        [SerializeField, Tooltip("ショップを閉じて戻るボタンです。")]
+        private Button backButton;
+        [SerializeField, Tooltip("カスタマイズ画面を開くボタンです。")]
+        private Button customizeButton;
+        [SerializeField, Tooltip("前のページを表示するボタンです。")]
+        private Button previousPageButton;
+        [SerializeField, Tooltip("次のページを表示するボタンです。")]
+        private Button nextPageButton;
+        [SerializeField, Tooltip("所持コイン数を表示するテキストです。")]
+        private TMP_Text currencyValueLabel;
+        [SerializeField, Tooltip("現在のページ番号を表示するテキストです。")]
+        private TMP_Text pageIndicatorLabel;
+        [SerializeField, Tooltip("商品カードを並べる場所です。")]
+        private RectTransform itemGrid;
+        [SerializeField, Tooltip("商品カードのプレハブです。")]
+        private ShopItemView itemViewPrefab;
+        [SerializeField, Tooltip("ショップに表示する商品一覧です。")]
+        private ShopItemCatalog itemCatalog;
+        [SerializeField, Min(1), Tooltip("商品を横に何個並べるかを指定します。")]
+        private int columnCount = 5;
+        [SerializeField, Min(1), Tooltip("1ページに表示する商品数です。")]
+        private int itemsPerPage = 10;
+        [SerializeField, Tooltip("ページ表示の形式です。{0} は現在のページ、{1} は総ページ数です。")]
+        private string pageIndicatorFormat = "{0} / {1}";
         private UiInputScope inputScope;
         private bool returnQueued;
         private bool purchaseQueued;

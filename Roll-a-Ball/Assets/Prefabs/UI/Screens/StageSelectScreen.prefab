@@ -1521,7 +1521,6 @@ MonoBehaviour:
   - stageId: stage-1
     stageNumber: 1
     displayName: "\u6728\u6F0F\u308C\u65E5\u306E\u6797\u9053"
-    difficulty: NORMAL
     previewTexture: {fileID: 2800000, guid: 7982052847398a94993f5d0f3ba59024, type: 2}
     playScene:
       scenePath: Assets/Scenes/MainScene.unity
@@ -1530,7 +1529,6 @@ MonoBehaviour:
   - stageId: stage-2
     stageNumber: 2
     displayName: "\u8FF7\u3044\u306E\u5BC6\u96C6\u6797"
-    difficulty: HARD
     previewTexture: {fileID: 2800000, guid: 7982052847398a94993f5d0f3ba59024, type: 2}
     playScene:
       scenePath: Assets/Scenes/MainScene.unity
@@ -1539,7 +1537,6 @@ MonoBehaviour:
   - stageId: stage-3
     stageNumber: 3
     displayName: "\u305B\u305B\u3089\u304E\u306E\u4E38\u592A\u6A4B"
-    difficulty: EXPERT
     previewTexture: {fileID: 2800000, guid: 7982052847398a94993f5d0f3ba59024, type: 2}
     playScene:
       scenePath: Assets/Scenes/MainScene.unity
