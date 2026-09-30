@@ -9,13 +9,20 @@ namespace Roll_a_Ball.OutGame
     /// </summary>
     public sealed class ShopPurchaseDialog : DialogBase<bool>
     {
-        [SerializeField] private Image iconImage;
-        [SerializeField] private TMP_Text categoryLabel;
-        [SerializeField] private TMP_Text nameLabel;
-        [SerializeField] private TMP_Text descriptionLabel;
-        [SerializeField] private TMP_Text priceValueLabel;
-        [SerializeField] private Button purchaseButton;
-        [SerializeField] private Button cancelButton;
+        [SerializeField, Tooltip("購入する商品の画像を表示します。")]
+        private Image iconImage;
+        [SerializeField, Tooltip("商品のカテゴリを表示します。")]
+        private TMP_Text categoryLabel;
+        [SerializeField, Tooltip("商品名を表示します。")]
+        private TMP_Text nameLabel;
+        [SerializeField, Tooltip("商品の説明を表示します。")]
+        private TMP_Text descriptionLabel;
+        [SerializeField, Tooltip("商品の価格を表示します。")]
+        private TMP_Text priceValueLabel;
+        [SerializeField, Tooltip("商品を購入するときに押すボタンです。")]
+        private Button purchaseButton;
+        [SerializeField, Tooltip("購入をやめるときに押すボタンです。")]
+        private Button cancelButton;
         private UiInputScope inputScope;
         private bool isReady;
 

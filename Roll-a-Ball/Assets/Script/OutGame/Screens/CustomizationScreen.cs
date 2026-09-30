@@ -18,9 +18,12 @@ namespace Roll_a_Ball.OutGame
             Shop
         }
 
-        [SerializeField] private Button backButton;
-        [SerializeField] private GameObject stageSelectBackLabel;
-        [SerializeField] private GameObject shopBackLabel;
+        [SerializeField, Tooltip("前の画面に戻るボタンです。")]
+        private Button backButton;
+        [SerializeField, Tooltip("ステージ選択画面から開いたときに表示する戻り先の案内です。")]
+        private GameObject stageSelectBackLabel;
+        [SerializeField, Tooltip("ショップから開いたときに表示する戻り先の案内です。")]
+        private GameObject shopBackLabel;
         private UiInputScope inputScope;
         private bool returnQueued;
         private ReturnDestination returnDestination;

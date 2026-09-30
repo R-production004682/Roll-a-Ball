@@ -7,7 +7,8 @@ namespace Roll_a_Ball.OutGame
     /// </summary>
     public sealed class OutGameClearController : MonoBehaviour
     {
-        [SerializeField, Tooltip("ステージ進行データとクリア記録に使う安定 ID")]
+        [Header("自動設定（手動変更不要）")]
+        [SerializeField, Tooltip("クリア記録の保存先です。開始時に選択中のステージ ID で上書きされるため、ここで変更しても反映されません。")]
         private string stageId = GameDataManager.InitialStageId;
         private bool hasRecordedClear;
 

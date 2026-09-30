@@ -18,8 +18,10 @@ namespace Roll_a_Ball.OutGame
             Se
         }
 
-        [SerializeField] private Channel channel;
-        [SerializeField, Range(0f, 1f)] private float baseVolume = 1f;
+        [SerializeField, Tooltip("この音源に適用する共通音量を選びます（BGM または効果音）。")]
+        private Channel channel;
+        [SerializeField, Range(0f, 1f), Tooltip("この音源固有の音量です。共通音量を掛けて再生します。")]
+        private float baseVolume = 1f;
         private AudioSource source;
 
         /// <summary>

@@ -10,7 +10,7 @@ namespace Roll_a_Ball.OutGame
     [RequireComponent(typeof(Button))]
     public sealed class SceneTransitionButton : MonoBehaviour
     {
-        [SerializeField, Tooltip("遷移先の Scene アセット。Build Profiles の Scene List にも登録してください。")]
+        [SerializeField, Tooltip("移動先のシーンを選びます。Build Profiles の Scene List にも登録してください。")]
         private SceneReference destination = new SceneReference();
         private Button button;
 

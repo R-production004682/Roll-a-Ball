@@ -11,16 +11,26 @@ namespace Roll_a_Ball.OutGame
     /// </summary>
     public sealed class SettingsDialogController : MonoBehaviour
     {
-        [SerializeField] private GameObject dialog;
-        [SerializeField] private Slider bgmSlider;
-        [SerializeField] private Slider seSlider;
-        [SerializeField] private TMP_Text bgmValue;
-        [SerializeField] private TMP_Text seValue;
-        [SerializeField] private TMP_Text backLabel;
-        [SerializeField] private TMP_Text contextLabel;
-        [SerializeField] private AudioSource previewSource;
-        [SerializeField] private AudioClip previewClip;
-        [SerializeField] private GameObject pauseMenu;
+        [SerializeField, Tooltip("設定画面全体のオブジェクトです。")]
+        private GameObject dialog;
+        [SerializeField, Tooltip("BGM 音量を変更するスライダーです。")]
+        private Slider bgmSlider;
+        [SerializeField, Tooltip("効果音の音量を変更するスライダーです。")]
+        private Slider seSlider;
+        [SerializeField, Tooltip("BGM 音量を数字で表示するテキストです。")]
+        private TMP_Text bgmValue;
+        [SerializeField, Tooltip("効果音の音量を数字で表示するテキストです。")]
+        private TMP_Text seValue;
+        [SerializeField, Tooltip("呼び出し元に戻る案内を表示するテキストです。")]
+        private TMP_Text backLabel;
+        [SerializeField, Tooltip("設定画面の説明を表示するテキストです。")]
+        private TMP_Text contextLabel;
+        [SerializeField, Tooltip("効果音を試しに鳴らす音源です。")]
+        private AudioSource previewSource;
+        [SerializeField, Tooltip("効果音を試しに再生するときに使う音です。")]
+        private AudioClip previewClip;
+        [SerializeField, Tooltip("ポーズ画面から設定を開いたときに隠すポーズ画面です。")]
+        private GameObject pauseMenu;
 
         private GameObject previousSelection;
         private UiInputScope dialogInputScope;

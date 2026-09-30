@@ -19,8 +19,10 @@ namespace Roll_a_Ball.OutGame
         private const int OverlaySortingOrder = 32767;
         private static FadeTransition persistentInstance;
 
-        [SerializeField, Min(0.01f)] private float duration = 0.25f;
-        [SerializeField] private Color fadeColor = Color.black;
+        [SerializeField, Min(0.01f), Tooltip("画面を覆う・表示する、それぞれにかける秒数です。往復でこの値の2倍かかり、シーンの読み込み時間は別です。")]
+        private float duration = 0.25f;
+        [SerializeField, Tooltip("画面切り替え時に重ねる色です。")]
+        private Color fadeColor = Color.black;
 
         private CanvasGroup canvasGroup;
         private Coroutine runningRoutine;

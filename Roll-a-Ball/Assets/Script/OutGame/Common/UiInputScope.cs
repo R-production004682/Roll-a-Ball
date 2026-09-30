@@ -16,8 +16,10 @@ namespace Roll_a_Ball.OutGame
     [RequireComponent(typeof(CanvasGroup))]
     public sealed class UiInputScope : MonoBehaviour
     {
-        [SerializeField] private Selectable firstSelected;
-        [SerializeField] private UnityEvent onCancel = new UnityEvent();
+        [SerializeField, Tooltip("画面を開いたときに最初に選ぶボタンなどを指定します。")]
+        private Selectable firstSelected;
+        [SerializeField, Tooltip("キャンセル操作で呼び出す処理を登録します。")]
+        private UnityEvent onCancel = new UnityEvent();
 
         private static readonly List<UiInputScope> scopes = new List<UiInputScope>();
         private static readonly HashSet<object> inputLocks = new HashSet<object>();

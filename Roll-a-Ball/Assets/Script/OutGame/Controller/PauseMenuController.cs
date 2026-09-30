@@ -11,10 +11,14 @@ namespace Roll_a_Ball.OutGame
     {
         private const KeyCode MenuKey = KeyCode.M;
 
-        [SerializeField] private GameObject menuDialog;
-        [SerializeField] private Button firstSelectedButton;
-        [SerializeField] private GameObject controlsGuide;
-        [SerializeField, Header("ゲーム開始時の状態")] private bool startsInPlay;
+        [SerializeField, Tooltip("ポーズ中に表示するメニューです。")]
+        private GameObject menuDialog;
+        [SerializeField, Tooltip("メニューを開いたときに最初に選ぶボタンです。")]
+        private Button firstSelectedButton;
+        [SerializeField, Tooltip("プレイ中に表示する操作案内です。")]
+        private GameObject controlsGuide;
+        [SerializeField, Header("ゲーム開始時の状態"), Tooltip("有効にするとシーン開始時からゲームを動かします。無効ならメニュー状態で始めます。")]
+        private bool startsInPlay;
         private UiInputScope menuInputScope;
 
         /// <summary>

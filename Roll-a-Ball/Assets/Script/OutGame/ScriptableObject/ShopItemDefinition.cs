@@ -9,14 +9,22 @@ namespace Roll_a_Ball.OutGame
     [Serializable]
     public sealed class ShopItemDefinition
     {
-        [SerializeField] private string id;
-        [SerializeField] private int displayOrder;
-        [SerializeField] private string category;
-        [SerializeField] private string displayName;
-        [SerializeField, TextArea] private string description;
-        [SerializeField] private int price;
-        [SerializeField, Min(1)] private int purchaseLimit = 1;
-        [SerializeField] private Sprite icon;
+        [SerializeField, Tooltip("保存データで商品を見分ける値です。他の商品と重ならないようにします。")]
+        private string id;
+        [SerializeField, Tooltip("ショップで並べる順番です。数字が小さい商品から表示します。")]
+        private int displayOrder;
+        [SerializeField, Tooltip("画面に表示する商品カテゴリです。")]
+        private string category;
+        [SerializeField, Tooltip("画面に表示する商品名です。")]
+        private string displayName;
+        [SerializeField, TextArea, Tooltip("画面に表示する商品の説明です。")]
+        private string description;
+        [SerializeField, Tooltip("購入に必要なコイン数です。")]
+        private int price;
+        [SerializeField, Min(1), Tooltip("この商品を購入できる回数です。")]
+        private int purchaseLimit = 1;
+        [SerializeField, Tooltip("画面に表示する商品画像です。")]
+        private Sprite icon;
 
         /// <summary>
         /// 商品を識別する安定 ID を取得する

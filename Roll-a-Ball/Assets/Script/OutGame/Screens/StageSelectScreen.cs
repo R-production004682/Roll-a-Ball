@@ -10,22 +10,38 @@ namespace Roll_a_Ball.OutGame
     /// </summary>
     public sealed class StageSelectScreen : ScreenBase
     {
-        [SerializeField] private StageDefinition[] stages = Array.Empty<StageDefinition>();
-        [SerializeField] private TMP_Text currencyLabel;
-        [SerializeField] private TMP_Text stageNumberLabel;
-        [SerializeField] private TMP_Text stageNameLabel;
-        [SerializeField] private TMP_Text[] clearTimeLabels = new TMP_Text[GameSaveData.MaximumClearTimeCount];
-        [SerializeField] private RawImage stagePreview;
-        [SerializeField] private GameObject lockedOverlay;
-        [SerializeField] private Button previousButton;
-        [SerializeField] private Button nextButton;
-        [SerializeField] private Button stagePreviewButton;
-        [SerializeField] private Button playButton;
-        [SerializeField] private Button shopButton;
-        [SerializeField] private Button customizeButton;
-        [SerializeField] private Button settingsButton;
-        [SerializeField] private RectTransform stageCard;
-        [SerializeField, Min(StageSelectScreenConstants.MinimumSelectionPulseDuration)]
+        [SerializeField, Tooltip("ステージ選択画面に表示するステージを登録します。")]
+        private StageDefinition[] stages = Array.Empty<StageDefinition>();
+        [SerializeField, Tooltip("所持コイン数を表示するテキストです。")]
+        private TMP_Text currencyLabel;
+        [SerializeField, Tooltip("選択中のステージ番号を表示するテキストです。")]
+        private TMP_Text stageNumberLabel;
+        [SerializeField, Tooltip("選択中のステージ名を表示するテキストです。")]
+        private TMP_Text stageNameLabel;
+        [SerializeField, Tooltip("選択中のステージのクリア時間を表示するテキストです。3件分を登録します。")]
+        private TMP_Text[] clearTimeLabels = new TMP_Text[GameSaveData.MaximumClearTimeCount];
+        [SerializeField, Tooltip("選択中のステージ画像を表示します。")]
+        private RawImage stagePreview;
+        [SerializeField, Tooltip("未解放のステージを選んだときに表示する案内です。")]
+        private GameObject lockedOverlay;
+        [SerializeField, Tooltip("前のステージを選ぶボタンです。")]
+        private Button previousButton;
+        [SerializeField, Tooltip("次のステージを選ぶボタンです。")]
+        private Button nextButton;
+        [SerializeField, Tooltip("選択中のステージを画像から開始するボタンです。")]
+        private Button stagePreviewButton;
+        [SerializeField, Tooltip("選択中のステージを開始するボタンです。")]
+        private Button playButton;
+        [SerializeField, Tooltip("ショップ画面を開くボタンです。")]
+        private Button shopButton;
+        [SerializeField, Tooltip("カスタマイズ画面を開くボタンです。")]
+        private Button customizeButton;
+        [SerializeField, Tooltip("設定画面を開くボタンです。")]
+        private Button settingsButton;
+        [SerializeField, Tooltip("選択中のステージを強調する表示です。")]
+        private RectTransform stageCard;
+        [SerializeField, Min(StageSelectScreenConstants.MinimumSelectionPulseDuration),
+            Tooltip("ステージ選択時にカードが拡大して元に戻るまでの秒数です。大きくするとゆっくり動きます。")]
         private float selectionPulseDuration = StageSelectScreenConstants.DefaultSelectionPulseDuration;
 
         private UiInputScope inputScope;

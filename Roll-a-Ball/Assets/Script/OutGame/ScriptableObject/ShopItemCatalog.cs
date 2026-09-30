@@ -9,7 +9,8 @@ namespace Roll_a_Ball.OutGame
     [CreateAssetMenu(menuName = "Roll-a-Ball/Shop/Shop Item Catalog")]
     public sealed class ShopItemCatalog : ScriptableObject
     {
-        [SerializeField] private ShopItemDefinition[] items = new ShopItemDefinition[0];
+        [SerializeField, Tooltip("ショップに並べる商品を登録します。")]
+        private ShopItemDefinition[] items = new ShopItemDefinition[0];
 
         /// <summary>
         /// 登録された商品定義を取得する

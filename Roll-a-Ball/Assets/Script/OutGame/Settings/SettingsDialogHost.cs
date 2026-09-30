@@ -8,7 +8,8 @@ namespace Roll_a_Ball.OutGame
     [DisallowMultipleComponent]
     public sealed class SettingsDialogHost : MonoBehaviour
     {
-        [SerializeField] private SettingsDialogController settingsDialogController;
+        [SerializeField, Tooltip("このシーンで使う設定画面を指定します。")]
+        private SettingsDialogController settingsDialogController;
 
         /// <summary>
         /// 設定ダイアログの参照を検証して現在のシーンのサービス窓口へ登録する

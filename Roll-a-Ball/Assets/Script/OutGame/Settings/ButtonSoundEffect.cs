@@ -10,7 +10,8 @@ namespace Roll_a_Ball.OutGame
     [RequireComponent(typeof(Button))]
     public sealed class ButtonSoundEffect : MonoBehaviour
     {
-        [SerializeField] private AudioClip clickSound;
+        [SerializeField, Tooltip("ボタンを押したときに再生する効果音です。")]
+        private AudioClip clickSound;
         private Button button;
 
         /// <summary>
