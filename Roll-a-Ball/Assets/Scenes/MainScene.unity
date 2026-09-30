@@ -2526,7 +2526,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Roll_a_Ball.OutGame.SceneTransitionButton
   destination:
-    scenePath: Assets/Scenes/TestScene/OutGameTestScene.unity
+    scenePath: 
     sceneGuid: 182c64d0ad3833a4f8b52af92f904e1c
 --- !u!222 &688935583
 CanvasRenderer:
@@ -3706,8 +3706,8 @@ MonoBehaviour:
       Input:
         InputAction: {fileID: 0}
         Gain: 1
-        LegacyInput: 
-        LegacyGain: 1
+        LegacyInput: Mouse X
+        LegacyGain: 150
         CancelDeltaTime: 0
       InputValue: 0
       Driver:
@@ -3746,7 +3746,7 @@ MonoBehaviour:
         InputAction: {fileID: 0}
         Gain: 1
         LegacyInput: Mouse X
-        LegacyGain: 50
+        LegacyGain: 150
         CancelDeltaTime: 0
       InputValue: 0
       Driver:
