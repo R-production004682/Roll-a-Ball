@@ -4,9 +4,6 @@ using UnityEngine;
 public class Goal : MonoBehaviour
 {
     [SerializeField]
-    private ParticleSystem goalEffect;//旧ゴールエフェクト
-
-    [SerializeField]
     private GoalClearEffect clearEffect;
 
     private bool isCompleting;
@@ -24,7 +21,6 @@ public class Goal : MonoBehaviour
         isCompleting = true;
         if (clearEffect == null)
         {
-            PlayLegacyGoalEffect();
             CompleteStage();
             return;
         }
@@ -41,17 +37,6 @@ public class Goal : MonoBehaviour
     {
         yield return new WaitForSeconds(clearEffect.Duration);
         CompleteStage();
-    }
-
-    /// <summary>
-    /// 既存のParticleSystemを使ってクリア演出を再生
-    /// </summary>
-    private void PlayLegacyGoalEffect()
-    {
-        if (goalEffect != null)
-        {
-            goalEffect.Play();
-        }
     }
 
     /// <summary>

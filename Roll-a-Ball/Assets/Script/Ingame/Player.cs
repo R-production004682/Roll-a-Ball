@@ -5,30 +5,31 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    private Rigidbody rb;//Rigidbody
+    private Rigidbody rb; //Rigidbody
 
-    private Vector3 moveDirection;//現在の移動方向
+    private Vector3 moveDirection; //現在の移動方向
 
-    [SerializeField]
-    private float playerSpeed = 20;//プレイヤーの最大移動速度
+    private List<CheckPoint> checkPoints = new List<CheckPoint>(); //リスポーン地点
 
-    [SerializeField]
-    private float acceleration = 50;//加速度
+    [Header("移動設定")]
+    [SerializeField, Tooltip("プレイヤーの最大移動速度")]
+    private float playerSpeed = 20; //プレイヤーの最大移動速度
 
-    [SerializeField]
-    private int fall;//落下地点
+    [SerializeField, Tooltip("プレイヤーの加速量")]
+    private float acceleration = 50; //加速度
 
-    [SerializeField]
-    private List<CheckPoint> respawnPoints = new List<CheckPoint>();//リスポーン地点
+    [SerializeField, Tooltip("落下判定とするy座標")]
+    private int fall; //落下地点
 
-    [SerializeField]
-    private CheckPoint startPoint;//スタート地点
+    [SerializeField, Tooltip("スタート地点(空オブジェクトで座標を決める)")]
+    private CheckPoint startPoint; //スタート地点
 
-    [SerializeField]
-    private bool isGoal = false;//ゴールしたか
+    private bool isGoal = false; //ゴールしたか
 
-    [SerializeField]
-    private Transform cameraTransform;//カメラ（インスペクターから指定）
+    [Header("カメラ")]
+
+    [SerializeField, Tooltip("プレイヤーの移動方向を決めるカメラオブジェクト")]
+    private Transform cameraTransform; //カメラ（インスペクターから指定）
 
     /// <summary>
     /// Rigidbodyを取得し新しい挑戦のチェックポイント登録と表示を初期化する
@@ -44,10 +45,10 @@ public class Player : MonoBehaviour
     /// </summary>
     void Update()
     {
-        if (transform.position.y <= fall && respawnPoints.Count > 0)//解放した地点の位置と向きに戻る
+        if (transform.position.y <= fall && checkPoints.Count > 0)//解放した地点の位置と向きに戻る
         {
-            transform.position = respawnPoints[respawnPoints.Count - 1].transform.position;
-            transform.rotation = respawnPoints[respawnPoints.Count - 1].transform.rotation;
+            transform.position = checkPoints[checkPoints.Count - 1].transform.position;
+            transform.rotation = checkPoints[checkPoints.Count - 1].transform.rotation;
             rb.linearVelocity = Vector3.zero;//速度をリセット
             moveDirection = Vector3.zero;//方向をリセット
             rb.angularVelocity = Vector3.zero;//回転をリセット
@@ -121,20 +122,20 @@ public class Player : MonoBehaviour
     /// <param name="point">新たに到達した復活地点</param>
     public void UnlockPoint(CheckPoint point)
     {
-        if (point == null || respawnPoints.Contains(point))//地点番号がないか解放済みだと処理しない
+        if (point == null || checkPoints.Contains(point))//地点番号がないか解放済みだと処理しない
         {
             return;
         }
 
-        if (respawnPoints.Count > 0)
+        if (checkPoints.Count > 0)
         {
-            var previous = respawnPoints[respawnPoints.Count - 1];
+            var previous = checkPoints[checkPoints.Count - 1];
             if (previous != null)
             {
                 previous.SetCheckpointEffectState(CheckpointBurstEffect.CheckpointState.Visited);
             }
         }
-        respawnPoints.Add(point);//リスポーンポイントを追加する
+        checkPoints.Add(point);//チェックポイントを追加する
         point.PlayCheckpointEffect();
     }
 
@@ -143,17 +144,17 @@ public class Player : MonoBehaviour
     /// </summary>
     public void ResetCheckpoints()
     {
-        foreach (var point in respawnPoints)
+        foreach (var point in checkPoints)
         {
             if (point != null)
             {
                 point.SetCheckpointEffectState(CheckpointBurstEffect.CheckpointState.Unvisited);
             }
         }
-        respawnPoints.Clear();
+        checkPoints.Clear();
         if (startPoint != null)
         {
-            respawnPoints.Add(startPoint);
+            checkPoints.Add(startPoint);
         }
     }
 
