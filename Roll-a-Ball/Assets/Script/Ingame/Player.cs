@@ -19,10 +19,10 @@ public class Player : MonoBehaviour
     private int fall;//落下地点
 
     [SerializeField]
-    private List<Respawnpoint> respawnPoints = new List<Respawnpoint>();//リスポーン地点
+    private List<CheckPoint> respawnPoints = new List<CheckPoint>();//リスポーン地点
 
     [SerializeField]
-    private Respawnpoint startPoint;//スタート地点
+    private CheckPoint startPoint;//スタート地点
 
     [SerializeField]
     private bool isGoal = false;//ゴールしたか
@@ -30,18 +30,21 @@ public class Player : MonoBehaviour
     [SerializeField]
     private Transform cameraTransform;//カメラ（インスペクターから指定）
 
+    /// <summary>
+    /// Rigidbodyを取得し新しい挑戦のチェックポイント登録と表示を初期化する
+    /// </summary>
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
-        respawnPoints.Add(startPoint);
+        ResetCheckpoints();
     }
 
     /// <summary>
-    /// プレイヤーとカメラを動かし、クリア状態、UI画面では操作できないようにする。倒れた場合スタート地点か行き解放されたリスポーン位置にワープする。
+    /// 落下時は最後の復活地点へ戻しプレイ中だけ移動入力を更新する
     /// </summary>
     void Update()
     {
-        if (transform.position.y <= fall)//リスポーンポイントがあると最後に解放した地点の位置と向きに戻る、移動を0にする
+        if (transform.position.y <= fall && respawnPoints.Count > 0)//解放した地点の位置と向きに戻る
         {
             transform.position = respawnPoints[respawnPoints.Count - 1].transform.position;
             transform.rotation = respawnPoints[respawnPoints.Count - 1].transform.rotation;
@@ -51,13 +54,17 @@ public class Player : MonoBehaviour
         }
 
         if (UiInputScope.BlocksPlayer)
+        {
             return;//UI画面では操作不可
+        }
 
         if (isGoal == true)
+        {
             return;//ゴールに触れると操作不可
+        }
 
-        Vector3 cameraForward = cameraTransform.forward;//カメラの前方向を取得
-        Vector3 cameraRight = cameraTransform.right;//カメラの右方向を取得
+        var cameraForward = cameraTransform.forward;//カメラの前方向を取得
+        var cameraRight = cameraTransform.right;//カメラの右方向を取得
 
         cameraForward.y = 0f;//上下を無視
         cameraRight.y = 0f;
@@ -65,16 +72,24 @@ public class Player : MonoBehaviour
         moveDirection = Vector3.zero;//移動リセット
 
         if (Input.GetKey(KeyCode.W))//Wキー入力
+        {
             moveDirection += cameraForward;//正面方向
+        }
 
         if (Input.GetKey(KeyCode.S))//Sキー入力
+        {
             moveDirection -= cameraForward;//後方
+        }
 
         if (Input.GetKey(KeyCode.D))//Dキー入力
+        {
             moveDirection += cameraRight;//右
+        }
 
         if (Input.GetKey(KeyCode.A))//Aキー入力
+        {
             moveDirection -= cameraRight;//左
+        }
 
         if (moveDirection != Vector3.zero)//入力がある
         {
@@ -101,16 +116,45 @@ public class Player : MonoBehaviour
     }
 
     /// <summary>
-    /// プレイヤーが中間地点に触れたときに、復活位置を中間地点に登録する
+    /// 未到達の復活地点を登録し前の地点を通過済みにして到達演出を再生する
     /// </summary>
-    /// <param name="point"></param>
-    public void UnlockPoint(Respawnpoint point)
+    /// <param name="point">新たに到達した復活地点</param>
+    public void UnlockPoint(CheckPoint point)
     {
         if (point == null || respawnPoints.Contains(point))//地点番号がないか解放済みだと処理しない
+        {
             return;
+        }
 
+        if (respawnPoints.Count > 0)
+        {
+            var previous = respawnPoints[respawnPoints.Count - 1];
+            if (previous != null)
+            {
+                previous.SetCheckpointEffectState(CheckpointBurstEffect.CheckpointState.Visited);
+            }
+        }
         respawnPoints.Add(point);//リスポーンポイントを追加する
+        point.PlayCheckpointEffect();
+    }
 
+    /// <summary>
+    /// 新しい挑戦用に到達済みの表示と登録を消去してスタート地点だけを残す
+    /// </summary>
+    public void ResetCheckpoints()
+    {
+        foreach (var point in respawnPoints)
+        {
+            if (point != null)
+            {
+                point.SetCheckpointEffectState(CheckpointBurstEffect.CheckpointState.Unvisited);
+            }
+        }
+        respawnPoints.Clear();
+        if (startPoint != null)
+        {
+            respawnPoints.Add(startPoint);
+        }
     }
 
     private void OnTriggerEnter(Collider other)
