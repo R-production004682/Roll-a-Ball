@@ -5,33 +5,45 @@ using UnityEngine;
 /// </summary>
 public sealed class GoalClearEffect : MonoBehaviour
 {
+    [Header("参照（通常はPrefabの設定を維持）")]
+    [Tooltip("到達直後に拡大・消滅する面のRenderer。色と拡大量をこのコンポーネントで制御します。")]
     [SerializeField]
     private MeshRenderer areaPulseRenderer;
 
+    [Tooltip("クリスタル破片のParticleSystem。粒子数・サイズ・色・寿命はこのSystemで調整します。")]
     [SerializeField]
     private ParticleSystem crystalBurst;
 
+    [Tooltip("キラキラ粒子のParticleSystem。粒子数・サイズ・色・寿命はこのSystemで調整します。")]
     [SerializeField]
     private ParticleSystem sparkleBurst;
 
+    [Tooltip("到達時のLight。Glow Light Intensityから徐々に消えます。未設定ならライト演出を省略します。")]
     [SerializeField]
     private Light glowLight;
 
+    [Header("クリア演出の調整")]
+    [Tooltip("拡大する面の色と透明度（A）。粒子やライトの色は各参照先で別に調整します。")]
     [SerializeField]
     private Color areaPulseColor = new Color(0.35f, 0.9f, 1f, 1f);
 
+    [Tooltip("面・ライトの本体演出時間（秒、最低0.1）。大きいほどライトの余韻が長くなり、終了後も生存中の粒子は自然消滅を待ちます。")]
     [SerializeField]
     private float duration = 1.2f;
 
+    [Tooltip("拡大する面の最大サイズ倍率（初期Scaleに対する倍率）。大きいほど面が広がります。")]
     [SerializeField]
     private float pulseScale = 2.8f;
 
+    [Tooltip("面が最大サイズへ拡大する時間（秒）。小さいほど素早く広がります。透明化の開始タイミングにも影響します。")]
     [SerializeField]
     private float pulseExpandDuration = 0.12f;
 
+    [Tooltip("到達直後のライト強度。大きいほど明るくなります。面・粒子の発光強度とは別です。")]
     [SerializeField]
     private float glowLightIntensity = 8f;
 
+    [Tooltip("ONなら有効化時に自動再生。OFFならゲーム側からPlayを呼んで再生します。")]
     [SerializeField]
     private bool playOnEnable;
 

@@ -5,23 +5,41 @@ using UnityEngine;
 /// </summary>
 public sealed class ButterflySwarmEffect : MonoBehaviour
 {
+    [Header("参照（4匹分の設定を維持）")]
+    [Tooltip("蝶4匹分のTransform（各オブジェクトにMeshRendererが必要）。配列は4要素を維持し、表示匹数はButterfly Countで調整します。")]
     [SerializeField] private Transform[] butterflies;
+    [Tooltip("蝶の現在位置から落とす鱗粉ParticleSystem。色・サイズ・寿命はSystem側、通常時の量はDust Rate Per Butterflyで調整します。")]
     [SerializeField] private ParticleSystem scaleDust;
+    [Header("通常の飛行と鱗粉")]
+    [Tooltip("表示する匹数（2〜4匹）。配列の先頭からこの数だけ表示するため、3なら4匹目を非表示にします。")]
     [SerializeField, Range(2, 4)] private int butterflyCount = 3;
+    [Tooltip("通常飛行の広がり（ローカル座標）。大きいほど群れの移動と各蝶の周回が広がり、最終位置はRoaming RadiusとFlight Areaで制限します。")]
     [SerializeField, Min(0.1f)] private float flightRadius = 1.15f;
+    [Tooltip("群れの基準高度（エフェクト原点からローカルY方向）。大きいほど高く飛びます。Playerとの高低差3以上では接近に反応しません。")]
     [SerializeField, Min(0f)] private float flightHeight = 1.4f;
+    [Tooltip("通常飛行の周期を進める速度係数。大きいほど周回・上下動が速くなります。距離/秒の指定ではなく、羽ばたき速度は別です。")]
     [SerializeField, Range(0.1f, 2f)] private float flightSpeed = 0.55f;
+    [Tooltip("通常時の羽ばたき回数の基準（回/秒、1〜8）。大きいほど速く、各蝶で少しずれます。逃走中は最大約1.7倍になります。")]
     [SerializeField, Range(1f, 8f)] private float flapFrequency = 3.8f;
+    [Tooltip("通常時に蝶1匹から出す鱗粉数（粒/秒、0〜6）。大きいほど増えます。逃走中は最大2倍、驚いた瞬間の追加2粒は0でも出ます。")]
     [SerializeField, Range(0f, 6f)] private float dustRatePerButterfly = 3f;
-    [Header("Player Reaction")]
-    [SerializeField, Tooltip("未指定の場合はPlayerタグから自動取得する")] private Transform player;
+    [Header("Playerへの反応と帰還")]
+    [Tooltip("接近に反応するPlayerのTransform。未指定ならPlayerタグを毎秒探索します。")]
+    [SerializeField] private Transform player;
+    [Tooltip("蝶からPlayerまでの逃走開始距離（ワールド水平距離）。大きいほど遠くから逃げます。高低差3以上では反応しません。")]
     [SerializeField, Min(0.1f)] private float scareDistance = 2.5f;
+    [Tooltip("帰還を許可する安全距離（ワールド水平距離）。蝶と元の群れ位置の両方から離れる必要があります。Scare Distance＋0.2以上へ補正します。")]
     [SerializeField, Min(0.1f)] private float clearDistance = 3.5f;
+    [Tooltip("Playerと反対方向へ退避する距離の基準（ワールド座標）。大きいほど遠くへ逃げます。Roaming Radius・Flight Areaで制限します。")]
     [SerializeField, Min(0.1f)] private float escapeDistance = 2.3f;
+    [Tooltip("逃走中に追加する高度の基準（ワールド座標）。大きいほど上へ逃げ、各蝶で高さを少しずらします。")]
     [SerializeField, Min(0f)] private float escapeHeight = 0.65f;
+    [Tooltip("安全距離の外で連続して待つ時間（秒）。大きいほど戻るまでが長く、Playerが再接近すると待ち時間をリセットします。逃走開始後は最低2.2秒待ちます。")]
     [SerializeField, Min(0f)] private float returnDelay = 3f;
+    [Tooltip("元のエフェクト位置から移動できる最大半径（ワールド水平距離）。Escape Distance以上へ補正し、Flight Areaがあればその範囲も適用します。")]
     [SerializeField, Min(0.1f)] private float roamingRadius = 3.5f;
-    [SerializeField, Tooltip("任意。飛行可能な床の範囲をBoxColliderのローカルXZで指定する。Colliderの設定は変更しない")]
+    [Tooltip("任意の飛行範囲BoxCollider。ColliderのローカルXZ内に位置を制限し、Yの高さ・Colliderの有効状態やサイズ自体は変更しません。")]
+    [SerializeField]
     private BoxCollider flightArea;
 
     private static readonly int FlutterTime = Shader.PropertyToID("_FlutterTime");

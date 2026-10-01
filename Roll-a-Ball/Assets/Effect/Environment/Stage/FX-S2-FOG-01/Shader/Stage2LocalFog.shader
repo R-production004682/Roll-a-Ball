@@ -123,4 +123,5 @@ Shader "Roll-a-Ball/Effects/Stage2 Local Fog"
             ENDHLSL
         }
     }
+    CustomEditor "Roll_a_Ball.EditorTools.EffectShaderGUI"
 }

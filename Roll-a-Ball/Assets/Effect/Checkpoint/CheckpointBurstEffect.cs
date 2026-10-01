@@ -7,18 +7,34 @@ public sealed class CheckpointBurstEffect : MonoBehaviour
 {
     public enum CheckpointState { Unvisited, Visited, Current }
 
+    [Header("参照（通常はPrefabの設定を維持）")]
+    [Tooltip("袋の左半分のTransform。破裂時に移動・回転・縮小する対象。通常はPrefabの参照を維持します。")]
     [SerializeField] private Transform leftHalf;
+    [Tooltip("袋の右半分のTransform。左半分と反対方向へ開きます。通常はPrefabの参照を維持します。")]
     [SerializeField] private Transform rightHalf;
+    [Tooltip("到達状態を示す矢印のTransform。位置と大きさを演出側で制御します。")]
     [SerializeField] private Transform arrow;
+    [Tooltip("矢印の色を変えるRenderer。Current Color / Visited Colorの適用先です。")]
     [SerializeField] private Renderer arrowRenderer;
+    [Tooltip("破裂時の破片ParticleSystem。量はFragment Count、粒子の形・サイズ・寿命はこのSystemで調整します。")]
     [SerializeField] private ParticleSystem fragments;
+    [Tooltip("破裂直後の閃光ParticleSystem。1粒放出します。色・サイズ・寿命はこのSystemで調整します。")]
     [SerializeField] private ParticleSystem flash;
+    [Header("状態の色")]
+    [Tooltip("未到達・現在地点の矢印色。Brightnessを乗算します。変更は次の状態変更・再生で反映します。")]
     [SerializeField] private Color currentColor = new Color(1f, .65f, .02f);
+    [Tooltip("通過済みの矢印色。Brightnessは乗算しません。変更は次の状態変更で反映します。")]
     [SerializeField] private Color visitedColor = new Color(.2f, .4f, .45f);
+    [Tooltip("未到達・現在地点の矢印色の倍率。大きいほど明るく、通過済みの色や破片の色は変えません。")]
     [SerializeField, Min(.1f)] private float brightness = 1.15f;
+    [Header("破裂の動き・量")]
+    [Tooltip("破裂の再生速度倍率。1が標準、2なら袋の動きと粒子が約2倍速。袋の実時間はDuration / この値です。")]
     [SerializeField, Min(.1f)] private float playbackSpeed = 1f;
+    [Tooltip("袋の片側が左右へ開く距離（ローカル座標）。大きいほど左右へ広がり、両側の間隔は約2倍になります。")]
     [SerializeField, Min(.1f)] private float splitDistance = 1.2f;
+    [Tooltip("速度倍率1での袋の破裂時間（秒）。大きいほどゆっくり開きます。粒子の寿命は各ParticleSystemで別に設定します。")]
     [SerializeField, Min(.1f)] private float duration = .75f;
+    [Tooltip("破裂時に追加放出する破片数（1〜40粒）。大きいほど密度が増えます。ParticleSystemのBurst設定は別です。")]
     [SerializeField, Range(1, 40)] private int fragmentCount = 18;
     private MaterialPropertyBlock properties;
     private Vector3 arrowPosition;

@@ -6,13 +6,23 @@ using UnityEngine;
 [ExecuteAlways]
 public sealed class Stage2WindEffect : MonoBehaviour
 {
+    [Header("参照（通常はPrefabの設定を維持）")]
+    [Tooltip("流れる葉片のParticleSystem。方向・速度・Noise・発生範囲はこのコンポーネントが設定します。量・寿命はSystem側で調整します。")]
     [SerializeField] private ParticleSystem leafParticles;
+    [Tooltip("湿った光粒のParticleSystem。葉片の約82%の速度、約90%の乱流で流します。")]
     [SerializeField] private ParticleSystem wetLightParticles;
+    [Tooltip("任意のWindZone。風向き・強さ・乱流を同期します。未設定でも粒子とSway Targetsは動きます。")]
     [SerializeField] private WindZone windZone;
+    [Tooltip("揺らす木・草のWindSwayTarget配列。空なら有効化時に子から自動取得します。追加・参照変更後は再有効化して確認します。")]
     [SerializeField] private WindSwayTarget[] swayTargets;
+    [Header("風と循環範囲")]
+    [Tooltip("風向き（粒子と揺れのローカルXYZ方向）。長さでは強さを変えず、ゼロなら前方向です。揺れ対象へのInspector変更反映は再有効化時です。")]
     [SerializeField] private Vector3 windDirection = new Vector3(1f, 0.16f, 0.32f);
+    [Tooltip("葉片の流れる速度（ローカル座標の距離/秒）と木・草の揺れ強さ。大きいほど強風になります。揺れ対象へのInspector変更反映は再有効化時です。")]
     [SerializeField, Range(0.1f, 2.5f)] private float windStrength = 0.92f;
+    [Tooltip("粒子と木・草の不規則な揺れの強さ（0〜1）。大きいほど乱れます。揺れ対象へのInspector変更反映は再有効化時です。")]
     [SerializeField, Range(0f, 1f)] private float turbulence = 0.48f;
+    [Tooltip("粒子の発生・循環範囲の全幅XYZ（ローカル座標、各軸最低0.5）。大きいほど風が流れる範囲が広がります。")]
     [SerializeField] private Vector3 localVolumeSize = new Vector3(8f, 3.8f, 8f);
 
     private ParticleSystem.Particle[] leafBuffer;

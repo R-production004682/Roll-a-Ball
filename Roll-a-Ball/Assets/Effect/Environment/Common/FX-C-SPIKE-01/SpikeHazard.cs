@@ -5,12 +5,17 @@ using UnityEngine;
 /// </summary>
 public sealed class SpikeHazard : MonoBehaviour
 {
+    [Header("接触演出の参照")]
+    [Tooltip("トゲ接触時に再生するSpikeContactEffect。未設定の場合は接触エフェクトを再生しません。")]
     [SerializeField]
     private SpikeContactEffect contactEffect;
 
+    [Tooltip("接触エフェクトの固定発生位置。未設定なら接触点などを使用します。通常はPrefabの参照を維持します。")]
     [SerializeField]
     private Transform effectAnchor;
 
+    [Header("接触の受付")]
+    [Tooltip("接触の連続受付を抑える時間（秒）。ただし現実装は最初の受付後に再処理を止めるため、値を下げても同じインスタンスでは再発火しません。")]
     [SerializeField]
     private float contactCooldown = 0.35f;
 

@@ -5,8 +5,12 @@ using UnityEngine;
 /// </summary>
 public sealed class WindSwayTarget : MonoBehaviour
 {
+    [Header("木・草の見た目の揺れ")]
+    [Tooltip("風で傾く角度の強さ（度、0〜12）。大きいほど揺れ角が増え、0でもPosition Swayによる移動は残ります。必ず見た目用の子に付けます。")]
     [SerializeField, Range(0f, 12f)] private float swayAngle = 4.8f;
+    [Tooltip("初期位置から揺れる移動幅の基準（ローカル座標、0〜0.5）。大きいほど横揺れが増え、風の強さを乗算します。物理用親には付けません。")]
     [SerializeField, Range(0f, 0.5f)] private float positionSway = 0.06f;
+    [Tooltip("揺れの速さ倍率（0.25〜3）。大きいほど速く揺れます。粒子の流れる速さには影響しません。")]
     [SerializeField, Range(0.25f, 3f)] private float speedMultiplier = 1.15f;
 
     private Vector3 restPosition;

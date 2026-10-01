@@ -6,15 +6,27 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public sealed class GroundDustEffect : MonoBehaviour
 {
+    [Header("参照（通常はPrefabの設定を維持）")]
+    [Tooltip("粉塵ParticleSystem（必須）。発生位置・色・量・寿命は地面Profileと速度から制御します。")]
     [SerializeField] private ParticleSystem dust;
+    [Tooltip("少量の光粒ParticleSystem（必須）。割合は地面ProfileのSparkle Ratioで調整します。")]
     [SerializeField] private ParticleSystem sparkles;
+    [Tooltip("草片用ParticleSystem。地面ProfileのSurface DetailがGrass Bladeの場合に使用します。")]
     [SerializeField] private ParticleSystem surfaceDetails;
+    [Tooltip("小石用ParticleSystem。地面ProfileのSurface DetailがPebbleの場合に使用します。")]
     [SerializeField] private ParticleSystem pebbleParticles;
+    [Tooltip("草片の形状Mesh。有効な参照は初期化時にSurface Detailsへ設定します。サイズはProfileで調整します。")]
     [SerializeField] private Mesh grassBladeMesh;
+    [Tooltip("小石の形状Mesh。有効な参照は初期化時にPebble Particlesへ設定します。サイズはProfileで調整します。")]
     [SerializeField] private Mesh pebbleMesh;
+    [Header("発生速度と位置")]
+    [Tooltip("粉塵が出始める接地面方向の移動速度（距離/秒）。大きいほど低速時に出にくくなり、未満では停止します。")]
     [SerializeField, Min(0.01f)] private float minimumSpeed = 0.35f;
+    [Tooltip("発生量が最大になる移動速度（距離/秒）。大きいほど最大量に達するまで速く動く必要があります。Minimum Speed＋0.01以上として扱います。")]
     [SerializeField, Min(0.02f)] private float fullEffectSpeed = 5f;
+    [Tooltip("接地点から面の法線方向へ浮かせる距離（ワールド座標）。大きいほど地面から離れて出ます。草片・小石の寿命制限にも使います。")]
     [SerializeField, Min(0f)] private float contactOffset = 0.045f;
+    [Tooltip("接地点から移動方向の後ろへずらす距離（ワールド座標）。大きいほどプレイヤーの後方に粒子が残ります。")]
     [SerializeField, Min(0f)] private float trailingOffset = 0.4f;
 
     private readonly System.Random random = new System.Random(13648);

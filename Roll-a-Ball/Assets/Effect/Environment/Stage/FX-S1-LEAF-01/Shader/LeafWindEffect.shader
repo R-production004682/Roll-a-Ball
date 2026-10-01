@@ -93,4 +93,5 @@ Shader "Roll-a-Ball/Effects/Leaf Drift"
             ENDHLSL
         }
     }
+    CustomEditor "Roll_a_Ball.EditorTools.EffectShaderGUI"
 }
