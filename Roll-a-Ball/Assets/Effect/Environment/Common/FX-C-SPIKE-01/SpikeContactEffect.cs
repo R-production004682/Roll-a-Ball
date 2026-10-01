@@ -5,27 +5,37 @@ using UnityEngine;
 /// </summary>
 public sealed class SpikeContactEffect : MonoBehaviour
 {
+    [Header("参照（通常はPrefabの設定を維持）")]
+    [Tooltip("接触直後の閃光ParticleSystem。粒子の色・サイズ・寿命はこのSystemで調整します。")]
     [SerializeField]
     private ParticleSystem flashBurst;
 
+    [Tooltip("接触時に散る破片ParticleSystem。量・サイズ・寿命はこのSystemで調整します。")]
     [SerializeField]
     private ParticleSystem shardBurst;
 
+    [Tooltip("接触時の小さな火花ParticleSystem。量・サイズ・寿命はこのSystemで調整します。")]
     [SerializeField]
     private ParticleSystem sparkBurst;
 
+    [Tooltip("接触時に点灯するLight。Flash ColorとFlash Light Intensityを適用します。")]
     [SerializeField]
     private Light flashLight;
 
+    [Header("接触演出の調整")]
+    [Tooltip("接触ライトの色。次の再生・停止で反映します。ParticleSystemの色は変えません。")]
     [SerializeField]
     private Color flashColor = new Color(1f, 0.12f, 0.08f, 1f);
 
+    [Tooltip("接触演出を停止・消去するまでの時間（秒、最低0.1）。大きいほど粒子を長く残し、時間到達時に残留粒子も消します。")]
     [SerializeField]
     private float duration = 0.42f;
 
+    [Tooltip("接触直後のライト強度。大きいほど明るくなり、Light Fade Durationで消えます。")]
     [SerializeField]
     private float flashLightIntensity = 6f;
 
+    [Tooltip("ライトが初期強度から0へ消える時間（秒、最低0.01）。大きいほど余韻が長く、Duration到達時には停止します。")]
     [SerializeField]
     private float lightFadeDuration = 0.18f;
 

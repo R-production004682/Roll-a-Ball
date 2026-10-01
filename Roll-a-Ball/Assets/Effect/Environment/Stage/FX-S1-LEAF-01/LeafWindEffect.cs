@@ -6,12 +6,21 @@ using UnityEngine;
 [ExecuteAlways]
 public sealed class LeafWindEffect : MonoBehaviour
 {
+    [Header("参照（通常はPrefabの設定を維持）")]
+    [Tooltip("風で流す葉のParticleSystem。風向き・速度・Noiseはこのコンポーネントが設定し、量・色・寿命はSystem側で調整します。")]
     [SerializeField] private ParticleSystem leafParticles;
+    [Tooltip("葉と一緒に流す光粒ParticleSystem。葉の約80%の速度・乱流で流します。")]
     [SerializeField] private ParticleSystem lightParticles;
+    [Tooltip("風の強さ・乱流を同期する任意のWindZone。未設定でも葉と光粒は動きます。")]
     [SerializeField] private WindZone windZone;
+    [Header("風と循環範囲")]
+    [Tooltip("風向き（エフェクトのローカルXYZ方向）。ベクトルの長さでは速度は変わりません。ゼロなら前方向になります。")]
     [SerializeField] private Vector3 windDirection = new Vector3(1f, 0.08f, 0.25f);
+    [Tooltip("葉の流れる速度（ローカル座標の距離/秒）。大きいほど速く流れます。光粒は約80%の速度になります。")]
     [SerializeField, Range(0.05f, 1.5f)] private float windSpeed = 0.34f;
+    [Tooltip("流れの不規則さ（0〜1）。大きいほど粒子のNoiseとWindZoneの乱流が強くなります。")]
     [SerializeField, Range(0f, 1f)] private float turbulence = 0.16f;
+    [Tooltip("粒子を循環させる範囲の全幅XYZ（ローカル座標、各軸最低0.5）。大きいほど範囲が広がります。発生Shapeの大きさはSystem側で別に設定します。")]
     [SerializeField] private Vector3 localVolumeSize = new Vector3(12f, 5f, 12f);
 
     private ParticleSystem.Particle[] leafBuffer;

@@ -5,30 +5,42 @@ using UnityEngine;
 /// </summary>
 public sealed class GoalHighlightEffect : MonoBehaviour
 {
+    [Header("参照（通常はPrefabの設定を維持）")]
+    [Tooltip("常時上昇させる四角形のRenderer配列。配列順がSquare ColorsとStaggerに対応します。参照変更は再生前に行います。")]
     [SerializeField]
     private MeshRenderer[] squareRenderers;
 
+    [Tooltip("ゴール周辺を明滅させるLight。明るさはGlow Light Intensityで制御します。未設定ならライト演出を省略します。")]
     [SerializeField]
     private Light glowLight;
 
+    [Header("色と再生")]
+    [Tooltip("四角形ごとの色と透明度（A）。Square Renderersの配列順に対応し、不足分はシアンになります。")]
     [SerializeField]
     private Color[] squareColors;
 
+    [Tooltip("ONならGameObject・コンポーネントの有効化時に自動再生。OFFならゲーム側からPlayを呼んで開始します。")]
     [SerializeField]
     private bool playOnEnable = true;
 
+    [Header("上昇と揺れ")]
+    [Tooltip("四角形が上昇して一周する時間（秒、最低0.1）。大きいほど上昇・明滅がゆっくりになります。")]
     [SerializeField]
     private float loopDuration = 2.4f;
 
+    [Tooltip("初期位置を中心に上昇する全高（ローカル座標）。下側−半分から上側＋半分まで移動します。")]
     [SerializeField]
     private float loopHeight = 2.2f;
 
+    [Tooltip("四角形同士のループ位相のずれ（秒）。0なら同期し、大きいほど隣の四角形とのタイミングが離れます。")]
     [SerializeField]
     private float stagger = 0.36f;
 
+    [Tooltip("四角形の揺れ角の強さ。大きいほど傾きが増えます。名前はSpeedですが回転速度ではなく、主な角度はこの値×0.08度です。")]
     [SerializeField]
     private float rotationSpeed = 45f;
 
+    [Tooltip("ライトの基準強度。大きいほど明るくなり、再生中はこの値の約64〜100%で明滅します。")]
     [SerializeField]
     private float glowLightIntensity = 1.6f;
 

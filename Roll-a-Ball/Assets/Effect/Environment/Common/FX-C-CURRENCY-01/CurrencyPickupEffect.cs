@@ -5,51 +5,70 @@ using UnityEngine;
 /// </summary>
 public sealed class CurrencyPickupEffect : MonoBehaviour
 {
+    [Header("参照（通常はPrefabの設定を維持）")]
+    [Tooltip("通常・大報酬で共通のクリスタル粒子。粒子数・色・サイズ・寿命はこのParticleSystemで調整します。")]
     [SerializeField]
     private ParticleSystem crystalBurst;
 
+    [Tooltip("大報酬時だけ追加するクリスタル粒子。通常報酬では非表示になります。")]
     [SerializeField]
     private ParticleSystem largeRewardBurst;
 
+    [Tooltip("通常・大報酬で共通の中心光ParticleSystem。再生時に指定された閃光の正面を向きます。")]
     [SerializeField]
     private ParticleSystem corePulse;
 
+    [Tooltip("大報酬時だけ再生する強い閃光ParticleSystem。通常報酬では非表示になります。")]
     [SerializeField]
     private ParticleSystem impactFlash;
 
+    [Tooltip("通常・大報酬で共通のキラキラ粒子。量・寿命はこのParticleSystemで調整します。")]
     [SerializeField]
     private ParticleSystem sparkleBurst;
 
+    [Tooltip("大報酬時だけ追加するキラキラ粒子。通常報酬では非表示になります。")]
     [SerializeField]
     private ParticleSystem largeSparkleBurst;
 
+    [Tooltip("大報酬の十字光Transform。向き・サイズ・表示を演出側で制御します。")]
     [SerializeField]
     private Transform crossSpark;
 
+    [Tooltip("十字光のRenderer。演出側から色と透明度を設定する対象です。")]
     [SerializeField]
     private MeshRenderer crossSparkRenderer;
 
+    [Tooltip("大報酬の補助十字光Transform。主十字から45度ずらして表示します。")]
     [SerializeField]
     private Transform crossSparkAccent;
 
+    [Tooltip("補助十字光のRenderer。演出側から色と透明度を設定する対象です。")]
     [SerializeField]
     private MeshRenderer crossSparkAccentRenderer;
 
+    [Tooltip("大報酬時だけ点灯するLight。明るさはPulse Light Intensityで調整します。")]
     [SerializeField]
     private Light pulseLight;
 
+    [Header("再生・終了")]
+    [Tooltip("ONなら有効化時にIs Large Rewardの設定で自動再生。OFFならゲーム側からPlayを呼びます。")]
     [SerializeField]
     private bool playOnEnable;
 
+    [Tooltip("ONなら演出と残留粒子の終了後にこのGameObjectを破棄。再利用・プール運用・繰り返し確認ではOFFにします。")]
     [SerializeField]
     private bool destroyOnComplete = true;
 
+    [Header("演出の時間・明るさ")]
+    [Tooltip("十字光・ライトなどの本体演出時間（秒、最低0.1）。大きいほどゆっくり消えます。終了後も粒子の自然消滅を待ちます。")]
     [SerializeField]
     private float duration = 1.1f;
 
+    [Tooltip("大報酬時のライト初期強度。大きいほど明るくなります。通常報酬ではライトを点灯しません。")]
     [SerializeField]
     private float pulseLightIntensity = 3.5f;
 
+    [Tooltip("ONなら追加粒子・十字光・ライトを含む大報酬版。引数なしPlayと自動再生の設定で、ゲーム側のPlay(bool)指定が優先されます。")]
     [SerializeField]
     private bool isLargeReward;
 

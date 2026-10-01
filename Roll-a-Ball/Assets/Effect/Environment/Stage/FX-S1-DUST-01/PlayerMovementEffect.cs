@@ -7,12 +7,21 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public sealed class PlayerMovementEffect : MonoBehaviour
 {
+    [Header("参照")]
+    [Tooltip("足元と移動速度を調べるPlayerのCollider（必須）。Player本体の物理Colliderを指定します。")]
     [SerializeField] private Collider playerCollider;
+    [Tooltip("接地中に再生するGroundDustEffect（必須）。停止・落下・リスポーン時は放出を止めます。")]
     [SerializeField] private GroundDustEffect effect;
+    [Header("接地と移動の判定")]
+    [Tooltip("足元のRaycastで地面として調べるLayer。対象を絞ると不要な物体を地面と誤認しにくくなります。Triggerは対象外です。")]
     [SerializeField] private LayerMask groundLayers = ~0;
+    [Tooltip("Colliderの底から下へ地面を探す追加距離（ワールド座標）。大きいほど隙間を許容しますが、宙に浮いた状態も接地と判定しやすくなります。")]
     [SerializeField, Min(0f)] private float groundTolerance = 0.055f;
+    [Tooltip("接地と認める面の上向き成分（0〜1）。大きいほど平らな床だけに限定し、小さいほど急な斜面でも粉塵を出します。")]
     [SerializeField, Range(0f, 1f)] private float minimumGroundNormal = 0.55f;
+    [Tooltip("1フレームの移動をテレポートと見なす距離（ワールド座標）。超えると粒子・履歴を消去します。高速移動で消える場合は大きくします。")]
     [SerializeField, Min(0.1f)] private float teleportDistance = 2f;
+    [Tooltip("地面から離れる法線方向の許容速度（距離/秒）。大きいほど小さな跳ねでも接地扱いになり、小さいほど離れた直後に粉塵を止めます。")]
     [SerializeField, Min(0f)] private float separationSpeed = 0.2f;
 
     private readonly RaycastHit[] hits = new RaycastHit[16];

@@ -154,4 +154,5 @@ Shader "Roll-a-Ball/Effects/Dappled Light Volume"
             ENDHLSL
         }
     }
+    CustomEditor "Roll_a_Ball.EditorTools.EffectShaderGUI"
 }

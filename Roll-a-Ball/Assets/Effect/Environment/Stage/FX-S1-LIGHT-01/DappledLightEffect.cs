@@ -6,12 +6,21 @@ using UnityEngine;
 [ExecuteAlways]
 public sealed class DappledLightEffect : MonoBehaviour
 {
+    [Header("参照（通常はPrefabの設定を維持）")]
+    [Tooltip("木漏れ日のSpot Light（必須）。色・Intensity・Range・Spot Angle・CookieはLight側で調整し、方向と影に光の筋を合わせます。")]
     [SerializeField] private Light sunLight;
+    [Tooltip("光の筋を描く箱型ボリュームのMeshRenderer（必須）。描画範囲はこのTransformのScaleで調整します。")]
     [SerializeField] private MeshRenderer volumeRenderer;
+    [Header("光の筋と品質")]
+    [Tooltip("光を散乱させる媒質の濃さ（0.001〜0.2）。大きいほど光の筋が濃くなりますが、透過が減るため単純な明るさ倍率ではありません。")]
     [SerializeField, Range(0.001f, 0.2f)] private float density = 0.035f;
+    [Tooltip("散乱光の明るさ倍率（0〜2）。大きいほど光の筋が明るく、0で散乱光が消えます。Lightの明るさとは別です。")]
     [SerializeField, Range(0f, 2f)] private float scattering = 0.16f;
+    [Tooltip("散乱光の方向性（0〜0.8）。0は方向差が小さく、大きいほど光方向と視線が近い場合を強調し、見る角度で明るさが変わります。")]
     [SerializeField, Range(0f, 0.8f)] private float anisotropy = 0.2f;
+    [Tooltip("光の筋を計算するサンプル数（24〜96）。大きいほど筋が滑らかになりますがGPU負荷が増えます。低品質設定では小さくします。")]
     [SerializeField, Range(24, 96)] private int sampleCount = 96;
+    [Tooltip("再生中にSpot Lightを揺らす角度幅（度、0〜1）。大きいほどCookieと影が揺れ、0なら揺れません。")]
     [SerializeField, Range(0f, 1f)] private float foliageSway = 0.25f;
 
     private static readonly int SunPosition = Shader.PropertyToID("_SunPositionWS");
