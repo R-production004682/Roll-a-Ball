@@ -5,10 +5,9 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;//ゲームマネージャー
 
-    [SerializeField]
     public bool isStageCompleted = false;//ステージ完了フラグ
 
-    [SerializeField]
+    [SerializeField,Tooltip("リザルト画面のCanvasをいれる")]
     private GameObject result;//リザルト画面
 
     [SerializeField]

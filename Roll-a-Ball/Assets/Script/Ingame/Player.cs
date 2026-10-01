@@ -9,25 +9,29 @@ public class Player : MonoBehaviour
 
     private Vector3 moveDirection;//現在の移動方向
 
-    [SerializeField]
-    private float playerSpeed = 20;//プレイヤーの最大移動速度
-
-    [SerializeField]
-    private float acceleration = 50;//加速度
-
-    [SerializeField]
-    private int fall;//落下地点
-
-    [SerializeField]
-    private List<Respawnpoint> respawnPoints = new List<Respawnpoint>();//リスポーン地点
-
-    [SerializeField]
-    private Respawnpoint startPoint;//スタート地点
-
-    [SerializeField]
     private bool isGoal = false;//ゴールしたか
 
-    [SerializeField]
+    private List<Respawnpoint> respawnPoints = new List<Respawnpoint>();//リスポーン地点
+
+    [Header("移動設定")]
+
+    [SerializeField, Tooltip("プレイヤーの最大移動速度")]
+    private float playerSpeed = 20;//プレイヤーの最大移動速度
+
+    [SerializeField, Tooltip("プレイヤーの加速量")]
+    private float acceleration = 50;//加速度
+
+    [Header("地点設定")]
+
+    [SerializeField, Tooltip("落下判定とするy座標")]
+    private int fall;//落下地点
+
+    [SerializeField, Tooltip("スタート地点(空オブジェクトで座標を決める)")]
+    private Respawnpoint startPoint;//スタート地点
+
+    [Header("その他")]
+
+    [SerializeField, Tooltip("プレイヤーの移動方向を決めるカメラオブジェクト")]
     private Transform cameraTransform;//カメラ（インスペクターから指定）
 
     private void Start()
@@ -106,7 +110,7 @@ public class Player : MonoBehaviour
     /// <param name="point"></param>
     public void UnlockPoint(Respawnpoint point)
     {
-        if (point == null || respawnPoints.Contains(point))//地点番号がないか解放済みだと処理しない
+        if (point == null || respawnPoints.Contains(point))//地点がないか解放済みだと処理しない
             return;
 
         respawnPoints.Add(point);//リスポーンポイントを追加する
@@ -118,7 +122,6 @@ public class Player : MonoBehaviour
         if (other.CompareTag("Goal"))
         {
             isGoal = true;
-            Debug.Log("ゴールに触れた");
             rb.isKinematic = true;//物理演算を止める
         }
     }

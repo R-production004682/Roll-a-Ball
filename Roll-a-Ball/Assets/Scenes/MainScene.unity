@@ -5202,10 +5202,7 @@ MonoBehaviour:
   playerSpeed: 5
   acceleration: 10
   fall: -5
-  respawnPoints:
-  - {fileID: 1893225323}
   startPoint: {fileID: 1893225323}
-  isGoal: 0
   cameraTransform: {fileID: 9809834}
 --- !u!114 &1485610942
 MonoBehaviour:
@@ -6447,7 +6444,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2de63c451cce38f4b800325ffaaddc41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Respawnpoint
-  pointNumber: 0
 --- !u!1001 &1895934441
 PrefabInstance:
   m_ObjectHideFlags: 0

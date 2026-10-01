@@ -3,10 +3,7 @@ using UnityEngine;
 
 public class Goal : MonoBehaviour
 {
-    [SerializeField]
-    private ParticleSystem goalEffect;//旧ゴールエフェクト
-
-    [SerializeField]
+    [SerializeField,Tooltip("クリア時のゴールエフェクトを入れる")]
     private GoalClearEffect clearEffect;
 
     private bool isCompleting;
@@ -16,18 +13,12 @@ public class Goal : MonoBehaviour
     /// </summary>
     private void OnTriggerEnter(Collider other)
     {
-        if (!other.CompareTag("Player") || isCompleting)
+        if (!other.CompareTag("Player") || isCompleting)//プレイヤー以外の衝突、または既にステージをクリアしている場合は処理しない
         {
             return;
         }
 
         isCompleting = true;
-        if (clearEffect == null)
-        {
-            PlayLegacyGoalEffect();
-            CompleteStage();
-            return;
-        }
 
         clearEffect.gameObject.SetActive(true);
         clearEffect.Play();
@@ -41,17 +32,6 @@ public class Goal : MonoBehaviour
     {
         yield return new WaitForSeconds(clearEffect.Duration);
         CompleteStage();
-    }
-
-    /// <summary>
-    /// 既存のParticleSystemを使ってクリア演出を再生
-    /// </summary>
-    private void PlayLegacyGoalEffect()
-    {
-        if (goalEffect != null)
-        {
-            goalEffect.Play();
-        }
     }
 
     /// <summary>

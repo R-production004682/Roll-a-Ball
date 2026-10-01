@@ -4,10 +4,6 @@ using UnityEngine;
 
 public class Respawnpoint : MonoBehaviour
 {
-    [SerializeField]
-    [Min(0)]
-    private int pointNumber;//リスポーン地点の番号
-
     /// <summary>
     /// 中間地点で復活するための処理
     /// </summary>
