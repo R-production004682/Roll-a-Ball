@@ -62,6 +62,8 @@ namespace Roll_a_Ball.EditorTools
         private string rootValidationMessage;
         private Vector3Int cachedDimensions;
         private readonly GameObject[] slotPrefabs = new GameObject[9];
+        private readonly ObjectField[] slotFields = new ObjectField[9];
+        private DropdownField rotationField;
         private bool hasCandidate;
         private Vector3Int candidate;
         private Vector3Int aimedCell;
@@ -73,7 +75,6 @@ namespace Roll_a_Ball.EditorTools
         private Button beginChunkSelectionButton;
         private Button confirmChunkButton;
         private Button unchunkButton;
-        private Button cancelChunkSelectionButton;
         private SceneView selectionView;
         private bool previousSelectionWantsMouseMove;
         private Block hoveredSelectionBlock;
@@ -155,6 +156,7 @@ namespace Roll_a_Ball.EditorTools
             public int slot;
             public bool fit = true;
             public int movementSpeedRevision;
+            public int rotationSteps;
         }
 
         private sealed class Block
@@ -423,6 +425,7 @@ namespace Roll_a_Ball.EditorTools
                 preferences.speed = ClampSetting(preferences.speed, 0.1f, 30f);
             }
             preferences.slot = Mathf.Clamp(preferences.slot, 0, 8);
+            preferences.rotationSteps = (preferences.rotationSteps % 4 + 4) % 4;
             ReloadPrefabs();
             SceneView.beforeSceneGui += BeforeSceneGUI;
             SceneView.duringSceneGui += DuringSceneGUI;
@@ -506,7 +509,7 @@ namespace Roll_a_Ball.EditorTools
             modeIndicator = new HelpBox(string.Empty, HelpBoxMessageType.Info);
             panel.Add(modeIndicator);
             UpdateModeIndicator();
-            panel.Add(new HelpBox("Scene View またはこのウィンドウで B 開始 / B・Esc 終了 / Alt で終了して通常操作\nWASD 移動（初期速度 10 セル / 秒）\n右クリック配置（長押し連続）・左クリック破壊\n1～9 / ホイールでスロット変更", HelpBoxMessageType.Info));
+            panel.Add(new HelpBox("Scene View またはこのウィンドウで B 開始 / B・Esc 終了 / Alt で終了して通常操作\nWASD 移動（初期速度 10 セル / 秒）\n右クリック配置（長押し連続）・左クリック破壊\n中クリック / F: スポイト・R / Shift+R: 90度回転\n1～9 / ホイールでスロット変更", HelpBoxMessageType.Info));
             var rootField = new ObjectField("配置ルート") { objectType = typeof(GameObject), allowSceneObjects = true, value = placementRoot };
             rootField.RegisterValueChangedCallback(OnRootChanged);
             panel.Add(rootField);
@@ -531,18 +534,24 @@ namespace Roll_a_Ball.EditorTools
             colliderWorkflow.Add(colliderWorkflowStatus);
             confirmChunkButton = new Button(ConfirmChunkSelection) { text = "選択を確定してチャンク化" };
             colliderWorkflow.Add(confirmChunkButton);
-            var selectionActions = new VisualElement();
-            selectionActions.Add(new Button(ClearChunkSelection) { text = "選択をクリア" });
-            cancelChunkSelectionButton = new Button(CancelChunkSelection) { text = "選択をキャンセル" };
-            selectionActions.Add(cancelChunkSelectionButton);
-            colliderWorkflow.Add(selectionActions);
             unchunkButton = new Button(UnchunkSelectedBlocks) { text = "選択したブロックを個別 Collider に戻す" };
             colliderWorkflow.Add(unchunkButton);
+            colliderWorkflow.Add(new Button(ShortenManagedNames)
+            {
+                text = "既存のブロック・Collider の名前を短くする",
+                name = "shortenManagedNamesButton"
+            });
             panel.Add(colliderWorkflow);
             UpdateColliderWorkflowUI();
             var fit = new Toggle("縦横比を保ってセルに収める") { value = preferences.fit };
             fit.RegisterValueChangedCallback(OnFitChanged);
             panel.Add(fit);
+            rotationField = new DropdownField("配置回転（Y）", new List<string> { "0°", "90°", "180°", "270°" }, preferences.rotationSteps)
+            {
+                name = "placementRotationField"
+            };
+            rotationField.RegisterValueChangedCallback(OnPlacementRotationChanged);
+            panel.Add(rotationField);
             var interval = new FloatField("連続配置間隔（秒）") { value = preferences.interval, isDelayed = true };
             interval.RegisterValueChangedCallback(OnIntervalChanged);
             panel.Add(interval);
@@ -559,6 +568,7 @@ namespace Roll_a_Ball.EditorTools
             {
                 var field = new ObjectField($"スロット {i + 1}") { objectType = typeof(GameObject), allowSceneObjects = false, value = SlotPrefab(i), userData = i };
                 field.RegisterValueChangedCallback(OnPrefabChanged);
+                slotFields[i] = field;
                 panel.Add(field);
             }
             var chunk = new Vector2IntField("選択チャンク（X / Z）") { value = selectedChunk };
@@ -673,7 +683,6 @@ namespace Roll_a_Ball.EditorTools
             CancelChunkSelection();
             placementRoot = change.newValue as GameObject;
             UpdatePlacementRootGlobalId();
-            EnsureRootSettings();
             chunkSignatures.Clear();
             Invalidate();
             CreateGUI();
@@ -687,6 +696,7 @@ namespace Roll_a_Ball.EditorTools
             preferences.grid = ClampSetting(change.newValue, 0.05f, 100f);
             ((FloatField)change.target).SetValueWithoutNotify(preferences.grid);
             SavePreferences();
+            Invalidate();
         }
 
         /// <summary>
@@ -697,6 +707,7 @@ namespace Roll_a_Ball.EditorTools
             preferences.chunkSize = Mathf.Clamp(change.newValue, 1, 64);
             ((IntegerField)change.target).SetValueWithoutNotify(preferences.chunkSize);
             SavePreferences();
+            Invalidate();
         }
 
         /// <summary>
@@ -762,7 +773,8 @@ namespace Roll_a_Ball.EditorTools
             Undo.IncrementCurrentGroup();
             var undoGroup = Undo.GetCurrentGroup();
             Undo.SetCurrentGroupName("選択ブロックをチャンク化");
-            var groupId = MeshGroupPrefix + Guid.NewGuid().ToString("N");
+            EnsureRootSettings();
+            var groupId = NextColliderGroupId();
             foreach (var block in selected)
             {
                 Undo.RecordObject(block.gameObject, "Group block colliders");
@@ -821,19 +833,6 @@ namespace Roll_a_Ball.EditorTools
         }
 
         /// <summary>
-        /// 選択モード中の未確定ブロック選択を空にする
-        /// </summary>
-        private void ClearChunkSelection()
-        {
-            selectedForChunking.Clear();
-            hoveredSelectionBlock = null;
-            status = selectingChunkBlocks ? "選択をクリアしました。Scene View で対象を選んでください" : status;
-            UpdateColliderWorkflowUI();
-            UpdateStatistics();
-            SceneView.RepaintAll();
-        }
-
-        /// <summary>
         /// 未確定の選択を破棄して通常モードへ戻る
         /// </summary>
         private void CancelChunkSelection()
@@ -867,10 +866,127 @@ namespace Roll_a_Ball.EditorTools
         /// </summary>
         private static string SetColliderGroupId(string blockName, string groupId)
         {
-            var marker = blockName.LastIndexOf("|Group=", StringComparison.Ordinal);
-            var baseName = marker < 0 ? blockName : blockName.Substring(0, marker);
+            var baseName = CompactBlockName(blockName);
             // 空の Group は明示的な個別 Collider を表し、旧ルートでも再統合しない
             return baseName + "|Group=" + groupId;
+        }
+
+        /// <summary>
+        /// Prefab 名と復元用の Collider フラグだけを残して管理ブロック名を短くする
+        /// </summary>
+        private static string CompactBlockName(string blockName)
+        {
+            var managed = ManagedName(blockName, BlockPrefix);
+            if (managed == null)
+            {
+                return blockName;
+            }
+            var parts = managed.Split('|');
+            var marker = blockName.LastIndexOf("|" + BlockPrefix, StringComparison.Ordinal);
+            var label = parts.Length > 2 && !parts[2].StartsWith("Group=", StringComparison.Ordinal)
+                ? parts[2] : marker >= 0 ? blockName.Substring(0, marker) : "Block";
+            return label + "|" + BlockPrefix + parts[1];
+        }
+
+        /// <summary>
+        /// 配置ルート内で重複しない短い MeshCollider グループ番号を発行する
+        /// </summary>
+        private string NextColliderGroupId()
+        {
+            var used = new HashSet<string>(placementRoot.transform.Cast<Transform>()
+                .Select(child => ReadColliderGroupId(child.name)
+                    ?? ManagedName(child.name, ChunkPrefix)?.Replace(ChunkPrefix + "Group|", string.Empty)), StringComparer.Ordinal);
+            var number = 1;
+            while (used.Contains(MeshGroupPrefix + number.ToString("D3", CultureInfo.InvariantCulture)))
+            {
+                number++;
+            }
+            return MeshGroupPrefix + number.ToString("D3", CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// 既存グループの対応と Collider の形状を保ちながら長い名前を Undo 対応で整理する
+        /// </summary>
+        private void ShortenManagedNames()
+        {
+            StopMode();
+            CancelChunkSelection();
+            if (EditorApplication.isPlayingOrWillChangePlaymode || PrefabStageUtility.GetCurrentPrefabStage() != null
+                || !ReadRootSettings())
+            {
+                return;
+            }
+            RebuildCache();
+            Undo.IncrementCurrentGroup();
+            var undoGroup = Undo.GetCurrentGroup();
+            Undo.SetCurrentGroupName("Block Builder の名前を短くする");
+            var groups = blocks.Select(block => block.colliderGroupId).Where(id => !string.IsNullOrEmpty(id))
+                .Distinct().OrderBy(id => id, StringComparer.Ordinal).ToArray();
+            var groupNames = new Dictionary<string, string>(StringComparer.Ordinal);
+            for (var i = 0; i < groups.Length; i++)
+            {
+                var prefix = groups[i].StartsWith(MeshGroupPrefix, StringComparison.Ordinal) ? MeshGroupPrefix : "Group-";
+                groupNames.Add(groups[i], prefix + (i + 1).ToString("D3", CultureInfo.InvariantCulture));
+            }
+            var renamed = 0;
+            foreach (var block in blocks)
+            {
+                var name = block.colliderGroupId == null ? CompactBlockName(block.gameObject.name)
+                    : SetColliderGroupId(block.gameObject.name, block.colliderGroupId.Length == 0
+                        ? string.Empty : groupNames[block.colliderGroupId]);
+                renamed += RenameManagedObject(block.gameObject, name) ? 1 : 0;
+            }
+            foreach (Transform child in placementRoot.transform)
+            {
+                var key = ManagedName(child.name, ChunkPrefix);
+                if (key == null)
+                {
+                    continue;
+                }
+                var groupPrefix = ChunkPrefix + "Group|";
+                if (key.StartsWith(groupPrefix, StringComparison.Ordinal)
+                    && groupNames.TryGetValue(key.Substring(groupPrefix.Length), out var groupId))
+                {
+                    key = groupPrefix + groupId;
+                }
+                renamed += RenameManagedObject(child.gameObject, key) ? 1 : 0;
+                foreach (var collider in child.GetComponents<MeshCollider>())
+                {
+                    var mesh = collider.sharedMesh;
+                    if (mesh != null && !AssetDatabase.Contains(mesh)
+                        && mesh.name.StartsWith(DerivedMeshPrefix, StringComparison.Ordinal))
+                    {
+                        var meshName = DerivedMeshPrefix + key.Substring(ChunkPrefix.Length).Replace("Group|", string.Empty);
+                        if (mesh.name != meshName)
+                        {
+                            Undo.RecordObject(mesh, "Shorten collision mesh name");
+                            mesh.name = meshName;
+                            EditorUtility.SetDirty(mesh);
+                        }
+                    }
+                }
+            }
+            chunkSignatures.Clear();
+            RebuildCache();
+            Undo.CollapseUndoOperations(undoGroup);
+            status = $"{renamed} 個のブロック・Collider の名前を整理しました（Undo で戻せます）";
+            UpdateStatistics();
+        }
+
+        /// <summary>
+        /// 名前が異なる管理オブジェクトだけを Undo と Prefab 差分へ記録する
+        /// </summary>
+        private static bool RenameManagedObject(GameObject target, string name)
+        {
+            if (target.name == name)
+            {
+                return false;
+            }
+            Undo.RecordObject(target, "Shorten managed object name");
+            target.name = name;
+            PrefabUtility.RecordPrefabInstancePropertyModifications(target);
+            EditorSceneManager.MarkSceneDirty(target.scene);
+            return true;
         }
 
         /// <summary>
@@ -893,7 +1009,6 @@ namespace Roll_a_Ball.EditorTools
                 : "選択されたブロックをまとめてチャンク化する";
             beginChunkSelectionButton?.SetEnabled(rootValid);
             confirmChunkButton?.SetEnabled(selectingChunkBlocks && selected.Length > 0 && invalidCount == 0);
-            cancelChunkSelectionButton?.SetEnabled(selectingChunkBlocks);
             unchunkButton?.SetEnabled(groupedCount > 0);
         }
 
@@ -959,10 +1074,76 @@ namespace Roll_a_Ball.EditorTools
                 field.SetValueWithoutNotify(SlotPrefab(index));
                 return;
             }
-            preferences.prefabGuids[index] = prefab == null ? "" : AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(prefab));
-            slotPrefabs[index] = prefab;
+            AssignSlotPrefab(index, prefab);
+        }
+
+        /// <summary>
+        /// 登録済み Prefab と GUID を更新しスポイト後もスロット欄へ反映する
+        /// </summary>
+        private void AssignSlotPrefab(int slot, GameObject prefab)
+        {
+            preferences.prefabGuids[slot] = prefab == null ? "" : AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(prefab));
+            slotPrefabs[slot] = prefab;
+            slotFields[slot]?.SetValueWithoutNotify(prefab);
             SavePreferences();
             SceneView.RepaintAll();
+        }
+
+        /// <summary>
+        /// 配置回転欄で選んだ角度を次の配置へ反映する
+        /// </summary>
+        private void OnPlacementRotationChanged(ChangeEvent<string> change)
+        {
+            SetPlacementRotation(rotationField.index);
+        }
+
+        /// <summary>
+        /// 追加の Y 回転を四方向へ正規化して保存しガイドと角度表示を更新する
+        /// </summary>
+        private void SetPlacementRotation(int steps)
+        {
+            preferences.rotationSteps = (steps % 4 + 4) % 4;
+            rotationField?.SetValueWithoutNotify(rotationField.choices[preferences.rotationSteps]);
+            SavePreferences();
+            UpdateStatistics();
+            SceneView.RepaintAll();
+        }
+
+        /// <summary>
+        /// 照準下の管理ブロックから Prefab と四方向の回転を現在のスロットへ拾う
+        /// </summary>
+        private void PickAimedPrefab()
+        {
+            EndStroke();
+            if (cacheDirty)
+            {
+                RebuildCache();
+            }
+            UpdateAim();
+            if (aimedBlock == null || aimedBlock.gameObject == null || !rootValid
+                || aimedBlock.gameObject.transform.parent != placementRoot.transform
+                || ManagedName(aimedBlock.gameObject.name, BlockPrefix) == null)
+            {
+                status = "スポイト: 配置ルート内のブロックに照準を合わせてください";
+                UpdateStatistics();
+                return;
+            }
+            var prefab = PrefabUtility.GetCorrespondingObjectFromSource(aimedBlock.gameObject);
+            if (prefab == null || !PrefabUtility.IsPartOfPrefabAsset(prefab) || prefab.transform.parent != null)
+            {
+                status = "スポイト: 元の Prefab 参照がありません。スロットへ Prefab を直接登録してください";
+                UpdateStatistics();
+                return;
+            }
+            var relative = aimedBlock.gameObject.transform.localRotation * Quaternion.Inverse(prefab.transform.localRotation);
+            var steps = (Mathf.RoundToInt(relative.eulerAngles.y / 90f) % 4 + 4) % 4;
+            var canCopyRotation = Quaternion.Angle(relative, Quaternion.Euler(0, steps * 90f, 0)) < 0.1f;
+            preferences.rotationSteps = canCopyRotation ? steps : 0;
+            rotationField?.SetValueWithoutNotify(rotationField.choices[preferences.rotationSteps]);
+            AssignSlotPrefab(preferences.slot, prefab);
+            status = $"スポイト: {prefab.name} をスロット {preferences.slot + 1} に登録（Y {preferences.rotationSteps * 90}°）"
+                + (canCopyRotation ? "" : "。自由回転は引き継がず Prefab の元の向きを使います");
+            UpdateStatistics();
         }
 
         /// <summary>
@@ -1036,7 +1217,7 @@ namespace Roll_a_Ball.EditorTools
         }
 
         /// <summary>
-        /// 明示的に選んだルートへ設定用データを追加し旧名に残る設定を引き継ぐ
+        /// 初回編集時に固定グリッド設定を保存しルート指定やモード開始だけでは子を追加しない
         /// </summary>
         private void EnsureRootSettings()
         {
@@ -1108,12 +1289,32 @@ namespace Roll_a_Ball.EditorTools
                 .Where(child => child.name.StartsWith(RootSettingsPrefix, StringComparison.Ordinal)).ToArray();
             rootValidationMessage = "配置ルートの設定データが不正または重複しています";
             var valid = settings.Length == 1 ? TryReadSettings(settings[0].name.Split('|'))
-                : settings.Length == 0 && TryReadLegacySettings(placementRoot.name);
+                : settings.Length == 0 && TryReadUninitializedRootSettings();
             if (valid)
             {
                 rootValidationMessage = string.Empty;
             }
             return valid;
+        }
+
+        /// <summary>
+        /// 保存前のルートは旧形式またはウィンドウの設定を読みシーンを変更しない
+        /// </summary>
+        private bool TryReadUninitializedRootSettings()
+        {
+            var source = PrefabUtility.GetCorrespondingObjectFromSource(placementRoot);
+            if (TryReadLegacySettings(placementRoot.name) || (source != null && TryReadLegacySettings(source.name)))
+            {
+                return true;
+            }
+            if (placementRoot.name.Contains(RootPrefix) || (source != null && source.name.Contains(RootPrefix)))
+            {
+                return false;
+            }
+            grid = preferences.grid;
+            chunkSize = preferences.chunkSize;
+            mergeColliders = false;
+            return true;
         }
 
         /// <summary>
@@ -1334,6 +1535,12 @@ namespace Roll_a_Ball.EditorTools
             }
             else if (current.type == EventType.MouseDown)
             {
+                if (current.button == 2)
+                {
+                    PickAimedPrefab();
+                    current.Use();
+                    return;
+                }
                 UpdateAim();
                 if (current.button == 1)
                 {
@@ -1471,6 +1678,26 @@ namespace Roll_a_Ball.EditorTools
         {
             var key = current.keyCode;
             var down = current.type == EventType.KeyDown;
+            if (key == KeyCode.R || key == KeyCode.F)
+            {
+                if (down && keys.Add(key))
+                {
+                    if (key == KeyCode.R)
+                    {
+                        SetPlacementRotation(preferences.rotationSteps + (current.shift ? -1 : 1));
+                    }
+                    else
+                    {
+                        PickAimedPrefab();
+                    }
+                }
+                else if (!down)
+                {
+                    keys.Remove(key);
+                }
+                current.Use();
+                return;
+            }
             if (key >= KeyCode.Alpha1 && key <= KeyCode.Alpha9)
             {
                 if (down)
@@ -1512,7 +1739,6 @@ namespace Roll_a_Ball.EditorTools
                 return;
             }
             RestorePlacementRootReference();
-            EnsureRootSettings();
             if (!ReadRootSettings())
             {
                 view.ShowNotification(new GUIContent(rootValidationMessage));
@@ -1815,7 +2041,7 @@ namespace Roll_a_Ball.EditorTools
                     continue;
                 }
                 var parts = managedName.Split('|');
-                if (parts.Length < 3 || !TryBounds(child.gameObject, out var bounds))
+                if (parts.Length < 2 || !TryBounds(child.gameObject, out var bounds))
                 {
                     continue;
                 }
@@ -1900,6 +2126,15 @@ namespace Roll_a_Ball.EditorTools
         /// </summary>
         private void SynchronizeChunks()
         {
+            var existing = new Dictionary<string, GameObject>(StringComparer.Ordinal);
+            foreach (Transform child in placementRoot.transform)
+            {
+                var chunkKey = ManagedName(child.name, ChunkPrefix);
+                if (chunkKey != null)
+                {
+                    existing[chunkKey] = child.gameObject;
+                }
+            }
             var desired = new Dictionary<string, HashSet<Vector3Int>>(StringComparer.Ordinal);
             var contributors = new Dictionary<string, HashSet<Block>>(StringComparer.Ordinal);
             var blockChunks = new Dictionary<Block, HashSet<string>>();
@@ -1912,6 +2147,13 @@ namespace Roll_a_Ball.EditorTools
                     continue;
                 }
                 if (block.colliderGroupId == string.Empty || (block.colliderGroupId == null && !mergeColliders))
+                {
+                    RestoreColliders(block);
+                    continue;
+                }
+                // 旧形式の自動チャンクは既存分だけを維持し、新しいチャンクへ広がるブロックは個別判定を残す
+                if (block.colliderGroupId == null && BlockCells(block).Any(cell =>
+                    !existing.ContainsKey(ChunkPrefix + ChunkOf(cell).x + "|" + ChunkOf(cell).y)))
                 {
                     RestoreColliders(block);
                     continue;
@@ -1935,15 +2177,6 @@ namespace Roll_a_Ball.EditorTools
                         blockChunks.Add(block, chunkNames);
                     }
                     chunkNames.Add(chunkName);
-                }
-            }
-            var existing = new Dictionary<string, GameObject>(StringComparer.Ordinal);
-            foreach (Transform child in placementRoot.transform)
-            {
-                var chunkKey = ManagedName(child.name, ChunkPrefix);
-                if (chunkKey != null)
-                {
-                    existing[chunkKey] = child.gameObject;
                 }
             }
             foreach (var pair in existing)
@@ -1977,7 +2210,7 @@ namespace Roll_a_Ball.EditorTools
                     RestoreColliders(block);
                 }
                 var replacement = !geometryValid ? null : meshGroup
-                    ? BuildMeshChunk(pair.Key, signature, vertices, triangles, contributors[pair.Key].First().gameObject.layer)
+                    ? BuildMeshChunk(pair.Key, vertices, triangles, contributors[pair.Key].First().gameObject.layer)
                     : BuildChunk(pair.Key, pair.Value);
                 if (replacement == null)
                 {
@@ -2216,13 +2449,17 @@ namespace Roll_a_Ball.EditorTools
         /// <summary>
         /// 凹形状を維持するシーン保存可能なメッシュと固定ステージ用 Collider を生成する
         /// </summary>
-        private GameObject BuildMeshChunk(string chunkName, string signature, List<Vector3> vertices, List<int> triangles, int layer)
+        private GameObject BuildMeshChunk(string chunkName, List<Vector3> vertices, List<int> triangles, int layer)
         {
-            var mesh = new Mesh { name = signature, indexFormat = UnityEngine.Rendering.IndexFormat.UInt32 };
+            var mesh = new Mesh
+            {
+                name = DerivedMeshPrefix + chunkName.Substring(ChunkPrefix.Length).Replace("Group|", string.Empty),
+                indexFormat = UnityEngine.Rendering.IndexFormat.UInt32
+            };
             mesh.SetVertices(vertices);
             mesh.SetTriangles(triangles, 0);
             mesh.RecalculateBounds();
-            var result = new GameObject(placementRoot.name + "_Collider|" + chunkName) { layer = layer };
+            var result = new GameObject(chunkName) { layer = layer };
             SceneManager.MoveGameObjectToScene(result, placementRoot.scene);
             result.transform.SetParent(placementRoot.transform, false);
             var collider = result.AddComponent<MeshCollider>();
@@ -2249,7 +2486,7 @@ namespace Roll_a_Ball.EditorTools
         /// </summary>
         private GameObject BuildChunk(string chunkName, HashSet<Vector3Int> occupied)
         {
-            var result = new GameObject(placementRoot.name + "_Collider|" + chunkName);
+            var result = new GameObject(chunkName);
             SceneManager.MoveGameObjectToScene(result, placementRoot.scene);
             result.transform.SetParent(placementRoot.transform, false);
             foreach (var row in occupied.GroupBy(c => new Vector2Int(c.y, c.z)))
@@ -2446,7 +2683,7 @@ namespace Roll_a_Ball.EditorTools
         }
 
         /// <summary>
-        /// Prefab を等比調整して未占有セルへ配置する
+        /// Prefab の元の向きに Y 回転を加え等比調整して未占有セルへ配置する
         /// </summary>
         private void PlaceCandidate()
         {
@@ -2460,6 +2697,7 @@ namespace Roll_a_Ball.EditorTools
             {
                 return;
             }
+            instance.transform.localRotation = Quaternion.Euler(0, preferences.rotationSteps * 90f, 0) * prefab.transform.localRotation;
             if (!TryBounds(instance, out var bounds))
             {
                 DestroyImmediate(instance);
@@ -2485,7 +2723,8 @@ namespace Roll_a_Ball.EditorTools
                 return;
             }
             var flags = string.Concat(instance.GetComponentsInChildren<Collider>(true).Select(c => c.enabled ? "1" : "0"));
-            instance.name = placementRoot.name + "_" + prefab.name + "|" + BlockPrefix + flags + "|" + prefab.name;
+            EnsureRootSettings();
+            instance.name = prefab.name + "|" + BlockPrefix + flags;
             PrefabUtility.RecordPrefabInstancePropertyModifications(instance.transform);
             PrefabUtility.RecordPrefabInstancePropertyModifications(instance);
             Undo.RegisterCreatedObjectUndo(instance, "Place block");
@@ -2569,7 +2808,14 @@ namespace Roll_a_Ball.EditorTools
                     {
                         using (new Handles.DrawingScope(preferences.guideColor))
                         {
-                            Handles.DrawWireCube(((Vector3)candidate + Vector3.one * 0.5f) * grid, Vector3.one * grid);
+                            var center = ((Vector3)candidate + Vector3.one * 0.5f) * grid;
+                            Handles.DrawWireCube(center, Vector3.one * grid);
+                            var direction = Quaternion.Euler(0, preferences.rotationSteps * 90f, 0) * Vector3.forward;
+                            var side = Vector3.Cross(Vector3.up, direction);
+                            var tip = center + direction * grid * 0.38f;
+                            Handles.DrawLine(center - direction * grid * 0.3f, tip);
+                            Handles.DrawLine(tip, tip - direction * grid * 0.16f + side * grid * 0.12f);
+                            Handles.DrawLine(tip, tip - direction * grid * 0.16f - side * grid * 0.12f);
                         }
                     }
                     if (aimedBlock != null)
@@ -2605,9 +2851,10 @@ namespace Roll_a_Ball.EditorTools
                 var center = GUIUtility.ScreenToGUIPoint(aimScreenPoint);
                 EditorGUI.DrawRect(new Rect(center.x - 7, center.y - 1, 14, 2), Color.white);
                 EditorGUI.DrawRect(new Rect(center.x - 1, center.y - 7, 2, 14), Color.white);
-                var info = new Rect(view.cameraViewport.x + 8, 76, Mathf.Max(1, Mathf.Min(530, view.cameraViewport.width - 16)), 36);
+                var info = new Rect(view.cameraViewport.x + 8, 76, Mathf.Max(1, Mathf.Min(530, view.cameraViewport.width - 16)), 72);
                 EditorGUI.DrawRect(info, new Color(0, 0, 0, 0.65f));
-                GUI.Label(info, $"照準セル {aimedCell}   チャンク {ChunkOf(aimedCell)}\n右: 配置 / 左: 破壊 / B・Esc・Alt: 終了");
+                var prefab = SlotPrefab(preferences.slot);
+                GUI.Label(info, $"照準セル {aimedCell}   チャンク {ChunkOf(aimedCell)}\nスロット {preferences.slot + 1}: {(prefab != null ? prefab.name : "未登録")}   Y回転 {preferences.rotationSteps * 90}°\n中クリック / F: スポイト / R・Shift+R: 回転\n右: 配置 / 左: 破壊 / B・Esc・Alt: 終了");
             }
             Handles.EndGUI();
         }
@@ -2650,7 +2897,7 @@ namespace Roll_a_Ball.EditorTools
             {
                 return;
             }
-            statistics.text = $"横幅 {cachedDimensions.x} / 奥行き {cachedDimensions.z} / 高さ {cachedDimensions.y} セル\nブロック数 {blocks.Count} / グリッド {grid} / チャンク幅 {chunkSize}\n照準セル {aimedCell} / チャンク {ChunkOf(aimedCell)}\n配置候補 {candidate}\n{status}";
+            statistics.text = $"横幅 {cachedDimensions.x} / 奥行き {cachedDimensions.z} / 高さ {cachedDimensions.y} セル\nブロック数 {blocks.Count} / グリッド {grid} / チャンク幅 {chunkSize}\n照準セル {aimedCell} / チャンク {ChunkOf(aimedCell)}\n配置候補 {candidate} / Y回転 {preferences.rotationSteps * 90}°\n{status}";
         }
     }
 }
