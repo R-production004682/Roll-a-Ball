@@ -7,6 +7,8 @@ Shader "Roll-a-Ball/Effects/Leaf Drift"
         _EmissionStrength ("Emission Strength", Range(0, 3)) = 0.65
         _EdgeColor ("Crystal Edge Color", Color) = (0.35, 0.9, 0.75, 1)
         _EdgeStrength ("Edge Strength", Range(0, 2)) = 0.22
+        _WingFlap ("Butterfly Wing Flap", Range(0, 1)) = 0
+        [HideInInspector] _FlutterTime ("Flutter Time", Float) = 0
     }
     SubShader
     {
@@ -32,6 +34,8 @@ Shader "Roll-a-Ball/Effects/Leaf Drift"
                 half _EmissionStrength;
                 half4 _EdgeColor;
                 half _EdgeStrength;
+                float _WingFlap;
+                float _FlutterTime;
             CBUFFER_END
 
             struct Attributes
@@ -39,6 +43,7 @@ Shader "Roll-a-Ball/Effects/Leaf Drift"
                 float4 positionOS : POSITION;
                 float3 normalOS : NORMAL;
                 float4 color : COLOR;
+                float2 uv : TEXCOORD0;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
@@ -51,11 +56,21 @@ Shader "Roll-a-Ball/Effects/Leaf Drift"
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
+            /// <summary>
+            /// 葉の描画位置を計算し、蝶Materialでは翅のヒンジを変形する
+            /// </summary>
             Varyings Vert(Attributes input)
             {
                 Varyings output;
                 UNITY_SETUP_INSTANCE_ID(input);
                 UNITY_TRANSFER_INSTANCE_ID(input, output);
+                // UV.x marks the wing; the body and antennae keep their original position.
+                float angle = (0.35 + 0.95 * sin(_FlutterTime * 6.2831853)) * _WingFlap * input.uv.x;
+                float side = sign(input.positionOS.x);
+                input.positionOS.y += abs(input.positionOS.x) * sin(angle);
+                input.positionOS.x *= cos(angle);
+                float3 flapNormal = float3(-side * sin(angle), cos(angle), 0);
+                input.normalOS = lerp(input.normalOS, flapNormal, _WingFlap * input.uv.x);
                 VertexPositionInputs position = GetVertexPositionInputs(input.positionOS.xyz);
                 output.positionCS = position.positionCS;
                 output.normalWS = TransformObjectToWorldNormal(input.normalOS);
