@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Goal : MonoBehaviour
 {
-    [SerializeField,Tooltip("クリア時のゴールエフェクトを入れる")]
+    [SerializeField, Tooltip("クリア時のゴールエフェクトを入れる")]
     private GoalClearEffect clearEffect;
 
     private bool isCompleting;
