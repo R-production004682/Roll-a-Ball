@@ -7,7 +7,7 @@ public class GameManager : MonoBehaviour
 
     public bool isStageCompleted = false;//ステージ完了フラグ
 
-    [SerializeField,　Tooltip("リザルト画面のCanvasを入れる")]
+    [SerializeField, Tooltip("リザルト画面のCanvasを入れる")]
     private GameObject result;//リザルト画面
 
     [SerializeField]
