@@ -11,7 +11,7 @@ public class JumpPad : MonoBehaviour
             return;
         Player player = other.GetComponent<Player>();//プレイヤー取得
 
-        if(player != null)
+        if (player != null)
         {
             player.Jump(jumpForce);//プレイヤーのジャンプ処理を行う
         }
