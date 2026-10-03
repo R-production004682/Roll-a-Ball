@@ -18,6 +18,12 @@ public class Goal : MonoBehaviour
             return;
         }
 
+        var player = other.GetComponentInParent<Player>();
+        if (player == null || !player.isActiveAndEnabled || player.IsRespawning)
+        {
+            return;
+        }
+
         isCompleting = true;
         if (clearEffect == null)
         {

@@ -1,0 +1,26 @@
+Play verification started
+trigger_start PASS=True returned=True inputUnlocked=True alphaCleared=True physicsRestored=True covered=True movedUnderCover=True effect=True duplicateRejected=True deathCount=1 peakAlpha=1 frame=53514
+same_spike_repeat PASS=True returned=True inputUnlocked=True alphaCleared=True physicsRestored=True covered=True movedUnderCover=True effect=True duplicateRejected=True deathCount=1 peakAlpha=1 frame=54261
+dead_checkpoint_and_goal_guard=True
+latest_checkpoint PASS=True returned=True inputUnlocked=True alphaCleared=True physicsRestored=True covered=True movedUnderCover=True effect=True duplicateRejected=True deathCount=1 peakAlpha=1 frame=55013
+scaled_child_collider PASS=True returned=True inputUnlocked=True alphaCleared=True physicsRestored=True covered=True movedUnderCover=True effect=True duplicateRejected=True deathCount=1 peakAlpha=1 frame=55754
+solid_collision PASS=True returned=True inputUnlocked=True alphaCleared=True physicsRestored=True covered=True movedUnderCover=True effect=True duplicateRejected=True deathCount=1 peakAlpha=1 frame=56515
+fall PASS=True returned=True inputUnlocked=True alphaCleared=True physicsRestored=True covered=True movedUnderCover=True effect=False duplicateRejected=True deathCount=1 peakAlpha=1 frame=57182
+overlapping_hazards PASS=True returned=True inputUnlocked=True alphaCleared=True physicsRestored=True covered=True movedUnderCover=True effect=True duplicateRejected=True deathCount=1 peakAlpha=1 frame=57952
+disable_before_fade PASS=True returned=True inputUnlocked=True alphaCleared=True physicsRestored=True covered=False movedUnderCover=False effect=True duplicateRejected=True deathCount=1 peakAlpha=0 frame=58252
+disable_during_fade PASS=True returned=True inputUnlocked=True alphaCleared=True physicsRestored=True covered=False movedUnderCover=False effect=True duplicateRejected=True deathCount=1 peakAlpha=0.3000289 frame=58709
+ten_repeated_contacts PASS=True returned=True inputUnlocked=True alphaCleared=True physicsRestored=True covered=True movedUnderCover=True effect=True duplicateRejected=True deathCount=1 peakAlpha=1 frame=59483
+ten_repeated_contacts PASS=True returned=True inputUnlocked=True alphaCleared=True physicsRestored=True covered=True movedUnderCover=True effect=True duplicateRejected=True deathCount=1 peakAlpha=1 frame=60234
+ten_repeated_contacts PASS=True returned=True inputUnlocked=True alphaCleared=True physicsRestored=True covered=True movedUnderCover=True effect=True duplicateRejected=True deathCount=1 peakAlpha=1 frame=60986
+ten_repeated_contacts PASS=True returned=True inputUnlocked=True alphaCleared=True physicsRestored=True covered=True movedUnderCover=True effect=True duplicateRejected=True deathCount=1 peakAlpha=1 frame=61679
+ten_repeated_contacts PASS=True returned=True inputUnlocked=True alphaCleared=True physicsRestored=True covered=True movedUnderCover=True effect=True duplicateRejected=True deathCount=1 peakAlpha=1 frame=62448
+ten_repeated_contacts PASS=True returned=True inputUnlocked=True alphaCleared=True physicsRestored=True covered=True movedUnderCover=True effect=True duplicateRejected=True deathCount=1 peakAlpha=1 frame=63208
+ten_repeated_contacts PASS=True returned=True inputUnlocked=True alphaCleared=True physicsRestored=True covered=True movedUnderCover=True effect=True duplicateRejected=True deathCount=1 peakAlpha=1 frame=63970
+ten_repeated_contacts PASS=True returned=True inputUnlocked=True alphaCleared=True physicsRestored=True covered=True movedUnderCover=True effect=True duplicateRejected=True deathCount=1 peakAlpha=1 frame=64732
+ten_repeated_contacts PASS=True returned=True inputUnlocked=True alphaCleared=True physicsRestored=True covered=True movedUnderCover=True effect=True duplicateRejected=True deathCount=1 peakAlpha=1 frame=65506
+ten_repeated_contacts PASS=True returned=True inputUnlocked=True alphaCleared=True physicsRestored=True covered=True movedUnderCover=True effect=True duplicateRejected=True deathCount=1 peakAlpha=1 frame=66255
+COMPLETE frame=66545
+actual_checkpoint_trigger=True
+movement_force_moves_player=True
+missing_startpoint_fallback=True
+normal_goal_contact=True

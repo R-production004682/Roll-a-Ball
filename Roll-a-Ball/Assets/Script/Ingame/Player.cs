@@ -3,6 +3,7 @@ using Roll_a_Ball.OutGame;
 using UnityEngine;
 
 
+[RequireComponent(typeof(Rigidbody), typeof(PlayerRespawnController))]
 public class Player : MonoBehaviour
 {
     private Rigidbody rb; //Rigidbody
@@ -31,33 +32,49 @@ public class Player : MonoBehaviour
     [SerializeField, Tooltip("プレイヤーの移動方向を決めるカメラオブジェクト")]
     private Transform cameraTransform; //カメラ（インスペクターから指定）
 
+    private PlayerRespawnController respawnController;
+
     /// <summary>
-    /// Rigidbodyを取得し新しい挑戦のチェックポイント登録と表示を初期化する
+    /// 復帰処理中かを取得し接触側が死亡状態を判断できるようにする
+    /// </summary>
+    public bool IsRespawning => respawnController != null && respawnController.IsRespawning;
+
+    /// <summary>
+    /// 生存中でチェックポイントやゴールとの接触を受け付けられるかを取得する
+    /// </summary>
+    public bool CanReceiveGameplayContact => isActiveAndEnabled && !isGoal && !IsRespawning;
+
+    /// <summary>
+    /// 操作と復帰の必須コンポーネントを取得し保存済みシーンにも復帰機能を補う
+    /// </summary>
+    private void Awake()
+    {
+        rb = GetComponent<Rigidbody>();
+        respawnController = GetComponent<PlayerRespawnController>() ?? gameObject.AddComponent<PlayerRespawnController>();
+    }
+
+    /// <summary>
+    /// 新しい挑戦のチェックポイント登録と表示を初期化する
     /// </summary>
     private void Start()
     {
-        rb = GetComponent<Rigidbody>();
         ResetCheckpoints();
     }
 
     /// <summary>
-    /// 落下時は最後の復活地点へ戻しプレイ中だけ移動入力を更新する
+    /// 落下時は死亡処理を開始し生存中かつ操作可能なときだけ移動入力を更新する
     /// </summary>
-    void Update()
+    private void Update()
     {
-        if (transform.position.y <= fall && checkPoints.Count > 0)//リスポーン処理を行う
+        if (CanReceiveGameplayContact && transform.position.y <= fall)
         {
-            RespawnCheckPoint();
+            respawnController.TryDie();
         }
 
-        if (UiInputScope.BlocksPlayer)
+        if (UiInputScope.BlocksPlayer || !CanReceiveGameplayContact || cameraTransform == null)
         {
+            moveDirection = Vector3.zero;
             return;//UI画面では操作不可
-        }
-
-        if (isGoal == true)
-        {
-            return;//ゴールに触れると操作不可
         }
 
         var cameraForward = cameraTransform.forward;//カメラの前方向を取得
@@ -94,21 +111,39 @@ public class Player : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 生存中の移動加速と最大速度の制限を適用する
+    /// </summary>
     private void FixedUpdate()
     {
-        if (isGoal == true)
-            return;//ゴールに触れると操作不可
+        if (!CanReceiveGameplayContact || UiInputScope.BlocksPlayer)
+        {
+            return;
+        }
 
         if (moveDirection != Vector3.zero)//入力がある
         {
             rb.AddForce(moveDirection * acceleration, ForceMode.Acceleration);//入力方向に加速度分力を加える(質量依存なし)
         }
 
-        Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);//水平方向の速度取得
+        var horizontalVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);//水平方向の速度取得
         if (horizontalVelocity.magnitude > playerSpeed)//最大速度を超えた
         {
             horizontalVelocity = horizontalVelocity.normalized * playerSpeed;//最大速度にする
             rb.linearVelocity = new Vector3(horizontalVelocity.x, rb.linearVelocity.y, horizontalVelocity.z);
+        }
+    }
+
+    /// <summary>
+    /// 生存中にゴールへ到達した場合だけ移動と物理演算を停止する
+    /// </summary>
+    private void OnTriggerEnter(Collider other)//衝突判定
+    {
+        if (CanReceiveGameplayContact && other.CompareTag("Goal"))
+        {
+            isGoal = true;
+            Debug.Log("ゴールに触れた");
+            rb.isKinematic = true;//物理演算を止める
         }
     }
 
@@ -118,7 +153,7 @@ public class Player : MonoBehaviour
     /// <param name="point">新たに到達した復活地点</param>
     public void UnlockPoint(CheckPoint point)
     {
-        if (point == null || checkPoints.Contains(point))//地点番号がないか解放済みだと処理しない
+        if (!CanReceiveGameplayContact || point == null || checkPoints.Contains(point))//地点番号がないか解放済みだと処理しない
         {
             return;
         }
@@ -154,22 +189,42 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider other)//衝突判定
+    /// <summary>
+    /// 最後の有効なチェックポイントの位置と向きを取得する
+    /// </summary>
+    /// <returns>復帰地点が登録されている場合だけ true</returns>
+    public bool TryGetCheckpointPose(out Vector3 position, out Quaternion rotation)
     {
-        if (other.CompareTag("Goal"))
+        for (var i = checkPoints.Count - 1; i >= 0; i--)
         {
-            isGoal = true;
-            Debug.Log("ゴールに触れた");
-            rb.isKinematic = true;//物理演算を止める
+            if (checkPoints[i] != null)
+            {
+                position = checkPoints[i].transform.position;
+                rotation = checkPoints[i].transform.rotation;
+                return true;
+            }
         }
+        position = Vector3.zero;
+        rotation = Quaternion.identity;
+        return false;
     }
 
-    private void RespawnCheckPoint()//リスポーン処理,解放した地点の位置と向きに戻る
+    /// <summary>
+    /// 操作停止時に蓄積した移動入力を消去する
+    /// </summary>
+    public void ClearMovement()
     {
-        transform.position = checkPoints[checkPoints.Count - 1].transform.position;
-        transform.rotation = checkPoints[checkPoints.Count - 1].transform.rotation;
-        rb.linearVelocity = Vector3.zero;//速度をリセット
-        moveDirection = Vector3.zero;//方向をリセット
-        rb.angularVelocity = Vector3.zero;//回転をリセット
+        moveDirection = Vector3.zero;
+    }
+
+    /// <summary>
+    /// 操作コンポーネント無効化時も復帰処理を完了する
+    /// </summary>
+    private void OnDisable()
+    {
+        if (respawnController != null)
+        {
+            respawnController.CancelRespawn();
+        }
     }
 }

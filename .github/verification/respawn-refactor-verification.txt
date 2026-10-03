@@ -1,0 +1,25 @@
+Static spike + separated respawn controller, actual physics Play Mode
+trial=0 PASS=True death=True static=True freeze=True duplicateRejected=True checkpointBlocked=True black=True warpInBlack=True pose=True cleanup=True hit=True maxShake=0.262 minFov=37.66
+trial=1 PASS=True death=True static=True freeze=True duplicateRejected=True checkpointBlocked=True black=True warpInBlack=True pose=True cleanup=True hit=True maxShake=0.261 minFov=37.55
+trial=2 PASS=True death=True static=True freeze=True duplicateRejected=True checkpointBlocked=True black=True warpInBlack=True pose=True cleanup=True hit=True maxShake=0.262 minFov=37.54
+trial=3 PASS=True death=True static=True freeze=True duplicateRejected=True checkpointBlocked=True black=True warpInBlack=True pose=True cleanup=True hit=True maxShake=0.262 minFov=37.55
+trial=4 PASS=True death=True static=True freeze=True duplicateRejected=True checkpointBlocked=True black=True warpInBlack=True pose=True cleanup=True hit=True maxShake=0.262 minFov=37.60
+trial=5 PASS=True death=True static=True freeze=True duplicateRejected=True checkpointBlocked=True black=True warpInBlack=True pose=True cleanup=True hit=False maxShake=0.000 minFov=40.00
+trial=6 PASS=True death=True static=True freeze=True duplicateRejected=True checkpointBlocked=True black=False warpInBlack=False pose=True cleanup=True hit=True maxShake=0.008 minFov=37.54
+trial=7 PASS=False death=True static=True freeze=True duplicateRejected=True checkpointBlocked=True black=False warpInBlack=False pose=True cleanup=False hit=True maxShake=0.261 minFov=37.54
+trial=8 PASS=True death=True static=True freeze=True duplicateRejected=True checkpointBlocked=True black=True warpInBlack=True pose=True cleanup=True hit=True maxShake=0.261 minFov=37.54
+trial=9 PASS=True death=True static=True freeze=True duplicateRejected=True checkpointBlocked=True black=True warpInBlack=True pose=True cleanup=True hit=True maxShake=0.260 minFov=37.54
+trial=10 PASS=True death=True static=True freeze=True duplicateRejected=True checkpointBlocked=True black=True warpInBlack=True pose=True cleanup=True hit=True maxShake=0.260 minFov=37.55
+trial=11 PASS=True death=True static=True freeze=True duplicateRejected=True checkpointBlocked=True black=True warpInBlack=True pose=True cleanup=True hit=True maxShake=0.261 minFov=37.54
+trial=12 PASS=True death=True static=True freeze=True duplicateRejected=True checkpointBlocked=True black=True warpInBlack=True pose=True cleanup=True hit=True maxShake=0.261 minFov=37.54
+trial=13 PASS=True death=True static=True freeze=True duplicateRejected=True checkpointBlocked=True black=True warpInBlack=True pose=True cleanup=True hit=True maxShake=0.260 minFov=37.55
+trial=14 PASS=True death=True static=True freeze=True duplicateRejected=True checkpointBlocked=True black=True warpInBlack=True pose=True cleanup=True hit=True maxShake=0.260 minFov=37.54
+trial=15 PASS=True death=True static=True freeze=True duplicateRejected=True checkpointBlocked=True black=True warpInBlack=True pose=True cleanup=True hit=True maxShake=0.262 minFov=37.55
+trial=16 PASS=True death=True static=True freeze=True duplicateRejected=True checkpointBlocked=True black=True warpInBlack=True pose=True cleanup=True hit=True maxShake=0.261 minFov=37.54
+trial=17 PASS=True death=True static=True freeze=True duplicateRejected=True checkpointBlocked=True black=True warpInBlack=True pose=True cleanup=True hit=True maxShake=0.260 minFov=37.54
+trial=18 PASS=True death=True static=True freeze=True duplicateRejected=True checkpointBlocked=True black=True warpInBlack=True pose=True cleanup=True hit=True maxShake=0.260 minFov=37.55
+trial=19 PASS=True death=True static=True freeze=True duplicateRejected=True checkpointBlocked=True black=True warpInBlack=True pose=True cleanup=True hit=True maxShake=0.262 minFov=37.54
+DONE 20 cases
+trial=7 focused retest PASS=True freshAlpha=0 respawning=False kinematic=False blocked=False hitPlaying=False
+Original trial=7 cleanup read the pre-disable alpha snapshot; post-disable state is checked above.
+Goal during death blocked=True; actual normal Goal completed=True; death after Goal rejected=True

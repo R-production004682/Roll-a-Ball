@@ -1,0 +1,28 @@
+Actual static-spike contacts with fracture, Ingametest
+trial=0 PASS=True pieces=2 crumbsPeak=22 hidden=True freeze=True duplicateRejected=True black=True restoredWhileCovered=True pose=True cleanup=True bounded=True colliderPreserved=True hit=True
+trial=1 PASS=True pieces=3 crumbsPeak=22 hidden=True freeze=True duplicateRejected=True black=True restoredWhileCovered=True pose=True cleanup=True bounded=True colliderPreserved=True hit=True
+trial=2 PASS=True pieces=4 crumbsPeak=22 hidden=True freeze=True duplicateRejected=True black=True restoredWhileCovered=True pose=True cleanup=True bounded=True colliderPreserved=True hit=True
+trial=3 PASS=True pieces=5 crumbsPeak=22 hidden=True freeze=True duplicateRejected=True black=True restoredWhileCovered=True pose=True cleanup=True bounded=True colliderPreserved=True hit=True
+trial=4 PASS=True pieces=6 crumbsPeak=22 hidden=True freeze=True duplicateRejected=True black=True restoredWhileCovered=True pose=True cleanup=True bounded=True colliderPreserved=True hit=True
+trial=5 PASS=True pieces=7 crumbsPeak=22 hidden=True freeze=True duplicateRejected=True black=True restoredWhileCovered=True pose=True cleanup=True bounded=True colliderPreserved=True hit=True
+trial=6 PASS=True pieces=8 crumbsPeak=22 hidden=True freeze=True duplicateRejected=True black=True restoredWhileCovered=True pose=True cleanup=True bounded=True colliderPreserved=True hit=True
+trial=7 PASS=True pieces=2 crumbsPeak=22 hidden=True freeze=True duplicateRejected=True black=True restoredWhileCovered=True pose=True cleanup=True bounded=True colliderPreserved=True hit=True
+trial=8 PASS=True pieces=3 crumbsPeak=22 hidden=True freeze=True duplicateRejected=True black=True restoredWhileCovered=True pose=True cleanup=True bounded=True colliderPreserved=True hit=True
+trial=9 PASS=True pieces=5 crumbsPeak=22 hidden=True freeze=True duplicateRejected=True black=True restoredWhileCovered=True pose=True cleanup=True bounded=True colliderPreserved=True hit=True
+trial=10 PASS=True pieces=7 crumbsPeak=22 hidden=True freeze=True duplicateRejected=True black=True restoredWhileCovered=True pose=True cleanup=True bounded=True colliderPreserved=True hit=True
+trial=11 PASS=True pieces=6 crumbsPeak=22 hidden=True freeze=True duplicateRejected=True black=True restoredWhileCovered=True pose=True cleanup=True bounded=True colliderPreserved=True hit=True
+trial=12 PASS=True pieces=4 crumbsPeak=22 hidden=True freeze=True duplicateRejected=True black=True restoredWhileCovered=True pose=True cleanup=True bounded=True colliderPreserved=True hit=True
+trial=13 PASS=True pieces=6 crumbsPeak=22 hidden=True freeze=True duplicateRejected=True black=True restoredWhileCovered=True pose=True cleanup=True bounded=True colliderPreserved=True hit=True
+trial=14 PASS=True pieces=5 crumbsPeak=22 hidden=True freeze=True duplicateRejected=True black=True restoredWhileCovered=True pose=True cleanup=True bounded=True colliderPreserved=True hit=True
+trial=15 PASS=True pieces=5 crumbsPeak=22 hidden=True freeze=True duplicateRejected=True black=True restoredWhileCovered=True pose=True cleanup=True bounded=True colliderPreserved=True hit=True
+trial=16 PASS=True pieces=2 crumbsPeak=22 hidden=True freeze=True duplicateRejected=True black=True restoredWhileCovered=True pose=True cleanup=True bounded=True colliderPreserved=True hit=True
+trial=17 PASS=False pieces=0 crumbsPeak=0 hidden=True freeze=True duplicateRejected=True black=False restoredWhileCovered=False pose=True cleanup=True bounded=True colliderPreserved=True hit=False
+trial=18 PASS=True pieces=7 crumbsPeak=22 hidden=True freeze=True duplicateRejected=True black=False restoredWhileCovered=False pose=True cleanup=True bounded=True colliderPreserved=True hit=True
+trial=19 PASS=True pieces=5 crumbsPeak=7 hidden=True freeze=True duplicateRejected=True black=True restoredWhileCovered=True pose=True cleanup=True bounded=True colliderPreserved=True hit=True
+trial=20 PASS=True pieces=6 crumbsPeak=22 hidden=True freeze=True duplicateRejected=True black=True restoredWhileCovered=True pose=True cleanup=True bounded=True colliderPreserved=True hit=False
+trial=21 PASS=True pieces=3 crumbsPeak=22 hidden=True freeze=True duplicateRejected=True black=True restoredWhileCovered=True pose=True cleanup=True bounded=True colliderPreserved=True hit=True
+trial=22 PASS=True pieces=0 crumbsPeak=0 hidden=False freeze=True duplicateRejected=True black=True restoredWhileCovered=True pose=True cleanup=True bounded=True colliderPreserved=True hit=True
+trial=23 PASS=True pieces=6 crumbsPeak=22 hidden=True freeze=True duplicateRejected=True black=True restoredWhileCovered=True pose=True cleanup=True bounded=True colliderPreserved=True hit=True
+DONE 24 cases. Live generated shard meshes after cleanup=0
+trial=17 focused retest PASS=True fractureAndCameraStartedBeforeDisable=True restoredAfterDisable=True
+Original trial=17 sampled camera feedback after immediate cancellation; the start and cleanup are checked separately above.

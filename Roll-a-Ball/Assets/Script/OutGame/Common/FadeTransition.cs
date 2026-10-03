@@ -7,7 +7,7 @@ using UnityEngine.UI;
 namespace Roll_a_Ball.OutGame
 {
     /// <summary>
-    /// アウトゲームの画面とシーンの切り替えを黒いフェードで覆う
+    /// 画面とシーンの切り替えやリスポーンを黒いフェードで覆う
     /// </summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Canvas))]
@@ -277,7 +277,7 @@ namespace Roll_a_Ball.OutGame
         }
 
         /// <summary>
-        /// 遷移終了時にレイキャスト、ナビゲーション、共有状態を復元し完了通知を送る
+        /// 遷移終了時に暗転を解除しレイキャスト、ナビゲーション、共有状態を復元して完了通知を送る
         /// </summary>
         private void CompleteRoutine()
         {
@@ -288,6 +288,7 @@ namespace Roll_a_Ball.OutGame
 
             if (canvasGroup != null)
             {
+                canvasGroup.alpha = 0f;
                 canvasGroup.blocksRaycasts = false;
             }
 
@@ -323,6 +324,8 @@ namespace Roll_a_Ball.OutGame
             canvasGroup.blocksRaycasts = true;
             yield return FadeAlpha(0f, 1f);
             onCovered?.Invoke();
+            // 復帰位置と追従カメラの更新を完全暗転のまま一フレーム反映する
+            yield return null;
             yield return FadeAlpha(1f, 0f);
             canvasGroup.blocksRaycasts = false;
         }
