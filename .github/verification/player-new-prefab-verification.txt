@@ -1,3 +1,0 @@
-Player_new prefab actual Play Mode instantiation
-accepted=True hidden=True pieces=2 readable=True
-restored=True cleaned=True PASS=True
