@@ -17,25 +17,31 @@ namespace Roll_a_Ball.OutGame
         IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler,
         ISelectHandler, IDeselectHandler
     {
+        private const float MinimumAnimationDuration = 0.01f;
+        private const float MinimumPressedScale = 0.01f;
+        private const float MaximumHoverScale = 1.1f;
+        private const float MaximumClickOvershootScale = 1.15f;
+        private const float ClickOvershootDurationRatio = 0.55f;
+
         [SerializeField, Tooltip("拡大する見た目のオブジェクトです。未設定ならこのボタンを拡大します。")]
         private Transform animationTarget;
 
         [Header("大きさの倍率")]
-        [SerializeField, Range(1f, 1.1f), Tooltip("ポインターを重ねたときの拡大倍率です。")]
+        [SerializeField, Range(1f, MaximumHoverScale), Tooltip("ポインターを重ねたときの拡大倍率です。")]
         private float hoverScale = 1.025f;
         [SerializeField, Tooltip("押している間の横幅と高さの倍率です。")]
         private Vector2 pressedScale = new Vector2(0.96f, 0.9f);
-        [SerializeField, Range(1f, 1.15f), Tooltip("クリック後に一瞬だけ使う拡大倍率です。")]
+        [SerializeField, Range(1f, MaximumClickOvershootScale), Tooltip("クリック後に一瞬だけ使う拡大倍率です。")]
         private float clickOvershootScale = 1.055f;
         [SerializeField, Tooltip("選択中のボタンも少し大きくします。")]
         private bool animateSelection = true;
 
         [Header("動く時間")]
-        [SerializeField, Min(0.01f), Tooltip("ポインターを重ねたときの変化にかける秒数です。")]
+        [SerializeField, Min(MinimumAnimationDuration), Tooltip("ポインターを重ねたときの変化にかける秒数です。")]
         private float hoverDuration = 0.12f;
-        [SerializeField, Min(0.01f), Tooltip("ボタンを押したときの変化にかける秒数です。")]
+        [SerializeField, Min(MinimumAnimationDuration), Tooltip("ボタンを押したときの変化にかける秒数です。")]
         private float pressDuration = 0.075f;
-        [SerializeField, Min(0.01f), Tooltip("クリック成立後、通常の大きさに戻る秒数です。その前の拡大にはこの値の0.55倍かかります。")]
+        [SerializeField, Min(MinimumAnimationDuration), Tooltip("クリック成立後、通常の大きさに戻る秒数です。その前の拡大にはこの値の0.55倍かかります。")]
         private float releaseDuration = 0.16f;
         [SerializeField, Tooltip("ゲーム停止中も演出を動かします。")]
         private bool useUnscaledTime = true;
@@ -273,7 +279,7 @@ namespace Roll_a_Ball.OutGame
             var sequence = DOTween.Sequence();
             // Also provides a press phase for keyboard/gamepad Submit and very fast taps.
             sequence.Append(target.DOScale(GetPressedScale(), pressDuration * 0.5f).SetEase(pressEase));
-            sequence.Append(target.DOScale(ScaleXY(clickOvershootScale), releaseDuration * 0.55f).SetEase(Ease.OutCubic));
+            sequence.Append(target.DOScale(ScaleXY(clickOvershootScale), releaseDuration * ClickOvershootDurationRatio).SetEase(Ease.OutCubic));
             sequence.Append(target.DOScale(GetRestScale(), releaseDuration).SetEase(releaseEase));
             TrackTween(sequence);
         }
@@ -394,13 +400,13 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private void OnValidate()
         {
-            hoverScale = Mathf.Clamp(hoverScale, 1f, 1.1f);
-            pressedScale.x = Mathf.Clamp(pressedScale.x, 0.01f, 1f);
-            pressedScale.y = Mathf.Clamp(pressedScale.y, 0.01f, 1f);
-            clickOvershootScale = Mathf.Clamp(clickOvershootScale, hoverScale, 1.15f);
-            hoverDuration = Mathf.Max(0.01f, hoverDuration);
-            pressDuration = Mathf.Max(0.01f, pressDuration);
-            releaseDuration = Mathf.Max(0.01f, releaseDuration);
+            hoverScale = Mathf.Clamp(hoverScale, 1f, MaximumHoverScale);
+            pressedScale.x = Mathf.Clamp(pressedScale.x, MinimumPressedScale, 1f);
+            pressedScale.y = Mathf.Clamp(pressedScale.y, MinimumPressedScale, 1f);
+            clickOvershootScale = Mathf.Clamp(clickOvershootScale, hoverScale, MaximumClickOvershootScale);
+            hoverDuration = Mathf.Max(MinimumAnimationDuration, hoverDuration);
+            pressDuration = Mathf.Max(MinimumAnimationDuration, pressDuration);
+            releaseDuration = Mathf.Max(MinimumAnimationDuration, releaseDuration);
         }
 #endif
     }

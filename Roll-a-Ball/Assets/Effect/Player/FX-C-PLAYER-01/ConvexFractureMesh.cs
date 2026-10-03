@@ -6,7 +6,25 @@ using UnityEngine;
 /// </summary>
 public static class ConvexFractureMesh
 {
+    public const int MinimumPieceCount = 2;
+    public const int MaximumPieceCount = 12;
+
     private const float Epsilon = 0.00001f;
+    private const float MinimumTriangleCrossSquared = 0.000000000001f;
+    private const float MinimumPieceSelectionWeight = 0.8f;
+    private const float MaximumPieceSelectionWeight = 1.2f;
+    private const float MinimumCutPositionRatio = 0.34f;
+    private const float MaximumCutPositionRatio = 0.66f;
+    private const float CapAxisAlignmentThreshold = 0.9f;
+
+    /// <summary>
+    /// 切断平面の法線方向と逆方向のどちらを残すかを指定する
+    /// </summary>
+    private enum PlaneSide
+    {
+        Negative = -1,
+        Positive = 1
+    }
 
     private struct Vertex
     {
@@ -64,14 +82,14 @@ public static class ConvexFractureMesh
         }
         pieces.Add(first);
         var random = new System.Random(seed);
-        var targetCount = Mathf.Clamp(count, 2, 12);
+        var targetCount = Mathf.Clamp(count, MinimumPieceCount, MaximumPieceCount);
         while (pieces.Count < targetCount)
         {
             var index = 0;
             var largest = 0f;
             for (var i = 0; i < pieces.Count; i++)
             {
-                var score = pieces[i].Volume() * Mathf.Lerp(0.8f, 1.2f, (float)random.NextDouble());
+                var score = pieces[i].Volume() * Mathf.Lerp(MinimumPieceSelectionWeight, MaximumPieceSelectionWeight, (float)random.NextDouble());
                 if (score > largest)
                 {
                     largest = score;
@@ -88,10 +106,10 @@ public static class ConvexFractureMesh
                 low = Mathf.Min(low, distance);
                 high = Mathf.Max(high, distance);
             }
-            var offset = Mathf.Lerp(low, high, Mathf.Lerp(0.34f, 0.66f, (float)random.NextDouble()));
+            var offset = Mathf.Lerp(low, high, Mathf.Lerp(MinimumCutPositionRatio, MaximumCutPositionRatio, (float)random.NextDouble()));
             var plane = new Plane(normal, -offset);
-            var positive = Clip(piece, plane, 1f);
-            var negative = Clip(piece, plane, -1f);
+            var positive = Clip(piece, plane, PlaneSide.Positive);
+            var negative = Clip(piece, plane, PlaneSide.Negative);
             if (positive.vertices.Count == 0 || negative.vertices.Count == 0)
             {
                 break;
@@ -120,8 +138,9 @@ public static class ConvexFractureMesh
     /// <summary>
     /// 三角形を平面の片側へ切り取り切断面を新しいポリゴンで閉じる
     /// </summary>
-    private static Piece Clip(Piece source, Plane plane, float side)
+    private static Piece Clip(Piece source, Plane plane, PlaneSide side)
     {
+        var sideSign = (float)side;
         var result = new Piece();
         var rim = new List<Vector3>();
         var polygon = new List<Vertex>(4);
@@ -132,8 +151,8 @@ public static class ConvexFractureMesh
             {
                 var a = source.vertices[i + j];
                 var b = source.vertices[i + (j + 1) % 3];
-                var da = plane.GetDistanceToPoint(a.position) * side;
-                var db = plane.GetDistanceToPoint(b.position) * side;
+                var da = plane.GetDistanceToPoint(a.position) * sideSign;
+                var db = plane.GetDistanceToPoint(b.position) * sideSign;
                 if (da >= -Epsilon)
                 {
                     polygon.Add(a);
@@ -162,7 +181,7 @@ public static class ConvexFractureMesh
                 AddTriangle(result, polygon[0], polygon[j], polygon[j + 1]);
             }
         }
-        Cap(result, rim, -plane.normal * side);
+        Cap(result, rim, -plane.normal * sideSign);
         return result;
     }
 
@@ -196,7 +215,7 @@ public static class ConvexFractureMesh
             center += point;
         }
         center /= rim.Count;
-        var axis = Vector3.Cross(normal, Mathf.Abs(normal.y) < 0.9f ? Vector3.up : Vector3.right).normalized;
+        var axis = Vector3.Cross(normal, Mathf.Abs(normal.y) < CapAxisAlignmentThreshold ? Vector3.up : Vector3.right).normalized;
         var secondAxis = Vector3.Cross(normal, axis);
         rim.Sort((a, b) => Mathf.Atan2(Vector3.Dot(a - center, secondAxis), Vector3.Dot(a - center, axis))
             .CompareTo(Mathf.Atan2(Vector3.Dot(b - center, secondAxis), Vector3.Dot(b - center, axis))));
@@ -214,7 +233,7 @@ public static class ConvexFractureMesh
     /// </summary>
     private static void AddTriangle(Piece piece, Vertex a, Vertex b, Vertex c)
     {
-        if (Vector3.Cross(b.position - a.position, c.position - a.position).sqrMagnitude <= 0.000000000001f)
+        if (Vector3.Cross(b.position - a.position, c.position - a.position).sqrMagnitude <= MinimumTriangleCrossSquared)
         {
             return;
         }

@@ -5,6 +5,15 @@ using UnityEngine;
 /// </summary>
 public sealed class GoalClearEffect : MonoBehaviour
 {
+    private const float MinimumDuration = 0.1f;
+    private const float MinimumNormalizedPulseDuration = 0.01f;
+    private const float PulseFadeStartExpansionRatio = 0.75f;
+    private const float MinimumPulseFadeDelaySeconds = 0.08f;
+    private const float PulseFadeDurationSeconds = 0.32f;
+    private const float InitialPulseScale = 0.72f;
+    private const float PulseOpacityMultiplier = 0.86f;
+    private const float GlowFadeEndProgress = 0.82f;
+
     [Header("参照（通常はPrefabの設定を維持）")]
     [Tooltip("到達直後に拡大・消滅する面のRenderer。色と拡大量をこのコンポーネントで制御します。")]
     [SerializeField]
@@ -53,13 +62,12 @@ public sealed class GoalClearEffect : MonoBehaviour
     private MaterialPropertyBlock propertyBlock;
     private Vector3 baseAreaScale;
     private float elapsedTime;
-    private bool isPlaying;
-    private bool isFinishing;
+    private ParticleEffectPlaybackState playbackState;
 
     /// <summary>
     /// クリア演出の再生時間を取得
     /// </summary>
-    public float Duration => Mathf.Max(0.1f, duration);
+    public float Duration => Mathf.Max(MinimumDuration, duration);
 
     /// <summary>
     /// エリア演出の初期状態を保存して非表示化
@@ -90,12 +98,12 @@ public sealed class GoalClearEffect : MonoBehaviour
     /// </summary>
     private void Update()
     {
-        if (!isPlaying && !isFinishing)
+        if (playbackState == ParticleEffectPlaybackState.Idle)
         {
             return;
         }
 
-        if (isPlaying)
+        if (playbackState == ParticleEffectPlaybackState.Playing)
         {
             elapsedTime += Time.deltaTime;
             var normalizedTime = Mathf.Clamp01(elapsedTime / Duration);
@@ -108,7 +116,7 @@ public sealed class GoalClearEffect : MonoBehaviour
             }
         }
 
-        if (isFinishing && !HasAliveParticles())
+        if (playbackState == ParticleEffectPlaybackState.WaitingForParticles && !HasAliveParticles())
         {
             FinishPlayback();
         }
@@ -121,8 +129,7 @@ public sealed class GoalClearEffect : MonoBehaviour
     {
         StopParticles();
         elapsedTime = 0f;
-        isPlaying = true;
-        isFinishing = false;
+        playbackState = ParticleEffectPlaybackState.Playing;
 
         if (areaPulseRenderer != null)
         {
@@ -153,8 +160,7 @@ public sealed class GoalClearEffect : MonoBehaviour
     /// </summary>
     public void Stop()
     {
-        isPlaying = false;
-        isFinishing = false;
+        playbackState = ParticleEffectPlaybackState.Idle;
         StopParticles();
 
         if (areaPulseRenderer != null)
@@ -181,15 +187,15 @@ public sealed class GoalClearEffect : MonoBehaviour
             return;
         }
 
-        var expandDuration = Mathf.Max(0.01f, pulseExpandDuration / Duration);
-        var fadeStart = Mathf.Max(expandDuration * 0.75f, 0.08f / Duration);
-        var fadeDuration = Mathf.Max(0.01f, 0.32f / Duration);
+        var expandDuration = Mathf.Max(MinimumNormalizedPulseDuration, pulseExpandDuration / Duration);
+        var fadeStart = Mathf.Max(expandDuration * PulseFadeStartExpansionRatio, MinimumPulseFadeDelaySeconds / Duration);
+        var fadeDuration = Mathf.Max(MinimumNormalizedPulseDuration, PulseFadeDurationSeconds / Duration);
         var expandProgress = Mathf.Clamp01(normalizedTime / expandDuration);
         var fadeProgress = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((normalizedTime - fadeStart) / fadeDuration));
-        areaPulseRenderer.transform.localScale = baseAreaScale * Mathf.Lerp(0.72f, pulseScale, expandProgress);
+        areaPulseRenderer.transform.localScale = baseAreaScale * Mathf.Lerp(InitialPulseScale, pulseScale, expandProgress);
 
         var color = areaPulseColor;
-        color.a *= (1f - fadeProgress) * 0.86f;
+        color.a *= (1f - fadeProgress) * PulseOpacityMultiplier;
         SetRendererColor(areaPulseRenderer, color);
     }
 
@@ -204,7 +210,7 @@ public sealed class GoalClearEffect : MonoBehaviour
             return;
         }
 
-        var fade = 1f - Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(normalizedTime / 0.82f));
+        var fade = 1f - Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(normalizedTime / GlowFadeEndProgress));
         glowLight.intensity = glowLightIntensity * fade;
     }
 
@@ -213,8 +219,7 @@ public sealed class GoalClearEffect : MonoBehaviour
     /// </summary>
     private void BeginParticleFinish()
     {
-        isPlaying = false;
-        isFinishing = true;
+        playbackState = ParticleEffectPlaybackState.WaitingForParticles;
         StopParticleEmission();
 
         if (areaPulseRenderer != null)
@@ -234,7 +239,7 @@ public sealed class GoalClearEffect : MonoBehaviour
     /// </summary>
     private void FinishPlayback()
     {
-        isFinishing = false;
+        playbackState = ParticleEffectPlaybackState.Idle;
         StopParticles();
 
         if (areaPulseRenderer != null)

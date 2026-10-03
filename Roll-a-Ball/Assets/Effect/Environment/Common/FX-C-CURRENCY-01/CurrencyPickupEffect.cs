@@ -5,6 +5,16 @@ using UnityEngine;
 /// </summary>
 public sealed class CurrencyPickupEffect : MonoBehaviour
 {
+    private const float MinimumDuration = 0.1f;
+    private const float CrossSparkAccentRotationDegrees = 45f;
+    private const float CrossSparkInitialScale = 0.1f;
+    private const float CrossSparkMaximumScale = 0.665f;
+    private const float CrossSparkBurstEndProgress = 0.22f;
+    private const float CrossSparkSettlingRatio = 0.35f;
+    private const float CrossSparkAccentScaleRatio = 0.75f;
+    private const float CrossSparkFadeStartProgress = 0.18f;
+    private const float CrossSparkOpacity = 0.78f;
+
     [Header("参照（通常はPrefabの設定を維持）")]
     [Tooltip("通常・大報酬で共通のクリスタル粒子。粒子数・色・サイズ・寿命はこのParticleSystemで調整します。")]
     [SerializeField]
@@ -76,8 +86,7 @@ public sealed class CurrencyPickupEffect : MonoBehaviour
     private static readonly int ColorProperty = Shader.PropertyToID("_Color");
 
     private float elapsedTime;
-    private bool isPlaying;
-    private bool isFinishing;
+    private ParticleEffectPlaybackState playbackState;
     private MaterialPropertyBlock crossSparkPropertyBlock;
 
     /// <summary>
@@ -96,25 +105,25 @@ public sealed class CurrencyPickupEffect : MonoBehaviour
     /// </summary>
     private void Update()
     {
-        if (!isPlaying && !isFinishing)
+        if (playbackState == ParticleEffectPlaybackState.Idle)
         {
             return;
         }
 
-        if (isPlaying)
+        if (playbackState == ParticleEffectPlaybackState.Playing)
         {
             elapsedTime += Time.deltaTime;
-            var normalizedTime = Mathf.Clamp01(elapsedTime / Mathf.Max(0.1f, duration));
+            var normalizedTime = Mathf.Clamp01(elapsedTime / Mathf.Max(MinimumDuration, duration));
             UpdateCrossSpark(normalizedTime);
             UpdatePulseLight(normalizedTime);
 
-            if (elapsedTime >= Mathf.Max(0.1f, duration))
+            if (elapsedTime >= Mathf.Max(MinimumDuration, duration))
             {
                 BeginParticleFinish();
             }
         }
 
-        if (isFinishing && !HasAliveParticles())
+        if (playbackState == ParticleEffectPlaybackState.WaitingForParticles && !HasAliveParticles())
         {
             FinishPlayback();
         }
@@ -146,8 +155,7 @@ public sealed class CurrencyPickupEffect : MonoBehaviour
     {
         isLargeReward = largeReward;
         elapsedTime = 0f;
-        isPlaying = true;
-        isFinishing = false;
+        playbackState = ParticleEffectPlaybackState.Playing;
 
         StopParticles();
 
@@ -208,7 +216,7 @@ public sealed class CurrencyPickupEffect : MonoBehaviour
 
         if (crossSparkAccent != null)
         {
-            crossSparkAccent.rotation = flashRotation * Quaternion.Euler(0f, 0f, 45f);
+            crossSparkAccent.rotation = flashRotation * Quaternion.Euler(0f, 0f, CrossSparkAccentRotationDegrees);
             crossSparkAccent.gameObject.SetActive(largeReward);
             if (largeReward)
             {
@@ -216,7 +224,7 @@ public sealed class CurrencyPickupEffect : MonoBehaviour
             }
         }
 
-        SetCrossSparkColor(largeReward ? 0.78f : 0f);
+        SetCrossSparkColor(largeReward ? CrossSparkOpacity : 0f);
 
         if (pulseLight != null)
         {
@@ -230,8 +238,7 @@ public sealed class CurrencyPickupEffect : MonoBehaviour
     /// </summary>
     public void Stop()
     {
-        isPlaying = false;
-        isFinishing = false;
+        playbackState = ParticleEffectPlaybackState.Idle;
         StopParticles();
 
         if (largeRewardBurst != null)
@@ -246,13 +253,13 @@ public sealed class CurrencyPickupEffect : MonoBehaviour
 
         if (crossSpark != null)
         {
-            crossSpark.localScale = Vector3.one * 0.1f;
+            crossSpark.localScale = Vector3.one * CrossSparkInitialScale;
             crossSpark.gameObject.SetActive(false);
         }
 
         if (crossSparkAccent != null)
         {
-            crossSparkAccent.localScale = Vector3.one * 0.1f;
+            crossSparkAccent.localScale = Vector3.one * CrossSparkInitialScale;
             crossSparkAccent.gameObject.SetActive(false);
         }
 
@@ -276,11 +283,10 @@ public sealed class CurrencyPickupEffect : MonoBehaviour
             return;
         }
 
-        var burstProgress = Mathf.Clamp01(normalizedTime / 0.22f);
+        var burstProgress = Mathf.Clamp01(normalizedTime / CrossSparkBurstEndProgress);
         var burst = Mathf.SmoothStep(0f, 1f, burstProgress);
-        var maxScale = 0.665f;
-        var settle = 1f - Mathf.SmoothStep(0.22f, 1f, normalizedTime) * 0.35f;
-        var scale = Mathf.Lerp(0.1f, maxScale, burst) * settle;
+        var settle = 1f - Mathf.SmoothStep(CrossSparkBurstEndProgress, 1f, normalizedTime) * CrossSparkSettlingRatio;
+        var scale = Mathf.Lerp(CrossSparkInitialScale, CrossSparkMaximumScale, burst) * settle;
 
         if (crossSpark != null)
         {
@@ -289,10 +295,10 @@ public sealed class CurrencyPickupEffect : MonoBehaviour
 
         if (crossSparkAccent != null)
         {
-            crossSparkAccent.localScale = Vector3.one * (scale * 0.75f);
+            crossSparkAccent.localScale = Vector3.one * (scale * CrossSparkAccentScaleRatio);
         }
 
-        var alpha = 0.78f * (1f - Mathf.SmoothStep(0.18f, 1f, normalizedTime));
+        var alpha = CrossSparkOpacity * (1f - Mathf.SmoothStep(CrossSparkFadeStartProgress, 1f, normalizedTime));
         SetCrossSparkColor(alpha);
     }
 
@@ -316,8 +322,7 @@ public sealed class CurrencyPickupEffect : MonoBehaviour
     /// </summary>
     private void BeginParticleFinish()
     {
-        isPlaying = false;
-        isFinishing = true;
+        playbackState = ParticleEffectPlaybackState.WaitingForParticles;
         StopParticleEmission();
 
         if (pulseLight != null)

@@ -7,6 +7,8 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public sealed class PlayerMovementEffect : MonoBehaviour
 {
+    private const int GroundRaycastHitCapacity = 16;
+
     [Header("参照")]
     [Tooltip("足元と移動速度を調べるPlayerのCollider（必須）。Player本体の物理Colliderを指定します。")]
     [SerializeField] private Collider playerCollider;
@@ -24,7 +26,7 @@ public sealed class PlayerMovementEffect : MonoBehaviour
     [Tooltip("地面から離れる法線方向の許容速度（距離/秒）。大きいほど小さな跳ねでも接地扱いになり、小さいほど離れた直後に粉塵を止めます。")]
     [SerializeField, Min(0f)] private float separationSpeed = 0.2f;
 
-    private readonly RaycastHit[] hits = new RaycastHit[16];
+    private readonly RaycastHit[] hits = new RaycastHit[GroundRaycastHitCapacity];
     private Vector3 previousPosition;
     private Collider previousGround;
     private MovementSurface currentSurface;

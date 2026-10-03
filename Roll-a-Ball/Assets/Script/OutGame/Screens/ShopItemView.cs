@@ -12,6 +12,11 @@ namespace Roll_a_Ball.OutGame
     [RequireComponent(typeof(Button))]
     public sealed class ShopItemView : MonoBehaviour
     {
+        // Rec.709 の輝度係数。RGB の見かけの明るさを保ってグレースケールへ変換する
+        private const float RedLuminanceWeight = 0.2126f;
+        private const float GreenLuminanceWeight = 0.7152f;
+        private const float BlueLuminanceWeight = 0.0722f;
+
         [SerializeField, Tooltip("商品の画像を表示します。")]
         private Image iconImage;
         [SerializeField, Tooltip("商品のカテゴリを表示します。")]
@@ -93,7 +98,7 @@ namespace Roll_a_Ball.OutGame
                 }
 
                 iconImage.color = item.Icon == null
-                    ? new Color(0.78f, 0.8f, 0.84f, 1f)
+                    ? ShopPresentationConstants.MissingIconColor
                     : Color.white;
                 originalGraphicColors[iconImage] = iconImage.color;
             }
@@ -187,7 +192,7 @@ namespace Roll_a_Ball.OutGame
         /// <returns>グレースケールへ変換した色</returns>
         private static Color ToGrayscale(Color color)
         {
-            var luminance = color.r * 0.2126f + color.g * 0.7152f + color.b * 0.0722f;
+            var luminance = color.r * RedLuminanceWeight + color.g * GreenLuminanceWeight + color.b * BlueLuminanceWeight;
             return new Color(luminance, luminance, luminance, color.a);
         }
     }
