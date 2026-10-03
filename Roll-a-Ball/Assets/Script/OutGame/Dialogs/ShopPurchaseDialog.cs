@@ -67,7 +67,7 @@ namespace Roll_a_Ball.OutGame
             }
 
             iconImage.color = item.Icon == null
-                ? new Color(0.78f, 0.8f, 0.84f, 1f)
+                ? ShopPresentationConstants.MissingIconColor
                 : Color.white;
             categoryLabel.text = item.Category;
             nameLabel.text = item.DisplayName;

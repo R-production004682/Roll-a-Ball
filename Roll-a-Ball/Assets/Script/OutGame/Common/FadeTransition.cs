@@ -17,9 +17,10 @@ namespace Roll_a_Ball.OutGame
     public sealed class FadeTransition : MonoBehaviour
     {
         private const int OverlaySortingOrder = 32767;
+        private const float MinimumFadeDuration = 0.01f;
         private static FadeTransition persistentInstance;
 
-        [SerializeField, Min(0.01f), Tooltip("画面を覆う・表示する、それぞれにかける秒数です。往復でこの値の2倍かかり、シーンの読み込み時間は別です。")]
+        [SerializeField, Min(MinimumFadeDuration), Tooltip("画面を覆う・表示する、それぞれにかける秒数です。往復でこの値の2倍かかり、シーンの読み込み時間は別です。")]
         private float duration = 0.25f;
         [SerializeField, Tooltip("画面切り替え時に重ねる色です。")]
         private Color fadeColor = Color.black;
@@ -372,7 +373,7 @@ namespace Roll_a_Ball.OutGame
         private IEnumerator FadeAlpha(float from, float to)
         {
             var elapsed = 0f;
-            var fadeDuration = Mathf.Max(0.01f, duration);
+            var fadeDuration = Mathf.Max(MinimumFadeDuration, duration);
             canvasGroup.alpha = from;
             while (elapsed < fadeDuration)
             {

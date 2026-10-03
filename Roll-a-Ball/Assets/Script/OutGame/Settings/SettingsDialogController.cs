@@ -11,6 +11,17 @@ namespace Roll_a_Ball.OutGame
     /// </summary>
     public sealed class SettingsDialogController : MonoBehaviour
     {
+        private const float PercentPerUnitVolume = 100f;
+
+        /// <summary>
+        /// 設定を閉じたときに戻る画面を区別する
+        /// </summary>
+        private enum OpenOrigin
+        {
+            StageSelect,
+            Pause
+        }
+
         [SerializeField, Tooltip("設定画面全体のオブジェクトです。")]
         private GameObject dialog;
         [SerializeField, Tooltip("BGM 音量を変更するスライダーです。")]
@@ -34,7 +45,7 @@ namespace Roll_a_Ball.OutGame
 
         private GameObject previousSelection;
         private UiInputScope dialogInputScope;
-        private bool fromPause;
+        private OpenOrigin openOrigin;
         private bool confirmingDefaults;
 
         /// <summary>
@@ -111,7 +122,7 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         public void OpenFromStageSelect()
         {
-            Open(false);
+            Open(OpenOrigin.StageSelect);
         }
 
         /// <summary>
@@ -119,14 +130,14 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         public void OpenFromPause()
         {
-            Open(true);
+            Open(OpenOrigin.Pause);
         }
 
         /// <summary>
         /// 呼び出し元を記録し、設定 UI とフォーカスを表示する
         /// </summary>
-        /// <param name="openedFromPause">ポーズ画面から開いた場合は true</param>
-        private void Open(bool openedFromPause)
+        /// <param name="origin">設定画面の呼び出し元</param>
+        private void Open(OpenOrigin origin)
         {
             if (!isActiveAndEnabled || UiInputScope.IsBlocked)
             {
@@ -138,9 +149,9 @@ namespace Roll_a_Ball.OutGame
                 Debug.LogWarning("設定ダイアログはすでに開いています。", this);
                 return;
             }
-            fromPause = openedFromPause;
+            openOrigin = origin;
             previousSelection = EventSystem.current != null ? EventSystem.current.currentSelectedGameObject : null;
-            if (fromPause)
+            if (openOrigin == OpenOrigin.Pause)
             {
                 OutGameStateController.Enter(GameFlowState.Paused);
                 if (pauseMenu != null)
@@ -148,8 +159,8 @@ namespace Roll_a_Ball.OutGame
                     pauseMenu.SetActive(false);
                 }
             }
-            backLabel.text = fromPause ? "BACK TO PAUSE" : "BACK TO STAGES";
-            contextLabel.text = fromPause ? "GAME PAUSED  /  Test SE to preview your volume" : "MAKE YOURSELF COMFORTABLE";
+            backLabel.text = openOrigin == OpenOrigin.Pause ? "BACK TO PAUSE" : "BACK TO STAGES";
+            contextLabel.text = openOrigin == OpenOrigin.Pause ? "GAME PAUSED  /  Test SE to preview your volume" : "MAKE YOURSELF COMFORTABLE";
             RefreshValues();
             dialog.SetActive(true);
             if (EventSystem.current != null)
@@ -177,7 +188,7 @@ namespace Roll_a_Ball.OutGame
             GameSettings.Save();
             previewSource.Stop();
             dialog.SetActive(false);
-            if (fromPause && pauseMenu != null)
+            if (openOrigin == OpenOrigin.Pause && pauseMenu != null)
             {
                 pauseMenu.SetActive(true);
             }
@@ -275,8 +286,8 @@ namespace Roll_a_Ball.OutGame
         {
             bgmSlider.SetValueWithoutNotify(GameSettings.BgmVolume);
             seSlider.SetValueWithoutNotify(GameSettings.SeVolume);
-            bgmValue.text = Mathf.RoundToInt(GameSettings.BgmVolume * 100f) + "%";
-            seValue.text = Mathf.RoundToInt(GameSettings.SeVolume * 100f) + "%";
+            bgmValue.text = Mathf.RoundToInt(GameSettings.BgmVolume * PercentPerUnitVolume) + "%";
+            seValue.text = Mathf.RoundToInt(GameSettings.SeVolume * PercentPerUnitVolume) + "%";
             previewSource.volume = GameSettings.SeVolume;
         }
 

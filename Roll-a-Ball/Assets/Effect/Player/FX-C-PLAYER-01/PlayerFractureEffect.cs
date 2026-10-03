@@ -7,12 +7,25 @@ using UnityEngine;
 /// </summary>
 public sealed class PlayerFractureEffect : MonoBehaviour
 {
+    private const float MinimumDuration = 0.1f;
+    private const float MaximumTiltDegrees = 12f;
+    private const float MaximumYawDegrees = 8f;
+    private const float MaximumShardDelayProgress = 0.08f;
+    private const float MinimumSettlingRatio = 0.55f;
+    private const float CrumbEmissionRadiusRatio = 0.42f;
+    private const float InitialCrackGlow = 1.1f;
+    private const float FinalCrackGlow = 0.08f;
+    private const float CrackGlowProgressMultiplier = 2f;
+    private const float OpeningStartProgress = 0.06f;
+    private const float OpeningEndProgress = 0.48f;
+    private const float SettlingStartProgress = 0.3f;
+
     [SerializeField] private Material fractureMaterial;
     [SerializeField] private ParticleSystem crumbs;
     [SerializeField] private Transform crumbFloor;
-    [SerializeField, Range(2, 12)] private int minimumPieces = 2;
-    [SerializeField, Range(2, 12)] private int maximumPieces = 8;
-    [SerializeField, Min(0.1f)] private float duration = 0.65f;
+    [SerializeField, Range(ConvexFractureMesh.MinimumPieceCount, ConvexFractureMesh.MaximumPieceCount)] private int minimumPieces = ConvexFractureMesh.MinimumPieceCount;
+    [SerializeField, Range(ConvexFractureMesh.MinimumPieceCount, ConvexFractureMesh.MaximumPieceCount)] private int maximumPieces = 8;
+    [SerializeField, Min(MinimumDuration)] private float duration = 0.65f;
     [SerializeField, Min(0f), Tooltip("ぱっくり開いて欠片が落ちるまで暗転を待つ秒数")]
     private float visibleDuration = 0.52f;
     [SerializeField, Range(0.01f, 0.2f), Tooltip("球の直径に対する破片の開き幅")]
@@ -50,7 +63,7 @@ public sealed class PlayerFractureEffect : MonoBehaviour
     /// <summary>
     /// 暗転開始まで演出を見せる推奨秒数を取得する
     /// </summary>
-    public float VisibleDuration => Mathf.Min(Mathf.Max(0f, visibleDuration), Mathf.Max(0.1f, duration));
+    public float VisibleDuration => Mathf.Min(Mathf.Max(0f, visibleDuration), Mathf.Max(MinimumDuration, duration));
 
     /// <summary>
     /// 元メッシュの姿勢と色を引き継ぎ、毎回違う個数と切断面で割れ始める
@@ -64,10 +77,10 @@ public sealed class PlayerFractureEffect : MonoBehaviour
             Debug.LogWarning("PlayerFractureEffect: 読み取り可能な凸 Mesh、断面 Material、欠片 ParticleSystem を設定してください", this);
             return false;
         }
-        var low = Mathf.Clamp(minimumPieces, 2, 12);
-        var high = Mathf.Clamp(maximumPieces, low, 12);
+        var low = Mathf.Clamp(minimumPieces, ConvexFractureMesh.MinimumPieceCount, ConvexFractureMesh.MaximumPieceCount);
+        var high = Mathf.Clamp(maximumPieces, low, ConvexFractureMesh.MaximumPieceCount);
         var meshes = ConvexFractureMesh.Generate(source, Random.Range(low, high + 1), Random.Range(0, int.MaxValue));
-        if (meshes.Count < 2)
+        if (meshes.Count < ConvexFractureMesh.MinimumPieceCount)
         {
             foreach (var mesh in meshes)
             {
@@ -103,18 +116,19 @@ public sealed class PlayerFractureEffect : MonoBehaviour
             mesh.RecalculateBounds();
             shard.filter.sharedMesh = mesh;
             shard.direction = (shard.center - source.bounds.center).normalized;
-            shard.tilt = Quaternion.Euler(Random.Range(-12f, 12f), Random.Range(-8f, 8f), Random.Range(-12f, 12f));
-            shard.delay = Random.Range(0f, 0.08f);
-            shard.settling = Random.Range(0.55f, 1f);
+            shard.tilt = Quaternion.Euler(Random.Range(-MaximumTiltDegrees, MaximumTiltDegrees),
+                Random.Range(-MaximumYawDegrees, MaximumYawDegrees), Random.Range(-MaximumTiltDegrees, MaximumTiltDegrees));
+            shard.delay = Random.Range(0f, MaximumShardDelayProgress);
+            shard.settling = Random.Range(MinimumSettlingRatio, 1f);
             shard.transform.gameObject.SetActive(true);
         }
         phase = 0f;
         ApplyPose();
         crumbs.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
         var shape = crumbs.shape;
-        shape.radius = source.bounds.extents.magnitude * 0.42f;
+        shape.radius = source.bounds.extents.magnitude * CrumbEmissionRadiusRatio;
         crumbs.Play(true);
-        tween = DOTween.To(() => phase, value => phase = value, 1f, Mathf.Max(0.1f, duration))
+        tween = DOTween.To(() => phase, value => phase = value, 1f, Mathf.Max(MinimumDuration, duration))
             .SetEase(Ease.Linear).SetUpdate(true).SetTarget(this).OnUpdate(ApplyPose);
         return true;
     }
@@ -142,12 +156,13 @@ public sealed class PlayerFractureEffect : MonoBehaviour
     private void ApplyPose()
     {
         propertyBlock.SetColor(BaseColorId, surfaceColor);
-        propertyBlock.SetFloat(CrackGlowId, Mathf.Lerp(1.1f, 0.08f, Mathf.SmoothStep(0f, 1f, phase * 2f)));
+        propertyBlock.SetFloat(CrackGlowId, Mathf.Lerp(InitialCrackGlow, FinalCrackGlow,
+            Mathf.SmoothStep(0f, 1f, phase * CrackGlowProgressMultiplier)));
         for (var i = 0; i < activeCount; i++)
         {
             var shard = shards[i];
-            var open = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.06f + shard.delay, 0.48f, phase));
-            var settle = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.3f + shard.delay, 1f, phase));
+            var open = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(OpeningStartProgress + shard.delay, OpeningEndProgress, phase));
+            var settle = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(SettlingStartProgress + shard.delay, 1f, phase));
             shard.transform.localPosition = shard.center + shard.direction * (diameter * openingDistance * open);
             shard.transform.localRotation = Quaternion.Slerp(Quaternion.identity, shard.tilt, settle);
             shard.transform.position += Vector3.down * (diameter * settlingDistance * shard.settling * settle);

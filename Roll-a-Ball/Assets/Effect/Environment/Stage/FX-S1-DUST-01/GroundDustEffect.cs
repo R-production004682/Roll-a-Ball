@@ -6,6 +6,12 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public sealed class GroundDustEffect : MonoBehaviour
 {
+    private const int ParticleRandomSeed = 13648;
+    private const int MaximumDustParticlesPerUpdate = 4;
+    private const int MaximumDetailParticlesPerUpdate = 8;
+    private const float MaximumEmissionDeltaTime = 0.1f;
+    private const float MinimumFullEffectSpeedGap = 0.01f;
+
     [Header("参照（通常はPrefabの設定を維持）")]
     [Tooltip("粉塵ParticleSystem（必須）。発生位置・色・量・寿命は地面Profileと速度から制御します。")]
     [SerializeField] private ParticleSystem dust;
@@ -29,7 +35,7 @@ public sealed class GroundDustEffect : MonoBehaviour
     [Tooltip("接地点から移動方向の後ろへずらす距離（ワールド座標）。大きいほどプレイヤーの後方に粒子が残ります。")]
     [SerializeField, Min(0f)] private float trailingOffset = 0.4f;
 
-    private readonly System.Random random = new System.Random(13648);
+    private readonly System.Random random = new System.Random(ParticleRandomSeed);
     private float dustRemainder;
     private float sparkleRemainder;
     private float detailRemainder;
@@ -100,7 +106,7 @@ public sealed class GroundDustEffect : MonoBehaviour
         }
 
         var amount = Mathf.SmoothStep(0f, 1f,
-            Mathf.InverseLerp(minimumSpeed, Mathf.Max(minimumSpeed + 0.01f, fullEffectSpeed), speed));
+            Mathf.InverseLerp(minimumSpeed, Mathf.Max(minimumSpeed + MinimumFullEffectSpeedGap, fullEffectSpeed), speed));
         var rate = amount * Mathf.Max(0f, Mathf.Lerp(surface.ParticlesPerSecond.x, surface.ParticlesPerSecond.y, amount));
 
         if (!IsEmitting)
@@ -121,8 +127,8 @@ public sealed class GroundDustEffect : MonoBehaviour
         }
 
         IsEmitting = true;
-        dustRemainder += rate * Mathf.Min(deltaTime, 0.1f);
-        var count = Mathf.Min(4, Mathf.FloorToInt(dustRemainder));
+        dustRemainder += rate * Mathf.Min(deltaTime, MaximumEmissionDeltaTime);
+        var count = Mathf.Min(MaximumDustParticlesPerUpdate, Mathf.FloorToInt(dustRemainder));
         dustRemainder -= Mathf.Floor(dustRemainder);
         var direction = tangentVelocity / speed;
         var side = Vector3.Cross(normal, direction);
@@ -224,8 +230,8 @@ public sealed class GroundDustEffect : MonoBehaviour
 
         var rate = speedAmount * Mathf.Max(0f, Mathf.Lerp(surface.DetailParticlesPerSecond.x,
             surface.DetailParticlesPerSecond.y, speedAmount));
-        detailRemainder += rate * Mathf.Min(deltaTime, 0.1f);
-        var count = Mathf.Min(8, Mathf.FloorToInt(detailRemainder));
+        detailRemainder += rate * Mathf.Min(deltaTime, MaximumEmissionDeltaTime);
+        var count = Mathf.Min(MaximumDetailParticlesPerUpdate, Mathf.FloorToInt(detailRemainder));
         // 低FPSでも通常の放出量を保ち、停止後の追い出しが起きないよう整数の余剰は捨てる
         detailRemainder -= Mathf.Floor(detailRemainder);
         var lift = Mathf.Max(0f, surface.DetailLiftSpeed);

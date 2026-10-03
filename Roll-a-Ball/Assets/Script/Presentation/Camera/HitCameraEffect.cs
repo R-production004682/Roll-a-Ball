@@ -9,7 +9,12 @@ using UnityEngine;
 [RequireComponent(typeof(CinemachineCamera))]
 public sealed class HitCameraEffect : CinemachineExtension
 {
-    [SerializeField, Min(0.01f), Tooltip("被弾直後のシェイクが減衰して消えるまでの秒数")]
+    private const float MinimumEffectDuration = 0.01f;
+    private const float ShakeRandomnessDegrees = 90f;
+    private const float MinimumFieldOfViewDegrees = 1f;
+    private const float MaximumFieldOfViewDegrees = 179f;
+
+    [SerializeField, Min(MinimumEffectDuration), Tooltip("被弾直後のシェイクが減衰して消えるまでの秒数")]
     private float duration = 0.28f;
 
     [SerializeField, Tooltip("カメラのローカル方向でのシェイク幅。Z は奥行き方向です")]
@@ -45,17 +50,17 @@ public sealed class HitCameraEffect : CinemachineExtension
         }
 
         Stop();
-        var effectDuration = Mathf.Max(0.01f, duration);
+        var effectDuration = Mathf.Max(MinimumEffectDuration, duration);
         var vibrations = Mathf.Max(1, vibrato);
         fieldOfViewOffset = -zoomKick;
         sequence = DOTween.Sequence();
         sequence.SetUpdate(true).SetTarget(this);
         sequence.Join(DOTween.Shake(
             () => positionOffset, value => positionOffset = value,
-            effectDuration, positionStrength, vibrations, 90f, true, ShakeRandomnessMode.Harmonic));
+            effectDuration, positionStrength, vibrations, ShakeRandomnessDegrees, true, ShakeRandomnessMode.Harmonic));
         sequence.Join(DOTween.Shake(
             () => rotationOffset, value => rotationOffset = value,
-            effectDuration, rotationStrength, vibrations, 90f, true, ShakeRandomnessMode.Harmonic));
+            effectDuration, rotationStrength, vibrations, ShakeRandomnessDegrees, true, ShakeRandomnessMode.Harmonic));
         sequence.Join(DOTween.To(
             () => fieldOfViewOffset, value => fieldOfViewOffset = value,
             0f, effectDuration).SetEase(Ease.OutCubic));
@@ -96,7 +101,7 @@ public sealed class HitCameraEffect : CinemachineExtension
 
         state.PositionCorrection += state.GetFinalOrientation() * positionOffset;
         state.OrientationCorrection *= Quaternion.Euler(rotationOffset);
-        state.Lens.FieldOfView = Mathf.Clamp(state.Lens.FieldOfView + fieldOfViewOffset, 1f, 179f);
+        state.Lens.FieldOfView = Mathf.Clamp(state.Lens.FieldOfView + fieldOfViewOffset, MinimumFieldOfViewDegrees, MaximumFieldOfViewDegrees);
     }
 
     /// <summary>
