@@ -12,12 +12,20 @@ public class Player : MonoBehaviour
 
     private List<CheckPoint> checkPoints = new List<CheckPoint>(); //リスポーン地点
 
-    [Header("移動設定")]
-    [SerializeField, Tooltip("プレイヤーの最大移動速度")]
-    private float playerSpeed = 20; //プレイヤーの最大移動速度
+    private bool isJumping = false;//ジャンプ中か
+
+[Header("移動設定")]
+
+    [SerializeField, Tooltip("通常の最大速度")]
+    private float normalMaxSpeed = 20;//通常時の最大速度
+
+    [SerializeField, Tooltip("ジャンプ中の最大速度")]
+    private float jumpMaxSpeed = 10;//ジャンプ中の最大速度（水平方向）
 
     [SerializeField, Tooltip("プレイヤーの加速量")]
     private float acceleration = 50; //加速度
+
+    [Header("地点設定")]
 
     [SerializeField, Tooltip("落下判定とするy座標")]
     private int fall; //落下地点
@@ -69,6 +77,7 @@ public class Player : MonoBehaviour
         if (CanReceiveGameplayContact && transform.position.y <= fall)
         {
             respawnController.TryDie();
+            isJumping = false;//ジャンプ中ではない
         }
 
         if (UiInputScope.BlocksPlayer || !CanReceiveGameplayContact || cameraTransform == null)
@@ -120,6 +129,7 @@ public class Player : MonoBehaviour
         {
             return;
         }
+                float currentMaxSpeed = isJumping ? jumpMaxSpeed : normalMaxSpeed;
 
         if (moveDirection != Vector3.zero)//入力がある
         {
@@ -127,9 +137,9 @@ public class Player : MonoBehaviour
         }
 
         var horizontalVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);//水平方向の速度取得
-        if (horizontalVelocity.magnitude > playerSpeed)//最大速度を超えた
+        if (horizontalVelocity.magnitude > currentMaxSpeed)//最大速度を超えた
         {
-            horizontalVelocity = horizontalVelocity.normalized * playerSpeed;//最大速度にする
+            horizontalVelocity = horizontalVelocity.normalized * currentMaxSpeed;//最大速度にする
             rb.linearVelocity = new Vector3(horizontalVelocity.x, rb.linearVelocity.y, horizontalVelocity.z);
         }
     }
@@ -144,6 +154,14 @@ public class Player : MonoBehaviour
             isGoal = true;
             Debug.Log("ゴールに触れた");
             rb.isKinematic = true;//物理演算を止める
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            isJumping = false;//ジャンプ中ではない
         }
     }
 
@@ -226,5 +244,12 @@ public class Player : MonoBehaviour
         {
             respawnController.CancelRespawn();
         }
+    }
+
+    public void Jump(float jumForce)//ジャンプ台にふれたときの処理
+    {
+        rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);//縦方向の移動量をリセット
+        rb.AddForce(Vector3.up * jumForce, ForceMode.Impulse);//プレイヤーに上方向の力をのせる
+        isJumping = true;//ジャンプ中にする
     }
 }
