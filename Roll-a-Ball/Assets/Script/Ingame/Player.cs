@@ -14,7 +14,7 @@ public class Player : MonoBehaviour
 
     private bool isJumping = false;//ジャンプ中か
 
-[Header("移動設定")]
+    [Header("移動設定")]
 
     [SerializeField, Tooltip("通常の最大速度")]
     private float normalMaxSpeed = 20;//通常時の最大速度
@@ -129,7 +129,7 @@ public class Player : MonoBehaviour
         {
             return;
         }
-                float currentMaxSpeed = isJumping ? jumpMaxSpeed : normalMaxSpeed;
+        float currentMaxSpeed = isJumping ? jumpMaxSpeed : normalMaxSpeed;
 
         if (moveDirection != Vector3.zero)//入力がある
         {
