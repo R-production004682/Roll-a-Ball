@@ -45,13 +45,9 @@ public class Player : MonoBehaviour
     /// </summary>
     void Update()
     {
-        if (transform.position.y <= fall && checkPoints.Count > 0)//解放した地点の位置と向きに戻る
+        if (transform.position.y <= fall && checkPoints.Count > 0)//リスポーン処理を行う
         {
-            transform.position = checkPoints[checkPoints.Count - 1].transform.position;
-            transform.rotation = checkPoints[checkPoints.Count - 1].transform.rotation;
-            rb.linearVelocity = Vector3.zero;//速度をリセット
-            moveDirection = Vector3.zero;//方向をリセット
-            rb.angularVelocity = Vector3.zero;//回転をリセット
+            RespawnCheckPoint();
         }
 
         if (UiInputScope.BlocksPlayer)
@@ -158,7 +154,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Collider other)//衝突判定
     {
         if (other.CompareTag("Goal"))
         {
@@ -166,5 +162,14 @@ public class Player : MonoBehaviour
             Debug.Log("ゴールに触れた");
             rb.isKinematic = true;//物理演算を止める
         }
+    }
+
+    private void RespawnCheckPoint()//リスポーン処理,解放した地点の位置と向きに戻る
+    {
+        transform.position = checkPoints[checkPoints.Count - 1].transform.position;
+        transform.rotation = checkPoints[checkPoints.Count - 1].transform.rotation;
+        rb.linearVelocity = Vector3.zero;//速度をリセット
+        moveDirection = Vector3.zero;//方向をリセット
+        rb.angularVelocity = Vector3.zero;//回転をリセット
     }
 }
