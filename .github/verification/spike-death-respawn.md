@@ -128,6 +128,12 @@ Unity コンパイルと Play Mode 確認、C# 5ファイルの format whitespac
 
 ## 最終時点の未実施確認・既存の制約
 
+### Player_new Prefab の追加確認
+
+`Assets/Prefabs/InGame/Player_new.prefab` の演出参照は設定済みだったが、参照先 `A15_ball_env.fbx` の Mesh が読み取り不可で破片生成を拒否していた。ModelImporter の Read/Write を有効にし、Player_new Prefab とその既存 GUID を PR に追加した。
+
+Play Mode でこの Prefab を実際に生成し、死亡受付、2片の生成、元 Renderer の非表示、暗転・復帰後の Renderer / Rigidbody 復元、生成 Mesh の後片付けを確認した（PASS=True）。記録は [player-new-prefab-verification.txt](player-new-prefab-verification.txt)。実機ビルドの確認は未実施。今回の Console には既存 Missing Script に加えて Editor の SerializedProperty 破棄後アクセスの例外が2件あり、コンソール全体がエラーなしとはしていない。
+
 - 実機キーボードによる連続プレイ、各画面比率、ビルド確認は未実施。
 - Ingametest の既存 `RetryButton` / `StageSelectButton` に Missing Script がある。起動時に各二件の警告が出る。
 - Ingametest の `GameManager.outGameClearController` は元から未設定。ゴール後に未設定エラーが一件出るが、今回確認したクリア演出とリザルト表示は成功。ステージ記録保存、リザルトからのリトライ・ステージ選択は今回の確認対象外。
