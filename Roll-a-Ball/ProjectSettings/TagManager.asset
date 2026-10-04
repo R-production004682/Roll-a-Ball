@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Coin
   - Goal
+  - JumpPad
+  - Ground
   layers:
   - Default
   - TransparentFX
