@@ -81,13 +81,12 @@ namespace Roll_a_Ball.OutGame
         }
 
         /// <summary>
-        /// 進行状態と UI の有無に応じてカーソルだけを反映し、時間やポーズ状態を変更しない
+        /// カーソルを常に表示してロックを解除し、時間やポーズ状態を変更しない
         /// </summary>
         internal static void RefreshCursor()
         {
-            var capture = IsPlaying && !UiInputScope.HasOpenUi && !UiInputScope.IsBlocked;
-            Cursor.lockState = capture ? CursorLockMode.Locked : CursorLockMode.None;
-            Cursor.visible = !capture;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
 
         /// <summary>

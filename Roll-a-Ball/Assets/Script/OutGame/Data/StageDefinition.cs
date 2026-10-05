@@ -51,5 +51,24 @@ namespace Roll_a_Ball.OutGame
         /// クリア時に解放する次ステージの ID を取得する
         /// </summary>
         public string NextStageId => nextStageId;
+
+        /// <summary>
+        /// 検出したステージ番号に既存の表示設定を合わせて定義を作成する
+        /// </summary>
+        /// <param name="number">Prefab 名から取得したステージ番号</param>
+        /// <param name="template">表示名・画像・シーンの設定を引き継ぐ定義</param>
+        /// <param name="useDisplayName">同じ番号の既存定義なら表示名を引き継ぐ</param>
+        internal static StageDefinition FromPrefab(int number, StageDefinition template, bool useDisplayName)
+        {
+            return new StageDefinition
+            {
+                stageId = $"stage-{number}",
+                stageNumber = number,
+                displayName = useDisplayName ? template.displayName : $"STAGE {number:00}",
+                previewTexture = template.previewTexture,
+                playScene = template.playScene,
+                nextStageId = $"stage-{number + 1}"
+            };
+        }
     }
 }
