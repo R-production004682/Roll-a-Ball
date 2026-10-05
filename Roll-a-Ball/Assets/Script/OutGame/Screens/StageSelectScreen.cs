@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,7 +11,7 @@ namespace Roll_a_Ball.OutGame
     /// </summary>
     public sealed class StageSelectScreen : ScreenBase
     {
-        [SerializeField, Tooltip("ステージ選択画面に表示するステージを登録します。")]
+        [SerializeField, Tooltip("ステージの表示名・画像・遷移先を設定します。Prefab がある場合、一覧は自動収集され、同じステージ番号の表示設定を使用します。")]
         private StageDefinition[] stages = Array.Empty<StageDefinition>();
         [SerializeField, Tooltip("所持コイン数を表示するテキストです。")]
         private TMP_Text currencyLabel;
@@ -74,6 +75,8 @@ namespace Roll_a_Ball.OutGame
                 return;
             }
 
+            RefreshStageDefinitions();
+            StageSelectionContext.UnlockAvailableStages(stages);
             selectedIndex = FindSelectedIndex();
             previousButton.onClick.AddListener(SelectPrevious);
             nextButton.onClick.AddListener(SelectNext);
@@ -92,6 +95,11 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         public override void OnClose()
         {
+            if (stages != null && selectedIndex >= 0 && selectedIndex < stages.Length && stages[selectedIndex] != null)
+            {
+                StageSelectionContext.RememberStageSelectId(stages[selectedIndex].StageId);
+            }
+
             GameDataManager.Changed -= Refresh;
             if (previousButton != null)
             {
@@ -199,7 +207,7 @@ namespace Roll_a_Ball.OutGame
             }
 
             var stage = stages[selectedIndex];
-            if (stage == null || !GameDataManager.IsStageUnlocked(stage.StageId))
+            if (stage == null || !StagePrefabCatalog.CanPlayStage(stage.StageId, stage.StageNumber))
             {
                 return;
             }
@@ -281,7 +289,7 @@ namespace Roll_a_Ball.OutGame
                 return;
             }
 
-            var unlocked = GameDataManager.IsStageUnlocked(stage.StageId);
+            var unlocked = StagePrefabCatalog.CanPlayStage(stage.StageId, stage.StageNumber);
             currencyLabel.text = $"COIN  {GameDataManager.Currency:N0}";
             stageNumberLabel.text = $"STAGE {stage.StageNumber:00}";
             stageNameLabel.text = stage.DisplayName;
@@ -335,15 +343,35 @@ namespace Roll_a_Ball.OutGame
         /// <returns>一致するステージがなければ先頭の位置</returns>
         private int FindSelectedIndex()
         {
+            var stageId = StageSelectionContext.ConsumeStageSelectId();
             for (var index = 0; index < stages.Length; index++)
             {
-                if (stages[index] != null && stages[index].StageId == StageSelectionContext.SelectedStageId)
+                if (stages[index] != null && stages[index].StageId == stageId)
                 {
                     return index;
                 }
             }
 
             return 0;
+        }
+
+        /// <summary>
+        /// Prefab がある場合は実在するステージを番号順に表示し、未登録の番号にも定義を補う
+        /// </summary>
+        private void RefreshStageDefinitions()
+        {
+            var entries = StagePrefabCatalog.GetEntries();
+            if (entries.Count == 0)
+            {
+                return;
+            }
+
+            var configuredStages = stages;
+            stages = entries.Select(entry =>
+            {
+                var template = configuredStages.FirstOrDefault(stage => stage.StageNumber == entry.stageNumber);
+                return StageDefinition.FromPrefab(entry.stageNumber, template ?? configuredStages[0], template != null);
+            }).ToArray();
         }
 
         /// <summary>

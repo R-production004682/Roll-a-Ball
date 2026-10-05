@@ -434,6 +434,7 @@ namespace Roll_a_Ball.EditorTools
             EditorApplication.projectChanged += ReloadPrefabs;
             EditorApplication.focusChanged += OnApplicationFocus;
             EditorApplication.playModeStateChanged += OnPlayModeChanged;
+            EditorSceneManager.sceneClosing += OnPlacementRootSceneClosing;
             EditorApplication.quitting += StopAllModes;
             AssemblyReloadEvents.beforeAssemblyReload += StopAllModes;
             Undo.undoRedoPerformed += OnUndoRedo;
@@ -459,6 +460,7 @@ namespace Roll_a_Ball.EditorTools
             EditorApplication.projectChanged -= ReloadPrefabs;
             EditorApplication.focusChanged -= OnApplicationFocus;
             EditorApplication.playModeStateChanged -= OnPlayModeChanged;
+            EditorSceneManager.sceneClosing -= OnPlacementRootSceneClosing;
             EditorApplication.quitting -= StopAllModes;
             AssemblyReloadEvents.beforeAssemblyReload -= StopAllModes;
             Undo.undoRedoPerformed -= OnUndoRedo;
@@ -679,13 +681,35 @@ namespace Roll_a_Ball.EditorTools
         /// </summary>
         private void OnRootChanged(ChangeEvent<Object> change)
         {
+            SetPlacementRoot(change.newValue as GameObject);
+        }
+
+        /// <summary>
+        /// 配置ルートと復元用 ID を更新し操作状態と表示欄を同期する
+        /// </summary>
+        private void SetPlacementRoot(GameObject root)
+        {
             StopMode();
             CancelChunkSelection();
-            placementRoot = change.newValue as GameObject;
+            placementRoot = root;
             UpdatePlacementRootGlobalId();
             chunkSignatures.Clear();
             Invalidate();
             CreateGUI();
+        }
+
+        /// <summary>
+        /// 配置ルートがあるシーンを閉じる前に参照を None へ戻す
+        /// </summary>
+        private void OnPlacementRootSceneClosing(Scene scene, bool removingScene)
+        {
+            if (EditorApplication.isPlayingOrWillChangePlaymode || placementRoot == null || placementRoot.scene != scene)
+            {
+                return;
+            }
+
+            SetPlacementRoot(null);
+            RebuildCache();
         }
 
         /// <summary>
@@ -2683,7 +2707,7 @@ namespace Roll_a_Ball.EditorTools
         }
 
         /// <summary>
-        /// Prefab の元の向きに Y 回転を加え等比調整して未占有セルへ配置する
+        /// Prefab の元の向きに Y 回転を加え等比調整し全体の最下点を未占有セルの底面へ揃える
         /// </summary>
         private void PlaceCandidate()
         {
@@ -2709,7 +2733,9 @@ namespace Roll_a_Ball.EditorTools
                 instance.transform.localScale *= grid / Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z);
                 TryBounds(instance, out bounds);
             }
-            instance.transform.localPosition += ((Vector3)candidate + Vector3.one * 0.5f) * grid - bounds.center;
+            var cellBottomCenter = ((Vector3)candidate + new Vector3(0.5f, 0, 0.5f)) * grid;
+            var modelBottomCenter = new Vector3(bounds.center.x, bounds.min.y, bounds.center.z);
+            instance.transform.localPosition += cellBottomCenter - modelBottomCenter;
             TryBounds(instance, out bounds);
             var tolerance = Mathf.Min(BoundsTolerance(bounds), Mathf.Min(bounds.size.x, bounds.size.y, bounds.size.z) * 0.25f);
             var min = CellOf(bounds.min + Vector3.one * tolerance);

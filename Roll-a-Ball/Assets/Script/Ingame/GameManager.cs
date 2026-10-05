@@ -27,11 +27,28 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ゲーム開始時リザルト画面(クリアやゲームオーバー画面)を隠す処理
+    /// リザルト画面の参照を検証してゲーム開始時に非表示にする
     /// </summary>
-    void Start()
+    private void Start()
     {
+        if (result == null)
+        {
+            Debug.LogError("GameManager にリザルト画面が設定されていません。", this);
+            return;
+        }
+
         result.SetActive(false);//リザルトオフ
+    }
+
+    /// <summary>
+    /// シーン破棄時に自身の共有参照を解除する
+    /// </summary>
+    private void OnDestroy()
+    {
+        if (instance == this)
+        {
+            instance = null;
+        }
     }
 
     /// <summary>
@@ -40,9 +57,18 @@ public class GameManager : MonoBehaviour
     public void StageCompleted()//ステージ完了処理
     {
         if (isStageCompleted)//すでにクリアしている場合
+        {
             return;//処理しない
+        }
+
+        if (result == null)
+        {
+            Debug.LogError("GameManager にリザルト画面が設定されていません。", this);
+            return;
+        }
 
         isStageCompleted = true;//ステージ完了
+        OutGameStateController.Enter(GameFlowState.Cleared);
 
         if (outGameClearController == null)
         {
