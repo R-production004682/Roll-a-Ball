@@ -32,7 +32,7 @@ namespace Roll_a_Ball.EditorTools
 
             if (!BuildPipeline.IsBuildTargetSupported(BuildTargetGroup.WebGL, BuildTarget.WebGL))
             {
-                error = "Unity Hub で、この Editor に Web Build Support を追加してください。";
+                error = "Unity Hub で、この Editor に Web Build Support を追加し、Unity を再起動してください。";
                 return false;
             }
 
@@ -86,13 +86,23 @@ namespace Roll_a_Ball.EditorTools
         public static void BuildFromCommandLine()
         {
             var report = Build();
-            if (report == null || report.summary.result != BuildResult.Succeeded)
+            if (!IsSuccessful(report))
             {
                 EditorApplication.Exit(1);
                 return;
             }
 
             Debug.Log($"WebGL ビルド完了: {OutputDirectory}");
+        }
+
+        /// <summary>
+        /// エラーのないビルドと WebGL の出力を確認する
+        /// </summary>
+        public static bool IsSuccessful(BuildReport report)
+        {
+            return report != null && report.summary.result == BuildResult.Succeeded &&
+                report.summary.totalErrors == 0 &&
+                File.Exists(Path.Combine(report.summary.outputPath, "index.html"));
         }
     }
 }

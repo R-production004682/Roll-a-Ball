@@ -164,10 +164,21 @@ namespace Roll_a_Ball.EditorTools
         private void ExecuteBuild()
         {
             queued = false;
-            var report = WebGLBuildUtility.Build();
-            if (report == null || report.summary.result != BuildResult.Succeeded)
+            BuildReport report;
+            try
             {
-                SetStatus("ビルドが中止または失敗しました。公開・通知は行いません。Console を確認してください。", HelpBoxMessageType.Error);
+                report = WebGLBuildUtility.Build();
+            }
+            catch (System.Exception exception)
+            {
+                Debug.LogException(exception);
+                SetStatus("WebGL ビルドに失敗しました。Web Build Support を追加した直後は Unity を再起動してください。詳細は Console を確認してください。", HelpBoxMessageType.Error);
+                return;
+            }
+
+            if (!WebGLBuildUtility.IsSuccessful(report))
+            {
+                SetStatus("ビルドが中止または失敗しました。Web Build Support を追加した直後は Unity を再起動してください。詳細は Console を確認してください。", HelpBoxMessageType.Error);
                 return;
             }
 
