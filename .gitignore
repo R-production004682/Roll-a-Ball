@@ -1,0 +1,5 @@
+# Markdown is local by default; keep the repository entry point and PR template.
+*.md
+*.md.meta
+!/README.md
+!/.github/PULL_REQUEST_TEMPLATE.md
