@@ -35,12 +35,30 @@ namespace Roll_a_Ball.OutGame.Editor
     /// <summary>
     /// Scene の移動・改名後も、ビルドに含める遷移パスを最新にする
     /// </summary>
-    public sealed class SceneReferenceBuildProcessor : UnityEditor.Build.IProcessSceneWithReport
+    public sealed class SceneReferenceBuildProcessor : UnityEditor.Build.IProcessSceneWithReport,
+        UnityEditor.Build.IPreprocessBuildWithReport
     {
         /// <summary>
         /// Scene パス同期の実行順序を返す
         /// </summary>
         public int callbackOrder => 0;
+
+        /// <summary>
+        /// 実行時に生成されるタイトル Prefab の遷移先をビルド前に同期する
+        /// </summary>
+        public void OnPreprocessBuild(UnityEditor.Build.Reporting.BuildReport report)
+        {
+            foreach (var guid in AssetDatabase.FindAssets("t:Prefab", new[] { "Assets/Prefabs/UI/Screens" }))
+            {
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GUIDToAssetPath(guid));
+                foreach (var titleScreen in prefab.GetComponentsInChildren<TitleScreen>(true))
+                {
+                    titleScreen.SynchronizeDestination();
+                    EditorUtility.SetDirty(titleScreen);
+                    AssetDatabase.SaveAssetIfDirty(titleScreen);
+                }
+            }
+        }
 
         /// <summary>
         /// ビルド対象 Scene の遷移先パスを最新化する
@@ -52,6 +70,11 @@ namespace Roll_a_Ball.OutGame.Editor
                 foreach (var button in root.GetComponentsInChildren<SceneTransitionButton>(true))
                 {
                     button.SynchronizeDestination();
+                }
+
+                foreach (var titleScreen in root.GetComponentsInChildren<TitleScreen>(true))
+                {
+                    titleScreen.SynchronizeDestination();
                 }
             }
         }
