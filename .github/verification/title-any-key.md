@@ -31,3 +31,12 @@ Unity 6000.3.20f1 の接続済み Editor で確認。
 
 - ビルドした Player と実キーボード・実マウス・実ゲームパッドによる入力確認。
 - 実アセットの Scene 移動・改名を伴うビルド確認。パス同期処理単体は Editor 上で確認済み。
+
+## 残りの差分を PR に分離した後の確認
+
+- `feature/title-ui-and-project-settings` は `feature/coin-ui` をベースに作成。TitleScene が共通の ScreenFadeTransition Prefab を参照するため、Coin PR #201 を先に取り込む。
+- 新しいブランチの runtime 123 ファイル・Editor 10 ファイルを抽出し、Unity 6000.3.20f1 の C# コンパイラーと既存の Editor 参照で個別にコンパイル。両方成功。
+- 新規 GUID の参照漏れと `git diff --check` を確認。
+- Title の入力・明滅・遷移の Play Mode 検証は分割前の作業環境で実施。WebGL 公開版でもクリックによる遷移を確認済み。ブランチ単独の Unity インポート・実ビルドは未実施。
+- 残っていた ResultPanel の初期有効化、MainScene の BlockBuilder 設定オブジェクト削除、URP のシリアライズ設定、Oswald のソースフォント参照解除、入力アセットの事前ロードとプラットフォーム別 batching 設定も収録。これらは既存の差分を保持したもので、個別の挙動と Oswald の動的文字追加は未検証。
+- モデル・画像の LFS ハッシュは既存コミットと一致しており、内容変更なし。生成ログ・Player・Webhook 設定は含めない。
