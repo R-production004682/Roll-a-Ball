@@ -1,6 +1,8 @@
+using System;
 using Roll_a_Ball.OutGame;
 using UnityEngine;
 
+[DefaultExecutionOrder(-1000)]
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;//ゲームマネージャー
@@ -14,6 +16,16 @@ public class GameManager : MonoBehaviour
     private OutGameClearController outGameClearController;
 
     /// <summary>
+    /// このプレイで取得したコインの金額を返す
+    /// </summary>
+    public int CollectedCoins { get; private set; }
+
+    /// <summary>
+    /// このプレイの取得金額が変わったときに通知する
+    /// </summary>
+    public event Action CollectedCoinsChanged;
+
+    /// <summary>
     /// ゲーム開始時に呼び出され、GameManagerが重複しないようにチェックした上で、instanceに登録
     /// </summary>
     private void Awake()
@@ -24,6 +36,28 @@ public class GameManager : MonoBehaviour
             return;
         }
         instance = this;//このGameManagerをinstanceに登録
+    }
+
+    /// <summary>
+    /// コインを所持金へ保存し、成功した金額をこのプレイの取得金額に加える
+    /// </summary>
+    /// <param name="amount">取得する正の金額</param>
+    /// <returns>所持金への保存と取得金額の更新に成功した場合は true</returns>
+    public bool TryCollectCoin(int amount)
+    {
+        if (isStageCompleted || amount <= 0 || amount > int.MaxValue - CollectedCoins)
+        {
+            return false;
+        }
+
+        if (!GameDataManager.TryAddCurrency(amount, out _))
+        {
+            return false;
+        }
+
+        CollectedCoins += amount;
+        CollectedCoinsChanged?.Invoke();
+        return true;
     }
 
     /// <summary>

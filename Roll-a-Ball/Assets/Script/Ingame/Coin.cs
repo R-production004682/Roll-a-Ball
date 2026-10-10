@@ -17,7 +17,7 @@ public class Coin : MonoBehaviour
     private bool collected;
 
     /// <summary>
-    /// プレイヤーがコインに衝突した際に所持コインを加算し、衝突したコインは消える処理
+    /// プレイヤーの接触で所持金とこのプレイの取得金額を加算し、成功したコインを消す
     /// </summary>
     /// <param name="other">接触したコライダー</param>
     private void OnTriggerEnter(Collider other)//衝突判定
@@ -27,9 +27,19 @@ public class Coin : MonoBehaviour
             return;
         }
 
+        if (GameManager.instance == null)
+        {
+            Debug.LogWarning("Coin: GameManager が存在しないためコインを取得できません。", this);
+            return;
+        }
+
+        if (!GameManager.instance.TryCollectCoin(coinAmount))
+        {
+            Debug.LogWarning($"Coin: 所持コインを加算できませんでした。取得金額: {coinAmount}", this);
+            return;
+        }
+
         collected = true;
-        PlayerPrefs.SetInt("HasCoin", PlayerPrefs.GetInt("HasCoin", 0) + coinAmount);//所持コインにコインの金額を加算
-        PlayerPrefs.Save();//保存確定
 
         PlayPickupEffect();
         Destroy(gameObject);//コイン消える

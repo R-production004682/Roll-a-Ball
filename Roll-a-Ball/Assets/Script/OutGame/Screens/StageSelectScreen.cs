@@ -290,7 +290,6 @@ namespace Roll_a_Ball.OutGame
             }
 
             var unlocked = StagePrefabCatalog.CanPlayStage(stage.StageId, stage.StageNumber);
-            currencyLabel.text = $"COIN  {GameDataManager.Currency:N0}";
             stageNumberLabel.text = $"STAGE {stage.StageNumber:00}";
             stageNameLabel.text = stage.DisplayName;
             stagePreview.texture = stage.PreviewTexture;
