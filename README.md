@@ -31,6 +31,18 @@
 
 ---
 
+## Windows ビルド
+
+Unity の **Tools → Roll-a-Ball → Build Windows** から、Windows 64bit・1920×1080 のビルドを実行できます。
+「Windows ビルド」で生成し、「出力フォルダーを開く」で確認できます。標準の出力先は `Roll-a-Ball/Builds/Windows/` です。
+操作と設定の詳細は [Windows ビルドツール](Docs/WindowsBuild.md) を参照してください。
+
+ブラウザーでの確認用には **Tools → Roll-a-Ball → Build WebGL and Publish** を使用できます。
+WebGL ビルド成功後に GitHub Pages へ公開し、プレイ URL を `@roll-a-ball` へのメンション付きで Discord に通知します。
+初期設定と操作は [WebGL の公開・通知](Docs/WebGLPublishing.md) を参照してください。
+
+---
+
 ## 🌿 Git ブランチ運用ルール
 
 当プロジェクトでは、安全にチームでコードやアセットを共有するために**ブランチ運用**を行います。
