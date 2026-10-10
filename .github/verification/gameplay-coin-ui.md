@@ -39,3 +39,10 @@ GameManager の DefaultExecutionOrder(-1000) により、表示の OnEnable よ�
 
 - ビルドした Player、実操作による物理接触、保存失敗時の実ストレージ障害試験。
 - TestScene 配下の検証用 UI の Prefab 化。以前の UI 移行範囲は TitleScene / StageSelectScene / MainScene。
+
+## PR 分割後の確認
+
+- `feature/coin-ui` は master から独立して作成。Title の入力・演出変更とビルドツールは含めない。
+- 分割後のブランチのソースを抽出し、Unity 6000.3.20f1 の C# コンパイラーと既存の Editor 参照を使用して runtime 122 ファイル・Editor 10 ファイルを個別にコンパイル。両方成功。
+- 新規 Prefab・スクリプトの GUID 参照と `git diff --check` を確認。Build・WebGL 側との変更ファイルの重複なし。
+- 上記の Play Mode 確認は分割前の作業環境で実施。分割後ブランチ単独の Unity インポート・Play Mode は未実施。
