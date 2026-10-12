@@ -15,20 +15,20 @@ public class Birdsong : MonoBehaviour
     private bool movingUp = true;//上昇中か？
 
     [SerializeField,Tooltip("音の移動速度")]
-    private float moveSpeed = 5;
+    private float moveSpeed = 5;//音の移動速度
 
     // Update is called once per frame
     void Update()
     {
-        if (cameramain == null)//カメラがない場合処理しない
+        if (cameramain == null)//カメラがセットされていない場合処理しない
             return;
 
-        Vector3 cameraPosition = cameramain.position;//カメラの位置を取得
-        transform.position = new Vector3(cameraPosition.x, transform.position.y, cameraPosition.z);//ｘ座標とｚ座標をカメラと同じにする
+        Vector3 cameraPosition = cameramain.position;//カメラの座標を取得
+        transform.position = new Vector3(cameraPosition.x, transform.position.y, cameraPosition.z);//ｘ座標とｚ座標をカメラとあわせる
 
-        float distance = transform.position.y - cameraPosition.y;//カメラとの距離を測る
+        float distance = transform.position.y - cameraPosition.y;//カメラとの距離
 
-        if(distance >= turnDistance)//カメラとの距離が折り返し地点より遠い
+        if(distance >= turnDistance)//カメラとの距離が折り返し距離より遠い
         {
             movingUp = false;//上昇中ではない
         }
@@ -39,12 +39,12 @@ public class Birdsong : MonoBehaviour
             turnDistance = Random.Range(0f, maxDistance);//次の折り返し地点を決める
         }
 
-        if (movingUp == true)//折り返し地点より低い位置にいるとき
+        if (movingUp == true)//上昇中
         {
             transform.Translate(0f, +moveSpeed * Time.deltaTime, 0f, Space.World);//上に移動する
         }
 
-        else //折り返し地点より高い位置にいるとき
+        else
         {
             transform.Translate(0f, -moveSpeed * Time.deltaTime, 0f, Space.World);//下に移動する
         }
