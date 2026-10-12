@@ -7541,7 +7541,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 45a57620c44f4d3db88193b50a1c9f7b, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::Roll_a_Ball.OutGame.FadeTransition
 --- !u!4 &1917559551 stripped
 Transform:
