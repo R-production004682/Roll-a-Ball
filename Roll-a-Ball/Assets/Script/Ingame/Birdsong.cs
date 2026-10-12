@@ -5,7 +5,7 @@ public class Birdsong : MonoBehaviour
     [SerializeField]
     private Transform cameramain;//メインカメラの位置
 
-    [SerializeField,Tooltip("カメラとの最大距離")]
+    [SerializeField, Tooltip("カメラとの最大距離")]
     private float maxDistance = 30f;//折り返しの最大距離
 
     [SerializeField]
@@ -14,7 +14,7 @@ public class Birdsong : MonoBehaviour
     [SerializeField]
     private bool movingUp = true;//上昇中か？
 
-    [SerializeField,Tooltip("音の移動速度")]
+    [SerializeField, Tooltip("音の移動速度")]
     private float moveSpeed = 5;//音の移動速度
 
     // Update is called once per frame
@@ -28,12 +28,12 @@ public class Birdsong : MonoBehaviour
 
         float distance = transform.position.y - cameraPosition.y;//カメラとの距離
 
-        if(distance >= turnDistance)//カメラとの距離が折り返し距離より遠い
+        if (distance >= turnDistance)//カメラとの距離が折り返し距離より遠い
         {
             movingUp = false;//上昇中ではない
         }
 
-        if(distance <= 0 && movingUp == false)//カメラとの距離が0以下
+        if (distance <= 0 && movingUp == false)//カメラとの距離が0以下
         {
             movingUp = true;//上昇中にする
             turnDistance = Random.Range(0f, maxDistance);//次の折り返し地点を決める
