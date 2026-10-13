@@ -56,5 +56,6 @@ public class Goal : MonoBehaviour
         }
 
         Debug.Log("ゲームクリア");
+        Debug.Log(GameManager.instance.CollectedCoins);
     }
 }

@@ -10,11 +10,14 @@ namespace Roll_a_Ball.OutGame
     {
         public const float DefaultBgmVolume = 0.7f;
         public const float DefaultSeVolume = 0.8f;
+        private const float DefaultEsVolume = 0.7f;
         private const string BgmKey = "RollABall.Settings.BgmVolume";
         private const string SeKey = "RollABall.Settings.SeVolume";
+        private const string EsKey = "RollABall.Settings.EsVolume";
         private static bool loaded;
         private static float bgmVolume;
         private static float seVolume;
+        private static float esVolume;
 
         /// <summary>
         /// 設定値が変更されたときに通知する
@@ -42,6 +45,18 @@ namespace Roll_a_Ball.OutGame
             {
                 EnsureLoaded();
                 return seVolume;
+            }
+        }
+
+        /// <summary>
+        /// 現在の環境音の音量を返す
+        /// </summary>
+        public static float EsVolume
+        {
+            get
+            {
+                EnsureLoaded();
+                return esVolume;
             }
         }
 
@@ -79,6 +94,7 @@ namespace Roll_a_Ball.OutGame
 
             bgmVolume = Sanitize(PlayerPrefs.GetFloat(BgmKey, DefaultBgmVolume), DefaultBgmVolume);
             seVolume = Sanitize(PlayerPrefs.GetFloat(SeKey, DefaultSeVolume), DefaultSeVolume);
+            esVolume = Sanitize(PlayerPrefs.GetFloat(EsKey, DefaultEsVolume), DefaultEsVolume);
             loaded = true;
         }
 
@@ -114,6 +130,16 @@ namespace Roll_a_Ball.OutGame
 
             seVolume = sanitized;
             Changed?.Invoke();
+        }
+
+        public static void SetEsVolume(float value)
+        {
+            EnsureLoaded();
+            var sanitized = Sanitize(value, DefaultEsVolume);
+            if (Mathf.Approximately(esVolume, sanitized))
+            {
+                return;
+            }
         }
 
         /// <summary>

@@ -905,7 +905,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15a943e182e03dc42b6cab8243bb119d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Roll_a_Ball.OutGame.AudioVolumeBinding
-  channel: 0
+  channel: 2
   baseVolume: 1
 --- !u!82 &1041287859
 AudioSource:
@@ -6022,7 +6022,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8187289752383012598, guid: aa87a7d0c13c3a04a9f9575560d99e93, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -6142,7 +6142,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15a943e182e03dc42b6cab8243bb119d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Roll_a_Ball.OutGame.AudioVolumeBinding
-  channel: 0
+  channel: 2
   baseVolume: 1
 --- !u!82 &1646024863
 AudioSource:
