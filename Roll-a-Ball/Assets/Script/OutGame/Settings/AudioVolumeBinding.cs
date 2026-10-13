@@ -60,7 +60,15 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private void ApplyVolume()
         {
-            source.volume = baseVolume * (channel == Channel.Bgm ? GameSettings.BgmVolume : GameSettings.SeVolume);
+            float volume = channel switch
+            {
+                Channel.Bgm => GameSettings.BgmVolume,
+                Channel.Se => GameSettings.SeVolume,
+                Channel.Es => GameSettings.EsVolume,
+                _ => 1.0f
+            };
+
+            source.volume = baseVolume * volume;
         }
     }
 }

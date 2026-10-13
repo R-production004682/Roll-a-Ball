@@ -132,6 +132,10 @@ namespace Roll_a_Ball.OutGame
             Changed?.Invoke();
         }
 
+        /// <summary>
+        /// ES 音量を更新して購読者へ通知する
+        /// </summary>
+        /// <param name="value">設定する音量</param>
         public static void SetEsVolume(float value)
         {
             EnsureLoaded();
@@ -140,6 +144,9 @@ namespace Roll_a_Ball.OutGame
             {
                 return;
             }
+
+            esVolume = sanitized;
+            Changed?.Invoke();
         }
 
         /// <summary>
@@ -150,6 +157,7 @@ namespace Roll_a_Ball.OutGame
             loaded = true;
             bgmVolume = DefaultBgmVolume;
             seVolume = DefaultSeVolume;
+            esVolume = DefaultEsVolume;
             Changed?.Invoke();
             Save();
         }
@@ -162,6 +170,7 @@ namespace Roll_a_Ball.OutGame
             EnsureLoaded();
             PlayerPrefs.SetFloat(BgmKey, bgmVolume);
             PlayerPrefs.SetFloat(SeKey, seVolume);
+            PlayerPrefs.SetFloat(EsKey, esVolume);
             PlayerPrefs.Save();
         }
     }

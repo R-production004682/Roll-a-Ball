@@ -6253,7 +6253,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a64ba5859d776e440865efa0155fa9c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Birdsong
-  cameramain: {fileID: 0}
+  cameramain: {fileID: 1808568882}
   maxDistance: 30
   turnDistance: 0
   movingUp: 1
