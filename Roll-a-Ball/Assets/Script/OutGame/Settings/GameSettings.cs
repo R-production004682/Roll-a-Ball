@@ -10,11 +10,14 @@ namespace Roll_a_Ball.OutGame
     {
         public const float DefaultBgmVolume = 0.7f;
         public const float DefaultSeVolume = 0.8f;
+        private const float DefaultEsVolume = 0.7f;
         private const string BgmKey = "RollABall.Settings.BgmVolume";
         private const string SeKey = "RollABall.Settings.SeVolume";
+        private const string EsKey = "RollABall.Settings.EsVolume";
         private static bool loaded;
         private static float bgmVolume;
         private static float seVolume;
+        private static float esVolume;
 
         /// <summary>
         /// 設定値が変更されたときに通知する
@@ -42,6 +45,18 @@ namespace Roll_a_Ball.OutGame
             {
                 EnsureLoaded();
                 return seVolume;
+            }
+        }
+
+        /// <summary>
+        /// 現在の環境音の音量を返す
+        /// </summary>
+        public static float EsVolume
+        {
+            get
+            {
+                EnsureLoaded();
+                return esVolume;
             }
         }
 
@@ -79,6 +94,7 @@ namespace Roll_a_Ball.OutGame
 
             bgmVolume = Sanitize(PlayerPrefs.GetFloat(BgmKey, DefaultBgmVolume), DefaultBgmVolume);
             seVolume = Sanitize(PlayerPrefs.GetFloat(SeKey, DefaultSeVolume), DefaultSeVolume);
+            esVolume = Sanitize(PlayerPrefs.GetFloat(EsKey, DefaultEsVolume), DefaultEsVolume);
             loaded = true;
         }
 
@@ -117,6 +133,23 @@ namespace Roll_a_Ball.OutGame
         }
 
         /// <summary>
+        /// ES 音量を更新して購読者へ通知する
+        /// </summary>
+        /// <param name="value">設定する音量</param>
+        public static void SetEsVolume(float value)
+        {
+            EnsureLoaded();
+            var sanitized = Sanitize(value, DefaultEsVolume);
+            if (Mathf.Approximately(esVolume, sanitized))
+            {
+                return;
+            }
+
+            esVolume = sanitized;
+            Changed?.Invoke();
+        }
+
+        /// <summary>
         /// 音量を初期値へ戻して保存する
         /// </summary>
         public static void RestoreDefaults()
@@ -124,6 +157,7 @@ namespace Roll_a_Ball.OutGame
             loaded = true;
             bgmVolume = DefaultBgmVolume;
             seVolume = DefaultSeVolume;
+            esVolume = DefaultEsVolume;
             Changed?.Invoke();
             Save();
         }
@@ -136,6 +170,7 @@ namespace Roll_a_Ball.OutGame
             EnsureLoaded();
             PlayerPrefs.SetFloat(BgmKey, bgmVolume);
             PlayerPrefs.SetFloat(SeKey, seVolume);
+            PlayerPrefs.SetFloat(EsKey, esVolume);
             PlayerPrefs.Save();
         }
     }

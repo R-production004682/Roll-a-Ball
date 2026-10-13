@@ -15,10 +15,11 @@ namespace Roll_a_Ball.OutGame
         public enum Channel
         {
             Bgm,
-            Se
+            Se,
+            Es
         }
 
-        [SerializeField, Tooltip("この音源に適用する共通音量を選びます（BGM または効果音）。")]
+        [SerializeField, Tooltip("この音源に適用する共通音量を選びます（BGM または効果音、環境音）。")]
         private Channel channel;
         [SerializeField, Range(0f, 1f), Tooltip("この音源固有の音量です。共通音量を掛けて再生します。")]
         private float baseVolume = 1f;
@@ -59,7 +60,15 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private void ApplyVolume()
         {
-            source.volume = baseVolume * (channel == Channel.Bgm ? GameSettings.BgmVolume : GameSettings.SeVolume);
+            float volume = channel switch
+            {
+                Channel.Bgm => GameSettings.BgmVolume,
+                Channel.Se => GameSettings.SeVolume,
+                Channel.Es => GameSettings.EsVolume,
+                _ => 1.0f
+            };
+
+            source.volume = baseVolume * volume;
         }
     }
 }
