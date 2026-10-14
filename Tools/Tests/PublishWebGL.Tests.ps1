@@ -59,32 +59,26 @@ function Invoke-GitHub
     {
         return @{ tree = @(
             @{ path = 'roll-a-ball-publishing.json'; type = 'blob'; size = 40 },
-            @{ path = 'builds/20260101-old/a'; type = 'blob'; size = 10 },
+            @{ path = 'builds/pr-999-20260101-old/a'; type = 'blob'; size = 10 },
             @{ path = 'builds/20260201-old/a'; type = 'blob'; size = 10 },
             @{ path = 'builds/20260301-old/a'; type = 'blob'; size = 10 }
         ) }
-    }
-    if ($Endpoint -like '*/git/blobs') { return @{ sha = 'fixture-blob' } }
-    if ($Endpoint -like '*/git/trees')
-    {
-        $script:treeBody = $Body
-        $script:buildId = (($Body.tree | Where-Object { $_.path -like '*/build-info.json' }).content | ConvertFrom-Json).buildId
-        return @{ sha = 'new-tree' }
-    }
-    if ($Endpoint -like '*/git/commits')
-    {
-        Assert-Test ($Body.parents[0] -eq 'previous-commit') '公開履歴を維持する'
-        return @{ sha = 'new-commit' }
-    }
-    if ($Endpoint -like '*/git/refs/heads/*')
-    {
-        Assert-Test (!$Body.force) '競合する更新を強制上書きしない'
-        return @{ object = @{ sha = 'new-commit' } }
     }
     if ($Endpoint -eq "repos/$Repository/pages" -and $Method -eq 'POST') { return @{ html_url = 'https://example.test/game/' } }
     if ($Endpoint -like '*/pages/builds/latest') { return @{ commit = 'new-commit'; status = $script:pageResult } }
     if ($Endpoint -like '*/pages/builds') { return @{ status = 'queued' } }
     throw "Unexpected mocked API: $Endpoint"
+}
+
+function Push-GitBuild
+{
+    param([string] $Repo, [string] $Branch, [string] $PreviousSha, [object[]] $Entries, [string] $BuildId)
+    Assert-Test ($PreviousSha -eq 'previous-commit') '公開履歴を Git に渡す'
+    Assert-Test ($Branch -eq 'webgl-builds') '専用の公開ブランチだけを更新する'
+    Assert-Test (@($Entries | Where-Object { $_.ContainsKey('file') }).Count -eq 2) '実ファイルを Git へ渡す'
+    $script:treeBody = @{ tree = $Entries }
+    $script:buildId = $BuildId
+    return 'new-commit'
 }
 
 function Invoke-RestMethod
@@ -114,13 +108,21 @@ $script:notifications = 0
 $script:pageResult = 'built'
 Publish-WebGL | Out-Null
 Assert-Test ($notifications -eq 1) '公開成功後に一度だけ通知する'
-Assert-Test (@($treeBody.tree | Where-Object { $_.path -eq 'builds/20260101-old/a' -and $_.ContainsKey('sha') -and $null -eq $_.sha }).Count -eq 1) '古い公開版を削除する'
+Assert-Test (@($treeBody.tree | Where-Object { $_.path -eq 'builds/pr-999-20260101-old/a' -and $_.ContainsKey('sha') -and $null -eq $_.sha }).Count -eq 1) 'PR 番号ではなく日付順に古い公開版を削除する'
 Assert-Test (@($treeBody.tree | Where-Object { $_.path -eq 'builds/20260201-old/a' }).Count -eq 0) '過去二件を既存ツリーに維持する'
 Assert-Test (@($treeBody.tree | Where-Object { $_.path -match 'UserSettings|\.xml$|\.cs$' }).Count -eq 0) '設定・秘密情報・コードを公開しない'
+$script:PreviewId = 'pr-213'
+Publish-WebGL | Out-Null
+Assert-Test ($script:buildId -match '^pr-213-[0-9]{8}-[0-9]{6}-') 'PR ごとに識別できるバージョン付き URL を生成する'
+$script:PreviewId = ''
 $script:notifications = 0
 $script:pageResult = 'errored'
 $rejected = $false
 try { Publish-WebGL | Out-Null }
 catch { $rejected = $true }
 Assert-Test ($rejected -and $notifications -eq 0) '公開失敗時には通知しない'
+$oversize = Get-SafeCommandError 'gh: Sorry, your input was too large to process. (HTTP 422)'
+Assert-Test ($oversize -match 'too large' -and $oversize -match '422') 'GitHub が返した実際の失敗理由を表示する'
+$secret = Get-SafeCommandError 'fatal: ghp_fixturetoken https://discord.com/api/webhooks/123/fake'
+Assert-Test ($secret -notmatch 'fixturetoken|/webhooks/') 'トークンと通知先を診断から除外する'
 Write-Output 'PASS: 公開境界、ロール通知、公開成功・失敗、過去版保持（外部通信なし）'

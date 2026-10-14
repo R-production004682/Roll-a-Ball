@@ -57,7 +57,7 @@ namespace Roll_a_Ball.EditorTools
                 return null;
             }
 
-            if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+            if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
             {
                 return null;
             }

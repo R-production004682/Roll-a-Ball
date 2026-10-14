@@ -3,6 +3,7 @@ param(
     [string] $OutputDirectory,
     [string] $Repository = 'R-production004682/Roll-a-Ball',
     [string] $RoleId = '1538587867746668554',
+    [string] $PreviewId,
     [switch] $ConfigureWebhook,
     [switch] $ValidateOnly
 )
@@ -77,9 +78,138 @@ function Invoke-GitHub
         {
             return $null
         }
-        throw "GitHub API に失敗しました: $Method $Endpoint。gh auth login とリポジトリ権限を確認してください。"
+        $detail = Get-SafeCommandError $errorText
+        $hint = if ($errorText -match 'HTTP (401|403)') { '認証・権限または API 制限を確認してください。' } else { '' }
+        throw "GitHub API に失敗しました: $Method $Endpoint。$detail $hint"
     }
     return ($response -join "`n" | ConvertFrom-Json)
+}
+
+function Get-SafeCommandError
+{
+    <# .SYNOPSIS
+    GitHub CLI と Git のエラーから認証情報を伏せた診断を作成する
+    #>
+    param([string] $Message)
+    $lines = @($Message -split '\r?\n' | Where-Object { $_ -match 'gh:|fatal:|remote:|error:' })
+    $detail = if ($lines.Count -gt 0) { $lines -join ' ' } else { '外部コマンドが失敗しました。' }
+    $detail = $detail -replace 'https://discord\.com/api/webhooks/[^\s]+', '[Webhook redacted]'
+    $detail = $detail -replace '(gh[pousr]_[A-Za-z0-9_]+|github_pat_[A-Za-z0-9_]+)', '[Token redacted]'
+    return $detail
+}
+
+function Invoke-PublishingGit
+{
+    <# .SYNOPSIS
+    認証情報を使って Git コマンドを実行し、失敗時に安全な診断を返す
+    #>
+    param([string] $GitDirectory, [string[]] $GitArguments)
+    $stagingDirectory = Join-Path $scratchDirectory 'git-staging'
+    New-Item -ItemType Directory -Path $stagingDirectory -Force | Out-Null
+    $arguments = @('-c', 'credential.helper=', '-c', 'credential.helper=!gh auth git-credential',
+        '-c', 'commit.gpgSign=false', "--git-dir=$GitDirectory")
+    if ($GitArguments -contains '--force-remove')
+    {
+        $arguments += "--work-tree=$stagingDirectory"
+    }
+    $arguments += $GitArguments
+    $errorPath = Join-Path $scratchDirectory 'git-error.txt'
+    $previousPreference = $ErrorActionPreference
+    $previousPrompt = $env:GIT_TERMINAL_PROMPT
+    $ErrorActionPreference = 'Continue'
+    $env:GIT_TERMINAL_PROMPT = '0'
+    $response = & git @arguments 2> $errorPath
+    $exitCode = $LASTEXITCODE
+    $ErrorActionPreference = $previousPreference
+    $env:GIT_TERMINAL_PROMPT = $previousPrompt
+    if ($exitCode -ne 0)
+    {
+        $detail = Get-SafeCommandError (Get-Content -LiteralPath $errorPath -Raw)
+        throw "Git によるビルド送信に失敗しました。$detail"
+    }
+    return ($response -join "`n").Trim()
+}
+
+function Initialize-PublishingRepository
+{
+    <# .SYNOPSIS
+    専用の bare repository を作成または安全に再利用する
+    #>
+    param([string] $Repo)
+    $directory = Join-Path $scratchDirectory 'upload.git'
+    $marker = Join-Path $directory 'roll-a-ball-publisher.txt'
+    if (Test-Path -LiteralPath $directory)
+    {
+        if (!(Test-Path -LiteralPath $marker -PathType Leaf) -or
+            [IO.File]::ReadAllText($marker).Trim() -ne $Repo)
+        {
+            throw '公開用 Git フォルダーが別用途で使われています。上書きせずに停止しました。'
+        }
+    }
+    else
+    {
+        Invoke-PublishingGit $directory @('init', '--bare') | Out-Null
+        Invoke-PublishingGit $directory @('config', 'remote.origin.url', "https://github.com/$Repo.git") | Out-Null
+        Invoke-PublishingGit $directory @('config', 'remote.origin.promisor', 'true') | Out-Null
+        Invoke-PublishingGit $directory @('config', 'remote.origin.partialclonefilter', 'blob:none') | Out-Null
+        [IO.File]::WriteAllText($marker, $Repo, (New-Object Text.UTF8Encoding($false)))
+    }
+    return $directory
+}
+
+function Push-GitBuild
+{
+    <# .SYNOPSIS
+    大きなファイルを JSON/Base64 にせず、専用の bare repository から通常の Git push で送る
+    #>
+    param([string] $Repo, [string] $Branch, [string] $PreviousSha, [object[]] $Entries, [string] $BuildId)
+    $directory = Initialize-PublishingRepository $Repo
+    if (![string]::IsNullOrWhiteSpace($PreviousSha))
+    {
+        Invoke-PublishingGit $directory @('fetch', '--no-tags', '--depth=1', '--filter=blob:none', 'origin', "refs/heads/$Branch") | Out-Null
+        $fetched = Invoke-PublishingGit $directory @('rev-parse', 'FETCH_HEAD')
+        if ($fetched -ne $PreviousSha)
+        {
+            throw '公開ブランチが別の操作で更新されました。再実行してください。'
+        }
+        Invoke-PublishingGit $directory @('read-tree', $PreviousSha) | Out-Null
+    }
+    else
+    {
+        Invoke-PublishingGit $directory @('read-tree', '--empty') | Out-Null
+    }
+    foreach ($entry in $Entries)
+    {
+        if ($entry.ContainsKey('sha') -and $null -eq $entry.sha)
+        {
+            Invoke-PublishingGit $directory @('update-index', '--force-remove', '--', $entry.path) | Out-Null
+            continue
+        }
+        if ($entry.ContainsKey('file'))
+        {
+            $filePath = $entry.file
+        }
+        else
+        {
+            $filePath = Join-Path $scratchDirectory 'generated-content.txt'
+            [IO.File]::WriteAllText($filePath, [string]$entry.content, (New-Object Text.UTF8Encoding($false)))
+        }
+        # Pages では LFS pointer を配信できないため、フィルターを通さず実ファイルを登録する。
+        $sha = Invoke-PublishingGit $directory @('hash-object', '--no-filters', '-w', '--', $filePath)
+        Invoke-PublishingGit $directory @('update-index', '--add', '--cacheinfo', "100644,$sha,$($entry.path)") | Out-Null
+    }
+    $treeSha = Invoke-PublishingGit $directory @('write-tree')
+    $arguments = @('-c', 'user.name=Roll-a-Ball WebGL', '-c', 'user.email=webgl-publisher@users.noreply.github.com',
+        'commit-tree', $treeSha, '-m', "Publish WebGL $BuildId")
+    if (![string]::IsNullOrWhiteSpace($PreviousSha))
+    {
+        $arguments += @('-p', $PreviousSha)
+    }
+    $commitSha = Invoke-PublishingGit $directory $arguments
+    Write-Output 'Git でビルドを送信しています…' | Out-Host
+    # 強制更新しない。別の公開処理が先行した場合は push を失敗させる。
+    Invoke-PublishingGit $directory @('push', 'origin', "${commitSha}:refs/heads/$Branch") | Out-Null
+    return $commitSha
 }
 
 function New-DiscordPayload
@@ -99,16 +229,23 @@ function Get-DiscordWebhook
     <# .SYNOPSIS
     Windows ユーザーに紐付いた暗号化設定を読み込み、Discord の通知先を検証する
     #>
-    if (!(Test-Path -LiteralPath $secretPath -PathType Leaf))
+    if (![string]::IsNullOrWhiteSpace($env:DISCORD_WEBHOOK_URL))
+    {
+        $value = $env:DISCORD_WEBHOOK_URL
+    }
+    elseif (!(Test-Path -LiteralPath $secretPath -PathType Leaf))
     {
         throw 'Webhook 未設定です。PublishWebGL.ps1 -ConfigureWebhook を実行してください。'
     }
-    $secure = Import-Clixml -LiteralPath $secretPath
-    if ($secure -isnot [Security.SecureString])
+    else
     {
-        throw 'Webhook 設定形式が不正です。再設定してください。'
+        $secure = Import-Clixml -LiteralPath $secretPath
+        if ($secure -isnot [Security.SecureString])
+        {
+            throw 'Webhook 設定形式が不正です。再設定してください。'
+        }
+        $value = (New-Object System.Net.NetworkCredential('', $secure)).Password
     }
-    $value = (New-Object System.Net.NetworkCredential('', $secure)).Password
     if ($value -notmatch '\Ahttps://discord\.com/api/webhooks/[0-9]+/[A-Za-z0-9_-]+\z')
     {
         throw 'Discord Webhook の設定が不正です。再設定してください。'
@@ -122,6 +259,10 @@ function Publish-WebGL
     成功済み WebGL を GitHub Pages へ公開し、到達確認後に Discord へ通知する
     #>
     $files = Assert-PublishInput $OutputDirectory $Repository $RoleId
+    if (![string]::IsNullOrWhiteSpace($PreviewId) -and $PreviewId -notmatch '\Apr-[1-9][0-9]*\z')
+    {
+        throw 'PreviewId は pr-123 の形式で指定してください。'
+    }
     $webhook = Get-DiscordWebhook
     if ($ValidateOnly)
     {
@@ -131,6 +272,10 @@ function Publish-WebGL
     if ($null -eq (Get-Command gh -ErrorAction SilentlyContinue))
     {
         throw 'GitHub CLI が必要です。インストール後に gh auth login を実行してください。'
+    }
+    if ($null -eq (Get-Command git -ErrorAction SilentlyContinue))
+    {
+        throw 'Git が必要です。Git for Windows をインストールしてください。'
     }
     $script:scratchDirectory = Join-Path $projectRoot 'Builds/Publishing'
     New-Item -ItemType Directory -Path $scratchDirectory -Force | Out-Null
@@ -157,9 +302,14 @@ function Publish-WebGL
         }
     }
     $buildId = [DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss') + '-' + [Guid]::NewGuid().ToString('N').Substring(0, 6)
+    if (![string]::IsNullOrWhiteSpace($PreviewId))
+    {
+        $buildId = "$PreviewId-$buildId"
+    }
     $entries = New-Object System.Collections.Generic.List[object]
     $retainedIds = @($previousTree | Where-Object { $_.type -eq 'blob' -and $_.path -match '^builds/([^/]+)/' } |
-        ForEach-Object { $_.path.Split('/')[1] } | Sort-Object -Unique -Descending | Select-Object -First 2)
+        ForEach-Object { $_.path.Split('/')[1] } | Sort-Object -Unique |
+        Sort-Object { $_ -replace '^pr-[0-9]+-', '' } -Descending | Select-Object -First 2)
     $newSize = ($files | Measure-Object -Property Length -Sum).Sum
     while ($retainedIds.Count -gt 0)
     {
@@ -181,36 +331,15 @@ function Publish-WebGL
     foreach ($file in $files)
     {
         $relative = $file.FullName.Substring([IO.Path]::GetFullPath($OutputDirectory).TrimEnd('\', '/').Length + 1).Replace('\', '/')
-        Write-Output "アップロード: $relative"
-        $blob = Invoke-GitHub "repos/$Repository/git/blobs" 'POST' @{
-            content = [Convert]::ToBase64String([IO.File]::ReadAllBytes($file.FullName)); encoding = 'base64'
-        }
-        $entries.Add(@{ path = "builds/$buildId/$relative"; mode = '100644'; type = 'blob'; sha = $blob.sha })
+        Write-Output "公開ファイル: $relative"
+        $entries.Add(@{ path = "builds/$buildId/$relative"; file = $file.FullName })
     }
     $entries.Add(@{ path = '.nojekyll'; mode = '100644'; type = 'blob'; content = '' })
     $entries.Add(@{ path = 'roll-a-ball-publishing.json'; mode = '100644'; type = 'blob'; content = '{"tool":"RollABall.WebGL","version":1}' })
     $entries.Add(@{ path = "builds/$buildId/build-info.json"; mode = '100644'; type = 'blob'; content = (@{ buildId = $buildId } | ConvertTo-Json -Compress) })
     $entries.Add(@{ path = 'index.html'; mode = '100644'; type = 'blob'; content = "<!doctype html><meta charset=utf-8><meta http-equiv=refresh content='0;url=builds/$buildId/'><a href='builds/$buildId/'>Play Roll-a-Ball</a>" })
-    $treeBody = @{ tree = @($entries.ToArray()) }
-    if ($null -ne $previousCommit)
-    {
-        $treeBody.base_tree = $previousCommit.tree.sha
-    }
-    $tree = Invoke-GitHub "repos/$Repository/git/trees" 'POST' $treeBody
-    $commitBody = @{ message = "Publish WebGL $buildId"; tree = $tree.sha }
-    if ($null -ne $previousCommit)
-    {
-        $commitBody.parents = @($previousCommit.sha)
-    }
-    $commit = Invoke-GitHub "repos/$Repository/git/commits" 'POST' $commitBody
-    if ($null -eq $branch)
-    {
-        Invoke-GitHub "repos/$Repository/git/refs" 'POST' @{ ref = "refs/heads/$publishBranch"; sha = $commit.sha } | Out-Null
-    }
-    else
-    {
-        Invoke-GitHub "repos/$Repository/git/refs/heads/$publishBranch" 'PATCH' @{ sha = $commit.sha; force = $false } | Out-Null
-    }
+    $previousSha = if ($null -ne $previousCommit) { $previousCommit.sha } else { $null }
+    $commitSha = Push-GitBuild $Repository $publishBranch $previousSha @($entries.ToArray()) $buildId
     if ($null -eq $pages)
     {
         $pages = Invoke-GitHub "repos/$Repository/pages" 'POST' @{ build_type = 'legacy'; source = @{ branch = $publishBranch; path = '/' } }
@@ -223,11 +352,11 @@ function Publish-WebGL
     while ([DateTime]::UtcNow -lt $deadline)
     {
         $build = Invoke-GitHub "repos/$Repository/pages/builds/latest"
-        if ($build.commit -eq $commit.sha -and $build.status -eq 'errored')
+        if ($build.commit -eq $commitSha -and $build.status -eq 'errored')
         {
             throw 'GitHub Pages の公開が失敗しました。リポジトリの Actions と Pages 設定を確認してください。'
         }
-        if ($build.commit -eq $commit.sha -and $build.status -eq 'built')
+        if ($build.commit -eq $commitSha -and $build.status -eq 'built')
         {
             # 公開の反映待ちによる HTTP 404 は、短い待機の後に再確認する
             try
