@@ -21559,8 +21559,33 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4713656104923125363, guid: 8b92348f0a465e949b1dca18466736bc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1183723486}
   m_SourcePrefab: {fileID: 100100000, guid: 8b92348f0a465e949b1dca18466736bc, type: 3}
+--- !u!1 &1183723485 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4713656104923125363, guid: 8b92348f0a465e949b1dca18466736bc, type: 3}
+  m_PrefabInstance: {fileID: 1183723484}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1183723486
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1183723485}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a64ba5859d776e440865efa0155fa9c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Birdsong
+  cameramain: {fileID: 0}
+  maxDistance: 30
+  turnDistance: 30
+  movingUp: 1
+  moveSpeed: 5
 --- !u!4 &1186420612 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 01f53b250eccc7943aa37ee0377ed095, type: 3}
@@ -38918,17 +38943,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
---- !u!114 &555574172994679288 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4588765312517821176, guid: aa87a7d0c13c3a04a9f9575560d99e93, type: 3}
-  m_PrefabInstance: {fileID: 555574172994679285}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!1001 &2148572709332859148
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -39574,7 +39588,6 @@ MonoBehaviour:
   stageName: {fileID: 6991867547909669600}
   journeyLabel: {fileID: 6991867547909669599}
   stageDots: []
-  resultTime: {fileID: 555574172994679288}
   resultCoins: {fileID: 555574172994679287}
   resultWallet: {fileID: 555574172994679286}
 --- !u!1660057539 &9223372036854775807
