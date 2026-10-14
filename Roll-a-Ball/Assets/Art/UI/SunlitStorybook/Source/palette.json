@@ -51,7 +51,7 @@
   "refinement": "Lean layout with readable labels, ivory panels, forest green buttons and restrained wood accents. No ranking or camera guide. HUD occupies about 4.8% of the 1920x1080 reference area.",
   "titleAndExit": {
     "choice": "C: warm interior wooden window",
-    "scene": "StageSelectScene contains TitleScreen over an already prepared StageSelectScreen; no scene load on start.",
+    "scene": "HomeScene contains TitleScreen over an already prepared StageSelectScreen; no scene load on start.",
     "start": "Closed paired wooden shutters, wordmark and glowing slow-pulsing Any Press Key; key, mouse button or gamepad button opens shutters while the view moves closer.",
     "exit": "Settings Quit button reverses the same window movement, closes shutters at title framing, then fades to black and quits.",
     "travelSeconds": 3.4,
