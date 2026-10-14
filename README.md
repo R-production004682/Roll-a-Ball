@@ -39,6 +39,7 @@ Unity の **Tools → Roll-a-Ball → Build Windows** から、Windows 64bit・1
 
 ブラウザーでの確認用には **Tools → Roll-a-Ball → Build WebGL and Publish** を使用できます。
 WebGL ビルド成功後に GitHub Pages へ公開し、プレイ URL を `@roll-a-ball` へのメンション付きで Discord に通知します。
+Git と GitHub CLI (`gh auth login`) が必要です。公開用の独立した Git 領域からビルドだけを転送し、開発ブランチのソース・履歴は送信しません。
 初期設定と操作は [WebGL の公開・通知](Docs/WebGLPublishing.md) を参照してください。
 
 ---
