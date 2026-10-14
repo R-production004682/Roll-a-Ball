@@ -12,18 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7dfe22befa8151e4ab8028cab3040fde, type: 3}
   m_Name: DirtMovementSurface
   m_EditorClassIdentifier: Assembly-CSharp::MovementSurfaceProfile
-  dustColor: {r: 0.69, g: 0.56, b: 0.39, a: 0.46}
-  accentColor: {r: 0.81, g: 0.69, b: 0.5, a: 0.32}
+  dustColor: {r: 0.5943396, g: 0.41531685, b: 0.17661978, a: 0.74509805}
+  accentColor: {r: 0.7830189, g: 0.56996554, b: 0.24007656, a: 0.77254903}
   particlesPerSecond: {x: 10, y: 24}
-  particleSize: {x: 0.18, y: 0.34}
+  particleSize: {x: 1, y: 1}
   lifetime: {x: 0.35, y: 0.55}
-  lateralSpeed: 0.45
+  lateralSpeed: 1.5
   liftSpeed: 0.4
-  sparkleRatio: 0.02
+  sparkleRatio: 0.1
   surfaceDetail: 2
   detailColor: {r: 0.48, g: 0.38, b: 0.27, a: 1}
   detailParticlesPerSecond: {x: 3, y: 8}
-  detailSize: {x: 0.06, y: 0.11}
+  detailSize: {x: 0.1, y: 0.2}
   detailLifetime: {x: 0.32, y: 0.48}
   detailLateralSpeed: 0.62
   detailLiftSpeed: 1.15

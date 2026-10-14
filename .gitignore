@@ -2,4 +2,5 @@
 *.md
 *.md.meta
 !/README.md
+!/Docs/WebGLPublishing.md
 !/.github/PULL_REQUEST_TEMPLATE.md
