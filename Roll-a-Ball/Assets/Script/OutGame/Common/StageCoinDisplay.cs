@@ -10,6 +10,8 @@ namespace Roll_a_Ball.OutGame
     [RequireComponent(typeof(TextMeshProUGUI))]
     public sealed class StageCoinDisplay : MonoBehaviour
     {
+        [SerializeField, Tooltip("コインアイコンを併用するときは無効にします。")]
+        private bool showPrefix = true;
         private TMP_Text coinLabel;
         private GameManager gameManager;
 
@@ -29,7 +31,7 @@ namespace Roll_a_Ball.OutGame
             gameManager = GameManager.instance;
             if (gameManager == null)
             {
-                coinLabel.text = "COIN  0";
+                coinLabel.text = showPrefix ? "COIN  0" : "0";
                 Debug.LogError("StageCoinDisplay: GameManager が設定されたゲームシーンに配置してください。", this);
                 return;
             }
@@ -56,7 +58,7 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private void Refresh()
         {
-            coinLabel.text = $"COIN  {gameManager.CollectedCoins:N0}";
+            coinLabel.text = $"{(showPrefix ? "COIN  " : string.Empty)}{gameManager.CollectedCoins:N0}";
         }
     }
 }

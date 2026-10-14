@@ -44,6 +44,7 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private void Play()
         {
+            UiClickPulse.Play(transform as RectTransform);
             UiSoundPlayer.Play(clickSound);
         }
     }

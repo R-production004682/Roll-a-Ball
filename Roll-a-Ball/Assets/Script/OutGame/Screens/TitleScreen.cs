@@ -6,16 +6,15 @@ using UnityEngine.InputSystem.Controls;
 namespace Roll_a_Ball.OutGame
 {
     /// <summary>
-    /// タイトルの入力案内を明滅させ、キーやマウスなどの入力で次のシーンへ進む
+    /// タイトルの入力案内を明滅させ、入力で同じシーンのステージ選択を表示する
     /// </summary>
     public sealed class TitleScreen : ScreenBase
     {
         private const float MinimumBlinkDuration = 0.1f;
 
-        [SerializeField, Tooltip("開始入力後に移動するシーンです。")]
-        private SceneReference destination = new SceneReference();
         [SerializeField, Tooltip("Any Press Key の文字と光をまとめて明滅させるグループです。")]
         private CanvasGroup promptGroup;
+        [SerializeField] private AudioClip confirmSound;
         [SerializeField, Min(MinimumBlinkDuration), Tooltip("文字が暗くなり、元の明るさに戻るまでの秒数です。")]
         private float blinkDuration = 4f;
         [SerializeField, Range(0f, 1f), Tooltip("明滅中に最も暗くなったときの不透明度です。")]
@@ -27,36 +26,24 @@ namespace Roll_a_Ball.OutGame
         private bool transitionRequested;
         private int openedFrame;
 
-#if UNITY_EDITOR
-        /// <summary>
-        /// Inspector の遷移先パスを Scene アセットの現在位置へ同期する
-        /// </summary>
-        private void OnValidate()
-        {
-            SynchronizeDestination();
-        }
-
-        /// <summary>
-        /// ビルドで使用する遷移先パスを GUID から同期する
-        /// </summary>
-        public void SynchronizeDestination()
-        {
-            destination.SynchronizePath();
-        }
-#endif
-
         /// <summary>
         /// 入力受付を開始し、案内文字の緩やかな明滅を再生する
         /// </summary>
         public override void OnOpen(object arg)
         {
-            if (promptGroup == null || !destination.IsAssigned)
+            if (promptGroup == null)
             {
-                Debug.LogError("TitleScreen の promptGroup または destination が未設定です。", this);
+                Debug.LogError("TitleScreen の promptGroup が未設定です。", this);
                 return;
             }
 
             inputScope = GetComponent<UiInputScope>();
+            var home = ForestHomeTransition.GetOrCreate();
+            if (home != null)
+            {
+                home.ShowTitle();
+                promptGroup = home.PromptGroup;
+            }
             openedFrame = Time.frameCount;
             transitionRequested = false;
             isOpen = true;
@@ -97,7 +84,14 @@ namespace Roll_a_Ball.OutGame
                 return;
             }
 
-            transitionRequested = SceneRouter.LoadScene(destination.Path, this);
+            var home = ForestHomeTransition.GetOrCreate();
+            if (home != null && !home.IsAnimating)
+            {
+                StopBlink();
+                UiClickPulse.Play(promptGroup.transform as RectTransform);
+                UiSoundPlayer.Play(confirmSound);
+            }
+            transitionRequested = home != null && home.EnterStageSelect(this);
         }
 
         /// <summary>

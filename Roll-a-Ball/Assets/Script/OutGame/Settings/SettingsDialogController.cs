@@ -28,6 +28,9 @@ namespace Roll_a_Ball.OutGame
         private Slider bgmSlider;
         [SerializeField, Tooltip("効果音の音量を変更するスライダーです。")]
         private Slider seSlider;
+        [SerializeField, Tooltip("鳥の声や森の環境音の音量です。")]
+        private Slider ambientSlider;
+        [SerializeField] private TMP_Text ambientValue;
         [SerializeField, Tooltip("BGM 音量を数字で表示するテキストです。")]
         private TMP_Text bgmValue;
         [SerializeField, Tooltip("効果音の音量を数字で表示するテキストです。")]
@@ -72,6 +75,7 @@ namespace Roll_a_Ball.OutGame
             previewSource.playOnAwake = false;
             bgmSlider.onValueChanged.AddListener(GameSettings.SetBgmVolume);
             seSlider.onValueChanged.AddListener(GameSettings.SetSeVolume);
+            ambientSlider.onValueChanged.AddListener(GameSettings.SetAmbientVolume);
             RefreshValues();
         }
 
@@ -106,6 +110,7 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private void OnDestroy()
         {
+            if (ambientSlider != null) ambientSlider.onValueChanged.RemoveListener(GameSettings.SetAmbientVolume);
             if (bgmSlider != null)
             {
                 bgmSlider.onValueChanged.RemoveListener(GameSettings.SetBgmVolume);
@@ -131,6 +136,17 @@ namespace Roll_a_Ball.OutGame
         public void OpenFromPause()
         {
             Open(OpenOrigin.Pause);
+        }
+
+        /// <summary>設定画面から、同じ窓を閉じる終了演出を開始する。</summary>
+        public void QuitGame()
+        {
+            if (!IsOpen || !dialogInputScope.CanReceiveInput) return;
+            var home = ForestHomeTransition.GetOrCreate();
+            if (home == null) return;
+            GameSettings.Save();
+            previewSource.Stop();
+            DialogMotion.Hide(dialog, () => { dialog.SetActive(false); home.QuitGame(); });
         }
 
         /// <summary>
@@ -159,8 +175,8 @@ namespace Roll_a_Ball.OutGame
                     pauseMenu.SetActive(false);
                 }
             }
-            backLabel.text = openOrigin == OpenOrigin.Pause ? "BACK TO PAUSE" : "BACK TO STAGES";
-            contextLabel.text = openOrigin == OpenOrigin.Pause ? "GAME PAUSED  /  Test SE to preview your volume" : "MAKE YOURSELF COMFORTABLE";
+            backLabel.text = openOrigin == OpenOrigin.Pause ? "ポーズへ戻る" : "ステージセレクトへ戻る";
+            contextLabel.text = "心地よい音量に調整できます";
             RefreshValues();
             dialog.SetActive(true);
             if (EventSystem.current != null)
@@ -187,6 +203,12 @@ namespace Roll_a_Ball.OutGame
 
             GameSettings.Save();
             previewSource.Stop();
+            if (isActiveAndEnabled) DialogMotion.Hide(dialog, FinishClose);
+            else FinishClose();
+        }
+
+        private void FinishClose()
+        {
             dialog.SetActive(false);
             if (openOrigin == OpenOrigin.Pause && pauseMenu != null)
             {
@@ -286,6 +308,12 @@ namespace Roll_a_Ball.OutGame
         {
             bgmSlider.SetValueWithoutNotify(GameSettings.BgmVolume);
             seSlider.SetValueWithoutNotify(GameSettings.SeVolume);
+            ambientSlider.SetValueWithoutNotify(GameSettings.AmbientVolume);
+            ambientValue.text = Mathf.RoundToInt(GameSettings.AmbientVolume * PercentPerUnitVolume) + "%";
+            foreach (var toggle in dialog.GetComponentsInChildren<VolumeMuteToggle>(true))
+            {
+                toggle.Synchronize();
+            }
             bgmValue.text = Mathf.RoundToInt(GameSettings.BgmVolume * PercentPerUnitVolume) + "%";
             seValue.text = Mathf.RoundToInt(GameSettings.SeVolume * PercentPerUnitVolume) + "%";
             previewSource.volume = GameSettings.SeVolume;
@@ -297,6 +325,11 @@ namespace Roll_a_Ball.OutGame
         /// <returns>必須参照がすべて設定されている場合は true</returns>
         private bool ValidateReferences()
         {
+            if (ambientSlider == null || ambientValue == null)
+            {
+                Debug.LogError("SettingsDialog の環境音スライダーと数値を設定してください。", this);
+                return false;
+            }
             var missingReferences = SettingsDialogAlgorithm.GetMissingReferences(
                 dialog,
                 dialogInputScope,

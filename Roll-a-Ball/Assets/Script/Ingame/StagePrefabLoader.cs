@@ -2,7 +2,7 @@ using Roll_a_Ball.OutGame;
 using UnityEngine;
 
 /// <summary>
-/// 選択したステージ Prefab を読み込み、一件もない場合は MainScene の配置を使う
+/// 選択したステージ Prefab を読み込み、一件もない場合は GameplayScene の配置を使う
 /// </summary>
 [DefaultExecutionOrder(-2000)]
 public sealed class StagePrefabLoader : MonoBehaviour

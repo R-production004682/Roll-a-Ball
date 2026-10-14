@@ -17,6 +17,8 @@ namespace Roll_a_Ball.OutGame
         private List<ScreenBase> screenPrefabs = new List<ScreenBase>();
         [SerializeField, Tooltip("ゲーム開始時に表示する画面のプレハブです。")]
         private ScreenBase initialScreen;
+        [SerializeField, Tooltip("初期画面の背面で先に準備する画面です。タイトル終了後はこの画面を表示します。")]
+        private ScreenBase screenBehindInitial;
         [SerializeField, Tooltip("画面を切り替えるときに使うフェードです。")]
         private FadeTransition screenTransition;
 
@@ -63,6 +65,20 @@ namespace Roll_a_Ball.OutGame
 
             if (initialScreen != null && stack.Count == 0)
             {
+                if (screenBehindInitial != null)
+                {
+                    var background = Create(screenBehindInitial.GetType());
+                    if (background == null) return;
+                    CommitReplacement(background, null);
+                    if (initialScreen is TitleScreen && ForestHomeTransition.MenuEntered) return;
+                    var foreground = Create(initialScreen.GetType());
+                    if (foreground == null) return;
+                    foreground.transform.SetParent(screenRoot, false);
+                    foreground.gameObject.SetActive(true);
+                    stack.Add(foreground);
+                    OpenScreen(foreground, null);
+                    return;
+                }
                 var screen = Create(initialScreen.GetType());
                 if (screen != null)
                 {
@@ -133,6 +149,20 @@ namespace Roll_a_Ball.OutGame
             return (T)Push(typeof(T), arg);
         }
 
+        internal bool HasPreparedStageSelect(TitleScreen title)
+        {
+            return !changing && stack.Count == 2 && stack[1] == title && stack[0] is StageSelectScreen;
+        }
+
+        /// <summary>窓の演出中にタイトルだけを閉じ、準備済みのステージ選択へ入力先を移す。</summary>
+        internal bool RevealPreparedStageSelect(TitleScreen title)
+        {
+            if (!HasPreparedStageSelect(title)) return false;
+            stack.RemoveAt(1);
+            CloseAndDestroy(title);
+            return true;
+        }
+
         /// <summary>
         /// 最上位の表示を閉じ、下の表示へ操作を戻す
         /// </summary>
@@ -200,7 +230,11 @@ namespace Roll_a_Ball.OutGame
 
             if (openingScreen == dialog)
             {
-                pendingCompletion = () => CompleteDialog(dialog, result);
+                pendingCompletion = () =>
+                {
+                    stack.Remove(dialog);
+                    CloseCompletedDialog(dialog, result);
+                };
                 return;
             }
 
@@ -212,9 +246,12 @@ namespace Roll_a_Ball.OutGame
 
             LogDialogTransition("complete-requested", dialog);
             changing = true;
-            stack.RemoveAt(stack.Count - 1);
-            CloseCompletedDialog(dialog, result);
-            changing = false;
+            DialogMotion.Hide(dialog.gameObject, () =>
+            {
+                stack.Remove(dialog);
+                CloseCompletedDialog(dialog, result);
+                changing = false;
+            });
         }
 
         /// <summary>

@@ -155,8 +155,11 @@ namespace Roll_a_Ball.OutGame
                 return;
             }
 
-            OutGameStateController.Enter(GameFlowState.Playing);
-            CloseMenuVisuals();
+            DialogMotion.Hide(menuDialog, () =>
+            {
+                OutGameStateController.Enter(GameFlowState.Playing);
+                CloseMenuVisuals();
+            });
         }
 
         /// <summary>
