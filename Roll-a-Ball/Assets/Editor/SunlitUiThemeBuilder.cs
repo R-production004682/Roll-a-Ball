@@ -43,7 +43,7 @@ namespace Roll_a_Ball.EditorTools
             Edit("Settings/SettingsDialog.prefab", Settings);
             Edit("Results/ResultCanvas.prefab", Result);
             Edit("Hud/GameplayHud.prefab", Hud);
-            BindMainScene();
+            BindGameplayScene();
             BindMenuScene();
             ApplySharedFeedback();
             BindAmbientAudio();
@@ -671,7 +671,7 @@ namespace Roll_a_Ball.EditorTools
             }
             finally { if (existing) PrefabUtility.UnloadPrefabContents(root); else UnityEngine.Object.DestroyImmediate(root); }
             var previous = SceneManager.GetActiveScene().path;
-            foreach (var scenePath in new[] { "Assets/Scenes/MainScene.unity", "Assets/Scenes/StageSelectScene.unity" })
+            foreach (var scenePath in new[] { "Assets/Scenes/GameplayScene.unity", "Assets/Scenes/HomeScene.unity" })
             {
                 var scene = EditorSceneManager.OpenScene(scenePath);
                 if (!scene.GetRootGameObjects().Any(g => g.name == "ForestAmbience"))
@@ -683,7 +683,7 @@ namespace Roll_a_Ball.EditorTools
 
         private static void BindMenuScene()
         {
-            const string menuPath = "Assets/Scenes/StageSelectScene.unity";
+            const string menuPath = "Assets/Scenes/HomeScene.unity";
             var previous = SceneManager.GetActiveScene().path;
             var scene = previous == menuPath ? SceneManager.GetActiveScene() : EditorSceneManager.OpenScene(menuPath);
             var manager = scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<ScreenManager>(true)).Single();
@@ -706,10 +706,10 @@ namespace Roll_a_Ball.EditorTools
             if (!string.IsNullOrEmpty(previous) && previous != menuPath) EditorSceneManager.OpenScene(previous);
         }
 
-        private static void BindMainScene()
+        private static void BindGameplayScene()
         {
             var previous = SceneManager.GetActiveScene().path;
-            var scene = previous == "Assets/Scenes/MainScene.unity" ? SceneManager.GetActiveScene() : EditorSceneManager.OpenScene("Assets/Scenes/MainScene.unity");
+            var scene = previous == "Assets/Scenes/GameplayScene.unity" ? SceneManager.GetActiveScene() : EditorSceneManager.OpenScene("Assets/Scenes/GameplayScene.unity");
             var hud = scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<Canvas>(true)).First(c => c.name == "GameplayHud").transform;
             var result = scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<Transform>(true)).First(t => t.name == "ResultCanvas");
             var session = Get<StageSessionPresentation>(hud.gameObject);

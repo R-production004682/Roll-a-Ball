@@ -1197,7 +1197,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Roll_a_Ball.OutGame.SceneTransitionButton
   destination:
-    scenePath: Assets/Scenes/StageSelectScene.unity
+    scenePath: Assets/Scenes/HomeScene.unity
     sceneGuid: 2cf7963b28fe83347a2a8221117771a6
 --- !u!114 &3066577561403982282
 MonoBehaviour:
@@ -2006,7 +2006,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Roll_a_Ball.OutGame.SceneTransitionButton
   destination:
-    scenePath: Assets/Scenes/MainScene.unity
+    scenePath: Assets/Scenes/GameplayScene.unity
     sceneGuid: a214e2a22156b4a43ab298b90d0eebf6
 --- !u!114 &3504738407825934424
 MonoBehaviour:

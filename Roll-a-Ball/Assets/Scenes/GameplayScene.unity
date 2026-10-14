@@ -7659,7 +7659,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Roll_a_Ball.OutGame.SceneTransitionButton
   destination:
-    scenePath: Assets/Scenes/StageSelectScene.unity
+    scenePath: Assets/Scenes/HomeScene.unity
     sceneGuid: 2cf7963b28fe83347a2a8221117771a6
 --- !u!114 &393031009 stripped
 MonoBehaviour:
@@ -39552,7 +39552,7 @@ MonoBehaviour:
     displayName: "\u6728\u6F0F\u308C\u65E5\u306E\u6797\u9053"
     previewTexture: {fileID: 2800000, guid: ec8c1cf6e4200424cb85cdad0e99d4f7, type: 3}
     playScene:
-      scenePath: Assets/Scenes/MainScene.unity
+      scenePath: Assets/Scenes/GameplayScene.unity
       sceneGuid: a214e2a22156b4a43ab298b90d0eebf6
     nextStageId: stage-2
   - stageId: stage-2
@@ -39560,7 +39560,7 @@ MonoBehaviour:
     displayName: "\u8FF7\u3044\u306E\u5BC6\u96C6\u6797"
     previewTexture: {fileID: 2800000, guid: ec8c1cf6e4200424cb85cdad0e99d4f7, type: 3}
     playScene:
-      scenePath: Assets/Scenes/MainScene.unity
+      scenePath: Assets/Scenes/GameplayScene.unity
       sceneGuid: a214e2a22156b4a43ab298b90d0eebf6
     nextStageId: stage-3
   - stageId: stage-3
@@ -39568,7 +39568,7 @@ MonoBehaviour:
     displayName: "\u305B\u305B\u3089\u304E\u306E\u4E38\u592A\u6A4B"
     previewTexture: {fileID: 2800000, guid: ec8c1cf6e4200424cb85cdad0e99d4f7, type: 3}
     playScene:
-      scenePath: Assets/Scenes/MainScene.unity
+      scenePath: Assets/Scenes/GameplayScene.unity
       sceneGuid: a214e2a22156b4a43ab298b90d0eebf6
     nextStageId: 
   stageName: {fileID: 6991867547909669600}

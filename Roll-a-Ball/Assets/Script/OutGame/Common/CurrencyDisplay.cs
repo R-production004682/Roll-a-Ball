@@ -10,6 +10,8 @@ namespace Roll_a_Ball.OutGame
     [RequireComponent(typeof(TextMeshProUGUI))]
     public sealed class CurrencyDisplay : MonoBehaviour
     {
+        [SerializeField, Tooltip("コインアイコンを併用するときは無効にします。")]
+        private bool showPrefix = true;
         private TMP_Text currencyLabel;
 
         /// <summary>
@@ -42,7 +44,7 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private void Refresh()
         {
-            currencyLabel.text = $"COIN  {GameDataManager.Currency:N0}";
+            currencyLabel.text = $"{(showPrefix ? "COIN  " : string.Empty)}{GameDataManager.Currency:N0}";
         }
     }
 }

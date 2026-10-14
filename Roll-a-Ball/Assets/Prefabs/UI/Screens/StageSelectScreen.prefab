@@ -1722,14 +1722,14 @@ RectTransform:
   m_GameObject: {fileID: 3324096888035373177}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.5392, y: 1.5392, z: 1.5392}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6656179862083549749}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -585, y: 295}
+  m_AnchoredPosition: {x: -585, y: 268.1}
   m_SizeDelta: {x: 310, y: 310}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4397520395267299809
@@ -2754,9 +2754,9 @@ MonoBehaviour:
   - stageId: stage-1
     stageNumber: 1
     displayName: "\u6728\u6F0F\u308C\u65E5\u306E\u6797\u9053"
-    previewTexture: {fileID: 2800000, guid: ec8c1cf6e4200424cb85cdad0e99d4f7, type: 3}
+    previewTexture: {fileID: 2800000, guid: 33db6ec3b5778e4458f8225499661d02, type: 3}
     playScene:
-      scenePath: Assets/Scenes/MainScene.unity
+      scenePath: Assets/Scenes/GameplayScene.unity
       sceneGuid: a214e2a22156b4a43ab298b90d0eebf6
     nextStageId: stage-2
   - stageId: stage-2
@@ -2764,7 +2764,7 @@ MonoBehaviour:
     displayName: "\u8FF7\u3044\u306E\u5BC6\u96C6\u6797"
     previewTexture: {fileID: 2800000, guid: ec8c1cf6e4200424cb85cdad0e99d4f7, type: 3}
     playScene:
-      scenePath: Assets/Scenes/MainScene.unity
+      scenePath: Assets/Scenes/GameplayScene.unity
       sceneGuid: a214e2a22156b4a43ab298b90d0eebf6
     nextStageId: stage-3
   - stageId: stage-3
@@ -2772,7 +2772,7 @@ MonoBehaviour:
     displayName: "\u305B\u305B\u3089\u304E\u306E\u4E38\u592A\u6A4B"
     previewTexture: {fileID: 2800000, guid: ec8c1cf6e4200424cb85cdad0e99d4f7, type: 3}
     playScene:
-      scenePath: Assets/Scenes/MainScene.unity
+      scenePath: Assets/Scenes/GameplayScene.unity
       sceneGuid: a214e2a22156b4a43ab298b90d0eebf6
     nextStageId: 
   currencyLabel: {fileID: 3029882019708869254}
@@ -4599,7 +4599,7 @@ RectTransform:
   m_GameObject: {fileID: 7654297503171149793}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.4773, y: 1.4773, z: 1.4773}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 639716897070710943}
@@ -4842,7 +4842,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.9647059, g: 0.94509804, b: 0.8745098, a: 0.79}
+  m_Color: {r: 0.9647059, g: 0.94509804, b: 0.8745098, a: 0.59607846}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -5248,14 +5248,14 @@ RectTransform:
   m_GameObject: {fileID: 9170455047738514638}
   m_LocalRotation: {x: 0, y: 0, z: 1, w: -0.00000004371139}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.442, y: 1.442, z: 1.442}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6656179862083549749}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -148.125}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 585, y: -295}
+  m_AnchoredPosition: {x: 593, y: -286}
   m_SizeDelta: {x: 310, y: 310}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &20699292087117582
