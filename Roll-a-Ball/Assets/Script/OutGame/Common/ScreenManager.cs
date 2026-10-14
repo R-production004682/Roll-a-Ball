@@ -68,11 +68,20 @@ namespace Roll_a_Ball.OutGame
                 if (screenBehindInitial != null)
                 {
                     var background = Create(screenBehindInitial.GetType());
-                    if (background == null) return;
+                    if (background == null)
+                    {
+                        return;
+                    }
                     CommitReplacement(background, null);
-                    if (initialScreen is TitleScreen && ForestHomeTransition.MenuEntered) return;
+                    if (initialScreen is TitleScreen && ForestHomeTransition.MenuEntered)
+                    {
+                        return;
+                    }
                     var foreground = Create(initialScreen.GetType());
-                    if (foreground == null) return;
+                    if (foreground == null)
+                    {
+                        return;
+                    }
                     foreground.transform.SetParent(screenRoot, false);
                     foreground.gameObject.SetActive(true);
                     stack.Add(foreground);
@@ -149,15 +158,23 @@ namespace Roll_a_Ball.OutGame
             return (T)Push(typeof(T), arg);
         }
 
+        /// <summary>
+        /// タイトルの背後に遷移先のステージ選択が準備されているかを返す
+        /// </summary>
         internal bool HasPreparedStageSelect(TitleScreen title)
         {
             return !changing && stack.Count == 2 && stack[1] == title && stack[0] is StageSelectScreen;
         }
 
-        /// <summary>窓の演出中にタイトルだけを閉じ、準備済みのステージ選択へ入力先を移す。</summary>
+        /// <summary>
+        /// 窓の演出中にタイトルだけを閉じ、準備済みのステージ選択へ入力先を移す
+        /// </summary>
         internal bool RevealPreparedStageSelect(TitleScreen title)
         {
-            if (!HasPreparedStageSelect(title)) return false;
+            if (!HasPreparedStageSelect(title))
+            {
+                return false;
+            }
             stack.RemoveAt(1);
             CloseAndDestroy(title);
             return true;
@@ -244,7 +261,6 @@ namespace Roll_a_Ball.OutGame
                 return;
             }
 
-            LogDialogTransition("complete-requested", dialog);
             changing = true;
             DialogMotion.Hide(dialog.gameObject, () =>
             {
@@ -357,7 +373,6 @@ namespace Roll_a_Ball.OutGame
                 screen.transform.SetParent(screenRoot, false);
                 screen.gameObject.SetActive(true);
                 stack.Add(screen);
-                LogDialogTransition("push-active", screen);
                 if (!OpenScreen(screen, arg))
                 {
                     stack.Remove(screen);
@@ -366,7 +381,6 @@ namespace Roll_a_Ball.OutGame
                 }
                 else
                 {
-                    LogDialogTransition("open-complete", screen);
                 }
             }
 
@@ -467,41 +481,12 @@ namespace Roll_a_Ball.OutGame
                 return;
             }
 
-            LogDialogTransition("close-begin", dialog);
             dialog.OnClose();
-            LogDialogTransition("close-on-close-complete", dialog);
             dialog.gameObject.SetActive(false);
-            LogDialogTransition("close-inactive", dialog);
             dialog.SetResult(result);
-            LogDialogTransition("result-completed", dialog);
             dialog.ClearOwner();
             UnityEngine.Object.Destroy(dialog.gameObject);
         }
 
-        /// <summary>
-        /// Editor 上で Dialog の表示切り替え順序と RectTransform の状態を記録する
-        /// </summary>
-        /// <param name="phase">記録する表示切り替えの段階</param>
-        /// <param name="screen">状態を記録する Screen</param>
-        [System.Diagnostics.Conditional("UNITY_EDITOR")]
-        private void LogDialogTransition(string phase, ScreenBase screen)
-        {
-            if (screen == null || !(screen is IDialog))
-            {
-                return;
-            }
-
-            var rectTransform = screen.transform as RectTransform;
-            var rectSize = rectTransform == null ? Vector2.zero : rectTransform.rect.size;
-            var scale = rectTransform == null ? Vector3.one : rectTransform.localScale;
-            var canvas = screen.GetComponent<Canvas>();
-            var sortingOrder = canvas == null ? 0 : canvas.sortingOrder;
-            Debug.Log(
-                $"[DialogTransition] frame={Time.frameCount} phase={phase} dialog={screen.name} " +
-                $"id={screen.GetInstanceID()} activeSelf={screen.gameObject.activeSelf} " +
-                $"activeInHierarchy={screen.gameObject.activeInHierarchy} rect={rectSize} " +
-                $"scale={scale} sortingOrder={sortingOrder} stackCount={stack.Count}",
-                this);
-        }
     }
 }

@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEngine;
 
 /// <summary>
@@ -22,10 +23,6 @@ public sealed class MovementDustTestPreview : MonoBehaviour
     /// </summary>
     private void OnEnable()
     {
-#if !UNITY_EDITOR && !DEVELOPMENT_BUILD
-        gameObject.SetActive(false);
-        return;
-#else
         if (testBall == null || ballVisual == null || movementEffect == null || statusText == null)
         {
             Debug.LogError("MovementDustTestPreviewのボール、表示モデル、移動FX、状態表示を設定してください。", this);
@@ -34,7 +31,6 @@ public sealed class MovementDustTestPreview : MonoBehaviour
         }
 
         Restart();
-#endif
     }
 
     /// <summary>
@@ -140,3 +136,4 @@ public sealed class MovementDustTestPreview : MonoBehaviour
         }
     }
 }
+#endif

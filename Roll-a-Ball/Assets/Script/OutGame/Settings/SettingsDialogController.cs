@@ -110,7 +110,10 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private void OnDestroy()
         {
-            if (ambientSlider != null) ambientSlider.onValueChanged.RemoveListener(GameSettings.SetAmbientVolume);
+            if (ambientSlider != null)
+            {
+                ambientSlider.onValueChanged.RemoveListener(GameSettings.SetAmbientVolume);
+            }
             if (bgmSlider != null)
             {
                 bgmSlider.onValueChanged.RemoveListener(GameSettings.SetBgmVolume);
@@ -138,15 +141,27 @@ namespace Roll_a_Ball.OutGame
             Open(OpenOrigin.Pause);
         }
 
-        /// <summary>設定画面から、同じ窓を閉じる終了演出を開始する。</summary>
+        /// <summary>
+        /// 設定画面から、同じ窓を閉じる終了演出を開始する
+        /// </summary>
         public void QuitGame()
         {
-            if (!IsOpen || !dialogInputScope.CanReceiveInput) return;
+            if (!IsOpen || !dialogInputScope.CanReceiveInput)
+            {
+                return;
+            }
             var home = ForestHomeTransition.GetOrCreate();
-            if (home == null) return;
+            if (home == null)
+            {
+                return;
+            }
             GameSettings.Save();
             previewSource.Stop();
-            DialogMotion.Hide(dialog, () => { dialog.SetActive(false); home.QuitGame(); });
+            DialogMotion.Hide(dialog, () =>
+            {
+                dialog.SetActive(false);
+                home.QuitGame();
+            });
         }
 
         /// <summary>
@@ -203,10 +218,19 @@ namespace Roll_a_Ball.OutGame
 
             GameSettings.Save();
             previewSource.Stop();
-            if (isActiveAndEnabled) DialogMotion.Hide(dialog, FinishClose);
-            else FinishClose();
+            if (isActiveAndEnabled)
+            {
+                DialogMotion.Hide(dialog, FinishClose);
+            }
+            else
+            {
+                FinishClose();
+            }
         }
 
+        /// <summary>
+        /// 設定画面を閉じて呼び出し元の表示と選択状態を復元する
+        /// </summary>
         private void FinishClose()
         {
             dialog.SetActive(false);

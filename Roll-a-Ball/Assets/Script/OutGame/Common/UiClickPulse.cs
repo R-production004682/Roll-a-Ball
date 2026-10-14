@@ -5,7 +5,9 @@ using UnityEngine.UI;
 
 namespace Roll_a_Ball.OutGame
 {
-    /// <summary>クリックと決定キーで共用する、短い淡金色の輪。最大6個を再利用する。</summary>
+    /// <summary>
+    /// クリックと決定キーで共用する、短い淡金色の輪。最大6個を再利用する
+    /// </summary>
     [RequireComponent(typeof(CanvasRenderer))]
     public sealed class UiClickPulse : MaskableGraphic
     {
@@ -13,12 +15,25 @@ namespace Roll_a_Ball.OutGame
         private static readonly List<UiClickPulse> pool = new List<UiClickPulse>();
         private Tween tween;
 
+        /// <summary>
+        /// 再生開始時に共有表示先と再利用プールを初期化する
+        /// </summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        private static void ResetPool() { overlay = null; pool.Clear(); }
+        private static void ResetPool()
+        {
+            overlay = null;
+            pool.Clear();
+        }
 
+        /// <summary>
+        /// 操作対象の位置に短い決定フィードバックを再利用して表示する
+        /// </summary>
         public static void Play(RectTransform target)
         {
-            if (target == null) return;
+            if (target == null)
+            {
+                return;
+            }
             var canvas = target.GetComponentInParent<Canvas>();
             var camera = canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay ? canvas.worldCamera : null;
             var point = RectTransformUtility.WorldToScreenPoint(camera, target.TransformPoint(target.rect.center));
@@ -37,7 +52,10 @@ namespace Roll_a_Ball.OutGame
             var pulse = pool.Find(p => p != null && !p.gameObject.activeSelf);
             if (pulse == null)
             {
-                if (pool.Count >= 6) return;
+                if (pool.Count >= 6)
+                {
+                    return;
+                }
                 var root = new GameObject("ClickRing", typeof(RectTransform), typeof(CanvasRenderer));
                 root.transform.SetParent(overlay, false);
                 pulse = root.AddComponent<UiClickPulse>();
@@ -53,9 +71,16 @@ namespace Roll_a_Ball.OutGame
             pulse.tween = DOTween.Sequence().SetUpdate(true)
                 .Append(pulse.rectTransform.DOScale(1.45f, 0.32f).SetEase(Ease.OutCubic))
                 .Join(pulse.DOFade(0f, 0.32f).SetEase(Ease.OutQuad))
-                .OnComplete(() => { pulse.tween = null; pulse.gameObject.SetActive(false); });
+                .OnComplete(() =>
+                {
+                    pulse.tween = null;
+                    pulse.gameObject.SetActive(false);
+                });
         }
 
+        /// <summary>
+        /// 決定フィードバックの輪を頂点と三角形へ変換する
+        /// </summary>
         protected override void OnPopulateMesh(VertexHelper vertices)
         {
             vertices.Clear();
@@ -77,9 +102,13 @@ namespace Roll_a_Ball.OutGame
             }
         }
 
+        /// <summary>
+        /// 非表示になったフィードバックの Tween を停止する
+        /// </summary>
         protected override void OnDisable()
         {
-            tween?.Kill(); tween = null;
+            tween?.Kill();
+            tween = null;
             base.OnDisable();
         }
     }

@@ -21637,7 +21637,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a64ba5859d776e440865efa0155fa9c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Birdsong
-  cameramain: {fileID: 0}
+  cameramain: {fileID: 9809834}
   maxDistance: 30
   turnDistance: 30
   movingUp: 1
@@ -39669,7 +39669,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8832052183822078160, guid: 9c67fa0c6572a404f84128eb160bb919, type: 3}
       propertyPath: m_fontColor32.rgba
-      value: 4292866550
+      value: 4281877556
       objectReference: {fileID: 0}
     - target: {fileID: 8853491221240386966, guid: 9c67fa0c6572a404f84128eb160bb919, type: 3}
       propertyPath: m_fontColor32.rgba

@@ -59,6 +59,10 @@ public class Player : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         respawnController = GetComponent<PlayerRespawnController>() ?? gameObject.AddComponent<PlayerRespawnController>();
+        if (cameraTransform == null)
+        {
+            Debug.LogWarning("Player: Camera Transform が未設定のため移動入力を反映できません。移動方向を決めるカメラを設定してください。", this);
+        }
     }
 
     /// <summary>
@@ -129,7 +133,7 @@ public class Player : MonoBehaviour
         {
             return;
         }
-        float currentMaxSpeed = isJumping ? jumpMaxSpeed : normalMaxSpeed;
+        var currentMaxSpeed = isJumping ? jumpMaxSpeed : normalMaxSpeed;
 
         if (moveDirection != Vector3.zero)//入力がある
         {
@@ -152,11 +156,13 @@ public class Player : MonoBehaviour
         if (CanReceiveGameplayContact && other.CompareTag("Goal"))
         {
             isGoal = true;
-            Debug.Log("ゴールに触れた");
             rb.isKinematic = true;//物理演算を止める
         }
     }
 
+    /// <summary>
+    /// 地面に接触したらジャンプ中の速度制限を解除する
+    /// </summary>
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Ground"))
@@ -246,10 +252,14 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void Jump(float jumForce)//ジャンプ台にふれたときの処理
+    /// <summary>
+    /// 垂直速度をリセットしてジャンプ台の力を加える
+    /// </summary>
+    /// <param name="jumpForce">上向きに加える力</param>
+    public void Jump(float jumpForce)
     {
         rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);//縦方向の移動量をリセット
-        rb.AddForce(Vector3.up * jumForce, ForceMode.Impulse);//プレイヤーに上方向の力をのせる
+        rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);//プレイヤーに上方向の力をのせる
         isJumping = true;//ジャンプ中にする
     }
 }

@@ -34,7 +34,11 @@ namespace Roll_a_Ball.OutGame
         /// <summary>
         /// 画面またはシーンのフェード中かどうかを取得する
         /// </summary>
-        public static bool IsTransitioning { get; private set; }
+        public static bool IsTransitioning
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
         /// フェード UI を初期化し、最初の遷移が始まるまで非表示かつ入力を通す状態にする

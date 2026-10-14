@@ -29,12 +29,20 @@ namespace Roll_a_Ball.EditorTools
         /// <summary>
         /// 最新の進捗または完了結果を返す
         /// </summary>
-        public static string Status { get; private set; } = string.Empty;
+        public static string Status
+        {
+            get;
+            private set;
+        } = string.Empty;
 
         /// <summary>
         /// 公開失敗を結果表示へ伝える
         /// </summary>
-        public static bool Failed { get; private set; }
+        public static bool Failed
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
         /// 公開スクリプトとローカルの暗号化 Webhook 設定を検証する
@@ -87,6 +95,7 @@ namespace Roll_a_Ball.EditorTools
             {
                 Status = error;
                 Failed = true;
+                UnityEngine.Debug.LogError($"WebGL の公開を開始できません: {Status}");
                 return;
             }
 
@@ -114,6 +123,7 @@ namespace Roll_a_Ball.EditorTools
             {
                 Status = "PowerShell を起動できませんでした。公開手順を確認してください。";
                 Failed = true;
+                UnityEngine.Debug.LogError($"WebGL の公開を開始できません: {Status}");
                 return;
             }
 
@@ -171,7 +181,17 @@ namespace Roll_a_Ball.EditorTools
             Failed = process.ExitCode != 0 || outputTask.IsFaulted || errorTask.IsFaulted;
             if (Failed)
             {
+                if (outputTask.IsFaulted || errorTask.IsFaulted)
+                {
+                    var exception = outputTask.Exception ?? errorTask.Exception;
+                    Status = $"公開プロセスの出力を読み取れませんでした: {exception.GetBaseException().Message}";
+                }
                 Status = "公開または通知に失敗しました: " + Status;
+                UnityEngine.Debug.LogError(Status);
+            }
+            else
+            {
+                UnityEngine.Debug.Log($"WebGL の公開・通知が完了しました: {Status}");
             }
 
             ReleaseProcess();
@@ -185,6 +205,7 @@ namespace Roll_a_Ball.EditorTools
             if (!process.HasExited)
             {
                 process.Kill();
+                UnityEngine.Debug.LogWarning("スクリプト再読み込みのため WebGL の公開・通知を中断しました。公開状況を確認してから再実行してください。");
             }
 
             ReleaseProcess();

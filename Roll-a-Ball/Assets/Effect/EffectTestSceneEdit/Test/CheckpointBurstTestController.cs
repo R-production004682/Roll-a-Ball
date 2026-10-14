@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,7 +15,7 @@ public sealed class CheckpointBurstTestController : MonoBehaviour
     [SerializeField] private Button resetButton;
 
     /// <summary>
-    /// EditorとDevelopment Buildのみテストボタンを有効にする
+    /// Editor のテストボタンを表示し再生操作を登録する
     /// </summary>
     private void OnEnable()
     {
@@ -26,16 +27,11 @@ public sealed class CheckpointBurstTestController : MonoBehaviour
             return;
         }
 
-        var allowed = Application.isEditor || Debug.isDebugBuild;
-        showButton.gameObject.SetActive(allowed);
-        playButton.gameObject.SetActive(allowed);
-        stateButton.gameObject.SetActive(allowed);
-        resetButton.gameObject.SetActive(allowed);
+        showButton.gameObject.SetActive(true);
+        playButton.gameObject.SetActive(true);
+        stateButton.gameObject.SetActive(true);
+        resetButton.gameObject.SetActive(true);
         previewRoot.SetActive(false);
-        if (!allowed)
-        {
-            return;
-        }
 
         showButton.onClick.AddListener(TogglePreview);
         playButton.onClick.AddListener(PlayEffect);
@@ -113,3 +109,4 @@ public sealed class CheckpointBurstTestController : MonoBehaviour
         }
     }
 }
+#endif

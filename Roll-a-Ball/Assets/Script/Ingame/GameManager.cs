@@ -18,7 +18,11 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// このプレイで取得したコインの金額を返す
     /// </summary>
-    public int CollectedCoins { get; private set; }
+    public int CollectedCoins
+    {
+        get;
+        private set;
+    }
 
     /// <summary>
     /// このプレイの取得金額が変わったときに通知する
@@ -32,6 +36,7 @@ public class GameManager : MonoBehaviour
     {
         if (instance != null && instance != this)
         {
+            Debug.LogWarning($"GameManager が重複しています。既存の {instance.name} を使用し、重複オブジェクトを破棄します。", this);
             Destroy(gameObject);
             return;
         }

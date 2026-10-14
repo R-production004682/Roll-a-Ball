@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -104,3 +105,4 @@ public sealed class DappledLightTestController : MonoBehaviour
         RestoreEnvironment();
     }
 }
+#endif

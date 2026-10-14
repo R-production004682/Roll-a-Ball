@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEngine;
 
 /// <summary>
@@ -14,13 +15,6 @@ public sealed class MovementDustTestController : MonoBehaviour
     /// </summary>
     private void OnEnable()
     {
-#if !UNITY_EDITOR && !DEVELOPMENT_BUILD
-        if (toggleButton != null)
-        {
-            toggleButton.gameObject.SetActive(false);
-        }
-        return;
-#else
         if (toggleButton == null || previewRoot == null || statusRoot == null)
         {
             Debug.LogError("MovementDustTestControllerのボタン、展示、状態表示を設定してください。", this);
@@ -28,7 +22,6 @@ public sealed class MovementDustTestController : MonoBehaviour
         }
 
         toggleButton.onClick.AddListener(TogglePreview);
-#endif
     }
 
     /// <summary>
@@ -67,3 +60,4 @@ public sealed class MovementDustTestController : MonoBehaviour
         }
     }
 }
+#endif
