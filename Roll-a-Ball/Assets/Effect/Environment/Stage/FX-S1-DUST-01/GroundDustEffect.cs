@@ -42,7 +42,11 @@ public sealed class GroundDustEffect : MonoBehaviour
     private bool ready;
     private MovementSurfaceDetail previousDetail;
 
-    public bool IsEmitting { get; private set; }
+    public bool IsEmitting
+    {
+        get;
+        private set;
+    }
     public int ParticleCount => (dust != null ? dust.particleCount : 0)
         + (sparkles != null ? sparkles.particleCount : 0)
         + (surfaceDetails != null ? surfaceDetails.particleCount : 0)

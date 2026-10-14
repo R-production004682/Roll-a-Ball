@@ -32,7 +32,11 @@ public sealed class PlayerRespawnController : MonoBehaviour
     /// <summary>
     /// 死亡から暗転解除までの復帰処理中かを取得する
     /// </summary>
-    public bool IsRespawning { get; private set; }
+    public bool IsRespawning
+    {
+        get;
+        private set;
+    }
 
     /// <summary>
     /// 同一オブジェクトの操作と物理参照および初期復帰位置を保持する

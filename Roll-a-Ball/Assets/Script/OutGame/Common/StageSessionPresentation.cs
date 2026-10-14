@@ -17,7 +17,6 @@ namespace Roll_a_Ball.OutGame
         [SerializeField] private TMP_Text resultCoins;
         [SerializeField] private TMP_Text resultWallet;
         private int startingCurrency;
-        private double elapsedSeconds;
         private GameManager gameManager;
 
         /// <summary>
@@ -26,10 +25,23 @@ namespace Roll_a_Ball.OutGame
         private void Start()
         {
             gameManager = GameManager.instance;
-            startingCurrency = GameDataManager.Currency - (gameManager != null ? gameManager.CollectedCoins : 0);
+            if (gameManager == null || stageName == null || journeyLabel == null ||
+                resultCoins == null || resultWallet == null || stages == null ||
+                stageDots == null || Array.Exists(stageDots, dot => dot == null))
+            {
+                Debug.LogError("StageSessionPresentation: GameManager、ステージ定義、ステージ名・進行表示・リザルトの UI 参照を設定してください。プレイ情報の表示更新を無効化します。", this);
+                enabled = false;
+                return;
+            }
+
+            startingCurrency = GameDataManager.Currency - gameManager.CollectedCoins;
 
             var selectedId = StageSelectionContext.SelectedStageId;
-            var definition = Array.Find(stages, stage => stage.StageId == selectedId);
+            var definition = Array.Find(stages, stage => stage != null && stage.StageId == selectedId);
+            if (definition == null)
+            {
+                Debug.LogWarning($"StageSessionPresentation: {selectedId} のステージ定義がないため STAGE 01 を表示します。Stages の設定を確認してください。", this);
+            }
             var number = definition != null ? definition.StageNumber : 1;
 
             stageName.text = definition != null ? definition.DisplayName : $"STAGE {number:00}";
@@ -52,14 +64,8 @@ namespace Roll_a_Ball.OutGame
                 return;
             }
 
-            if (OutGameStateController.IsPlaying && !gameManager.isStageCompleted)
-            {
-                elapsedSeconds += Time.deltaTime;
-            }
-
             if (gameManager.isStageCompleted)
             {
-                var duration = TimeSpan.FromSeconds(elapsedSeconds);
                 resultCoins.text = $"+{gameManager.CollectedCoins:N0}";
                 resultWallet.text = $"{startingCurrency:N0} → {GameDataManager.Currency:N0}";
                 enabled = false;

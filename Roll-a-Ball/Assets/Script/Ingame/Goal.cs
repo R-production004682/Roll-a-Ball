@@ -50,12 +50,11 @@ public class Goal : MonoBehaviour
     /// </summary>
     private void CompleteStage()
     {
-        if (GameManager.instance != null)
+        if (GameManager.instance == null)
         {
-            GameManager.instance.StageCompleted();
+            Debug.LogError("Goal: GameManager が存在しないためステージクリアを確定できません。ゲームシーンに GameManager を配置してください。", this);
+            return;
         }
-
-        Debug.Log("ゲームクリア");
-        Debug.Log(GameManager.instance.CollectedCoins);
+        GameManager.instance.StageCompleted();
     }
 }

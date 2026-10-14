@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -50,3 +51,4 @@ public sealed class Stage2WindTestController : MonoBehaviour
         }
     }
 }
+#endif

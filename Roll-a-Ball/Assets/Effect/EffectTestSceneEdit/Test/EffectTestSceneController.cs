@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEngine;
 
 /// <summary>
@@ -141,3 +142,4 @@ public sealed class EffectTestSceneController : MonoBehaviour
         goalClearEffect.Play();
     }
 }
+#endif

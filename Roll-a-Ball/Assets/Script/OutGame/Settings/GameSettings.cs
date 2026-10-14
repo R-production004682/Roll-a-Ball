@@ -19,8 +19,17 @@ namespace Roll_a_Ball.OutGame
         private static float bgmVolume;
         private static float seVolume;
         private static float ambientVolume;
-        public static float AmbientVolume { get { EnsureLoaded(); return ambientVolume; } }
-        public static float EsVolume => AmbientVolume;
+        /// <summary>
+        /// 現在の環境音量を返す
+        /// </summary>
+        public static float AmbientVolume
+        {
+            get
+            {
+                EnsureLoaded();
+                return ambientVolume;
+            }
+        }
 
         /// <summary>
         /// 設定値が変更されたときに通知する
@@ -131,14 +140,17 @@ namespace Roll_a_Ball.OutGame
         {
             EnsureLoaded();
             var sanitized = Sanitize(value, DefaultAmbientVolume);
-            if (Mathf.Approximately(ambientVolume, sanitized)) return;
+            if (Mathf.Approximately(ambientVolume, sanitized))
+            {
+                return;
+            }
             ambientVolume = sanitized;
             Changed?.Invoke();
         }
 
-        public static void SetEsVolume(float value) => SetAmbientVolume(value);
-
-        /// <summary>音量を初期値へ戻して保存する。</summary>
+        /// <summary>
+        /// 音量を初期値へ戻して保存する
+        /// </summary>
         public static void RestoreDefaults()
         {
             loaded = true;

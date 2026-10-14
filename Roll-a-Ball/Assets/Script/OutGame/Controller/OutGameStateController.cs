@@ -26,7 +26,11 @@ namespace Roll_a_Ball.OutGame
         /// <summary>
         /// 現在のゲーム進行状態
         /// </summary>
-        public static GameFlowState Current { get; private set; } = GameFlowState.Menu;
+        public static GameFlowState Current
+        {
+            get;
+            private set;
+        } = GameFlowState.Menu;
 
         /// <summary>
         /// 現在プレイ中かどうか
@@ -36,7 +40,11 @@ namespace Roll_a_Ball.OutGame
         /// <summary>
         /// シーンの Controller が状態を設定済みかを示し、Player 単独のテストシーンを区別する
         /// </summary>
-        internal static bool HasState { get; private set; }
+        internal static bool HasState
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
         /// ゲーム進行状態が変更されたときに通知するイベント

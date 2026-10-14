@@ -33,7 +33,10 @@ namespace Roll_a_Ball.OutGame
             source = GetComponent<AudioSource>();
             // このプロパティは Prefab に保存されないため、実行時に設定する。
             // ポーズ中も環境音を聴きながら音量を調整できるようにする。
-            if (channel == Channel.Es) source.ignoreListenerPause = true;
+            if (channel == Channel.Es)
+            {
+                source.ignoreListenerPause = true;
+            }
         }
 
         /// <summary>
@@ -64,7 +67,7 @@ namespace Roll_a_Ball.OutGame
         private void ApplyVolume()
         {
             var volume = channel == Channel.Bgm ? GameSettings.BgmVolume
-                : channel == Channel.Es ? GameSettings.EsVolume : GameSettings.SeVolume;
+                : channel == Channel.Es ? GameSettings.AmbientVolume : GameSettings.SeVolume;
             source.volume = baseVolume * volume;
         }
     }

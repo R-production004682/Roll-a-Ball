@@ -5,7 +5,10 @@ using UnityEngine;
 /// </summary>
 public sealed class CheckpointBurstEffect : MonoBehaviour
 {
-    public enum CheckpointState { Unvisited, Visited, Current }
+    public enum CheckpointState
+    {
+        Unvisited, Visited, Current
+    }
 
     [Header("参照（通常はPrefabの設定を維持）")]
     [Tooltip("袋の左半分のTransform。破裂時に移動・回転・縮小する対象。通常はPrefabの参照を維持します。")]
@@ -42,7 +45,11 @@ public sealed class CheckpointBurstEffect : MonoBehaviour
     private float elapsed;
     private bool ready;
     private bool playing;
-    public CheckpointState State { get; private set; }
+    public CheckpointState State
+    {
+        get;
+        private set;
+    }
     public bool IsPlaying => playing;
 
     /// <summary>

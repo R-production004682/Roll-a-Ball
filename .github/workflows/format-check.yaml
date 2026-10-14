@@ -25,9 +25,11 @@ jobs:
             <PropertyGroup>
               <TargetFramework>net8.0</TargetFramework>
               <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+              <DefineConstants>UNITY_EDITOR;DEVELOPMENT_BUILD</DefineConstants>
             </PropertyGroup>
             <ItemGroup>
               <Compile Include="Roll-a-Ball/Assets/Script/**/*.cs" />
+              <Compile Include="Roll-a-Ball/Assets/Effect/**/*.cs" />
             </ItemGroup>
           </Project>
           EOF

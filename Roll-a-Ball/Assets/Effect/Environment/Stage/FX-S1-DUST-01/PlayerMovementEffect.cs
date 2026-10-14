@@ -32,8 +32,16 @@ public sealed class PlayerMovementEffect : MonoBehaviour
     private MovementSurface currentSurface;
     private bool ready;
 
-    public bool IsGrounded { get; private set; }
-    public float Speed { get; private set; }
+    public bool IsGrounded
+    {
+        get;
+        private set;
+    }
+    public float Speed
+    {
+        get;
+        private set;
+    }
     public MovementSurfaceProfile Surface => currentSurface != null ? currentSurface.Profile : null;
 
     /// <summary>

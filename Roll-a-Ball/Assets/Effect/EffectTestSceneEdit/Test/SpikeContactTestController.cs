@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -93,8 +94,11 @@ public sealed class SpikeContactTestPlayerDriver : MonoBehaviour
         }
 
         body.position = startPosition;
-        body.linearVelocity = Vector3.zero;
-        body.angularVelocity = Vector3.zero;
+        if (!body.isKinematic)
+        {
+            body.linearVelocity = Vector3.zero;
+            body.angularVelocity = Vector3.zero;
+        }
         isMoving = true;
     }
 
@@ -132,10 +136,11 @@ public sealed class SpikeContactTestPlayerDriver : MonoBehaviour
         }
 
         isMoving = false;
-        if (body != null)
+        if (body != null && !body.isKinematic)
         {
             body.linearVelocity = Vector3.zero;
             body.angularVelocity = Vector3.zero;
         }
     }
 }
+#endif

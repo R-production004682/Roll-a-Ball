@@ -17,14 +17,27 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private void OnEnable()
         {
+            if (volumeSlider == null || soundToggle == null || stateLabel == null)
+            {
+                Debug.LogError("VolumeMuteToggle: Volume Slider、Sound Toggle、State Label を設定してください。音量切り替えを無効化します。", this);
+                enabled = false;
+                return;
+            }
+
             volumeSlider.onValueChanged.AddListener(Refresh);
             soundToggle.onValueChanged.AddListener(SetEnabled);
             Synchronize();
         }
 
-        /// <summary>通知を伴わない設定値の読み込み後にも表示を同期する。</summary>
+        /// <summary>
+        /// 通知を伴わない設定値の読み込み後にも表示を同期する
+        /// </summary>
         public void Synchronize()
         {
+            if (volumeSlider == null || soundToggle == null || stateLabel == null)
+            {
+                return;
+            }
             Refresh(volumeSlider.value);
         }
 
@@ -33,8 +46,14 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private void OnDisable()
         {
-            volumeSlider.onValueChanged.RemoveListener(Refresh);
-            soundToggle.onValueChanged.RemoveListener(SetEnabled);
+            if (volumeSlider != null)
+            {
+                volumeSlider.onValueChanged.RemoveListener(Refresh);
+            }
+            if (soundToggle != null)
+            {
+                soundToggle.onValueChanged.RemoveListener(SetEnabled);
+            }
         }
 
         /// <summary>
