@@ -13,7 +13,7 @@ public class JumpPad : MonoBehaviour
 
     private void Update()
     {
-        if(elappsedTime < jumpcool)
+        if (elappsedTime < jumpcool)
             elappsedTime += Time.deltaTime;
     }
 
