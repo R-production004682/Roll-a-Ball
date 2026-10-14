@@ -1,0 +1,105 @@
+{
+  "theme": "B: Sunlit Storybook",
+  "referenceResolution": [
+    1920,
+    1080
+  ],
+  "colors": {
+    "ink": "#344438",
+    "cream": "#F6F1DF",
+    "green": "#456646",
+    "sage": "#88A57A",
+    "birch": "#C99C64",
+    "gold": "#D7AE55"
+  },
+  "issues": [
+    160,
+    161,
+    162,
+    163,
+    164
+  ],
+  "coin": {
+    "source": "Assets/Prefabs/InGame/10pt_coin.prefab",
+    "export": "Unity PreviewRenderUtility, orthographic view, transparent PNG; preserves the existing elongated diamond mesh and material."
+  },
+  "movementGuide": {
+    "W": "↑",
+    "A": "←",
+    "S": "↓",
+    "D": "→",
+    "arrowInput": "Guide artwork only; input implementation is separate."
+  },
+  "rasterGeneration": {
+    "mode": "built-in image_gen",
+    "background": "Warm illustrated low-poly forest diorama, winding path, ivory rolling ball, quiet center, no text or UI.",
+    "panel": "Transparent outside, light honey birch rounded frame, opaque quiet warm ivory center, no text, front view, 9-slice.",
+    "primaryButton": "Transparent outside, matte leaf-green center, slim ivory and light honey wood rim, no text, front view, 9-slice."
+  },
+  "approvedReferenceRefinement": {
+    "reference": "B Sunlit Storybook comparison board",
+    "mode": "built-in image_gen edit",
+    "menu": "Extract the B honey wooden stage-select frame, preserve golden woodgrain and corner leaf clusters; remove text and controls and continue the original woodgrain; transparent exterior.",
+    "secondaryButton": "Extract the B pause light woodgrain secondary button, preserve cream rim and woodgrain, remove text; transparent exterior.",
+    "ornament": "Extract the B panel corner leaf sprig, preserve illustrated shading and veins; no wood underneath, transparent exterior."
+  },
+  "delivery": {
+    "text": "Editable TextMeshPro labels in prefabs",
+    "states": "Selectable ColorTint and stage-card status sprite",
+    "sources": "SVG files for icons and palette.json for design values; generated raster originals are preserved in Textures."
+  },
+  "refinement": "Lean layout with readable labels, ivory panels, forest green buttons and restrained wood accents. No ranking or camera guide. HUD occupies about 4.8% of the 1920x1080 reference area.",
+  "titleAndExit": {
+    "choice": "C: warm interior wooden window",
+    "scene": "StageSelectScene contains TitleScreen over an already prepared StageSelectScreen; no scene load on start.",
+    "start": "Closed paired wooden shutters, wordmark and glowing slow-pulsing Any Press Key; key, mouse button or gamepad button opens shutters while the view moves closer.",
+    "exit": "Settings Quit button reverses the same window movement, closes shutters at title framing, then fades to black and quits.",
+    "travelSeconds": 3.4,
+    "blackFadeSeconds": 0.8,
+    "foliage": "Two transparent illustrated foreground leaf clusters sway slowly by 1.8 degrees.",
+    "rasterGeneration": "Built-in image_gen: decorated ivory room with ivy, terracotta plant, books and ceramic pot; one matched pair of distinct shutters lit from upper left, sampled as two UV halves without mirroring. Editable TMP wordmark and prompt.",
+    "apertureUV": [
+      0.239,
+      0.209,
+      0.522,
+      0.678
+    ],
+    "shutterUV": [
+      [
+        0,
+        0,
+        0.5,
+        1
+      ],
+      [
+        0.5,
+        0,
+        0.5,
+        1
+      ]
+    ]
+  },
+  "interactionPolish": {
+    "buttonHoverScale": 1.018,
+    "buttonPressScale": 0.975,
+    "buttonReleaseScale": 1.028,
+    "clickPulseSeconds": 0.32,
+    "dialogOpenSeconds": 0.28,
+    "dialogCloseSeconds": 0.16,
+    "unscaledTime": true,
+    "audioChannels": [
+      "BGM",
+      "SE",
+      "Ambient"
+    ],
+    "cleanupRemovedBytes": 11420257,
+    "generationBriefs": {
+      "shutters": "A matched pair of closed wooden window shutters, center seam exactly at 50 percent, distinct natural grain and knots on left and right, simple outer iron hinges and two central handles. One consistent warm light from upper left, shadows down and right. Edge-to-edge front view, no text, no surrounding wall.",
+      "room": "Preserve the warm ivory room and wooden window frame geometry and central opening. Add restrained climbing ivy near upper left, a small terracotta plant at lower left, two books and a white ceramic pot at lower right. Consistent warm daylight, calm natural composition, no text."
+    },
+    "assets": [
+      "Textures/UI-T-SHUTTERS-02_pair.png",
+      "Textures/UI-T-ROOM-02_decorated.png"
+    ]
+  }
+}

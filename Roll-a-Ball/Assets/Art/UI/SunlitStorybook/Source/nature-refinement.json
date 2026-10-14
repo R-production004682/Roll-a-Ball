@@ -1,0 +1,7 @@
+{
+  "mode": "built-in image_gen",
+  "output": "../Textures/UI-T-ROOM-02_decorated.png",
+  "prompt": "Edit this exact game UI window frame image. Preserve the exact canvas dimensions, perspective, window frame shape, central transparent aperture location and size, wooden sill, pots and books, and warm upper-left daylight. Add richer believable living greenery around the OUTSIDE of the window: a loose canopy of ivy across the top wooden lintel, especially the currently sparse upper-right; trailing ivy down the right wall, and delicate fern fronds and small leafy stems along the outer left and lower corners. More lush forest cabin atmosphere, but refined, asymmetrical and naturally grown, not a symmetrical wreath or repeated leaf stickers. Keep plenty of visible warm wood and cream plaster. Do not let foliage intrude into the central rectangular aperture; it is reserved for separate animated shutters and text. Keep the opening fully transparent and clean without colored edge fringes. No text, no logo, no doors added. Match the existing painterly-natural material and lighting. Transparent background in the opening only, retain opaque room walls.",
+  "stageSelect": "Four non-interactive leaf sprigs at the wooden board corners. Existing leaf artwork, varied sizes and angles; preserve title, wallet, settings, arrows and play button clearance.",
+  "titleForeground": "Two slowly swaying foreground leaf sprigs enlarged from 165x200 to 250x300 at outer corners."
+}

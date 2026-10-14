@@ -3,7 +3,7 @@ using UnityEngine;
 namespace Roll_a_Ball.OutGame
 {
     /// <summary>
-    /// AudioSource に追加し、BGM / SE の共有音量を適用する
+    /// AudioSource に追加し、BGM / SE / 環境音の共有音量を適用する
     /// </summary>
     [RequireComponent(typeof(AudioSource))]
     [DisallowMultipleComponent]
@@ -19,7 +19,7 @@ namespace Roll_a_Ball.OutGame
             Es
         }
 
-        [SerializeField, Tooltip("この音源に適用する共通音量を選びます（BGM または効果音、環境音）。")]
+        [SerializeField, Tooltip("この音源に適用する共通音量を選びます（BGM・効果音・環境音）。")]
         private Channel channel;
         [SerializeField, Range(0f, 1f), Tooltip("この音源固有の音量です。共通音量を掛けて再生します。")]
         private float baseVolume = 1f;
@@ -31,6 +31,9 @@ namespace Roll_a_Ball.OutGame
         private void Awake()
         {
             source = GetComponent<AudioSource>();
+            // このプロパティは Prefab に保存されないため、実行時に設定する。
+            // ポーズ中も環境音を聴きながら音量を調整できるようにする。
+            if (channel == Channel.Es) source.ignoreListenerPause = true;
         }
 
         /// <summary>
@@ -60,14 +63,8 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private void ApplyVolume()
         {
-            float volume = channel switch
-            {
-                Channel.Bgm => GameSettings.BgmVolume,
-                Channel.Se => GameSettings.SeVolume,
-                Channel.Es => GameSettings.EsVolume,
-                _ => 1.0f
-            };
-
+            var volume = channel == Channel.Bgm ? GameSettings.BgmVolume
+                : channel == Channel.Es ? GameSettings.EsVolume : GameSettings.SeVolume;
             source.volume = baseVolume * volume;
         }
     }

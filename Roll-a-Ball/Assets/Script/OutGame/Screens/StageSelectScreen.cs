@@ -41,6 +41,8 @@ namespace Roll_a_Ball.OutGame
         private Button settingsButton;
         [SerializeField, Tooltip("選択中のステージを強調する表示です。")]
         private RectTransform stageCard;
+        [SerializeField, Tooltip("ステージの状態アイコンと進行表示です。")]
+        private StageCardPresentation stagePresentation;
         [SerializeField, Min(StageSelectScreenConstants.MinimumSelectionPulseDuration),
             Tooltip("ステージ選択時にカードが拡大して元に戻るまでの秒数です。大きくするとゆっくり動きます。")]
         private float selectionPulseDuration = StageSelectScreenConstants.DefaultSelectionPulseDuration;
@@ -293,9 +295,21 @@ namespace Roll_a_Ball.OutGame
             stageNumberLabel.text = $"STAGE {stage.StageNumber:00}";
             stageNameLabel.text = stage.DisplayName;
             stagePreview.texture = stage.PreviewTexture;
+            // 画像を引き伸ばさず、カードの比率に合わせて中央を切り出す。
+            var previewSize = stagePreview.rectTransform.rect.size;
+            stagePreview.uvRect = new Rect(0f, 0f, 1f, 1f);
+            if (stage.PreviewTexture != null && previewSize.x > 0f && previewSize.y > 0f)
+            {
+                var imageAspect = (float)stage.PreviewTexture.width / stage.PreviewTexture.height;
+                var cardAspect = previewSize.x / previewSize.y;
+                var visibleWidth = Mathf.Min(1f, cardAspect / imageAspect);
+                var visibleHeight = Mathf.Min(1f, imageAspect / cardAspect);
+                stagePreview.uvRect = new Rect((1f - visibleWidth) * 0.5f, (1f - visibleHeight) * 0.5f, visibleWidth, visibleHeight);
+            }
             lockedOverlay.SetActive(!unlocked);
             stagePreviewButton.interactable = unlocked;
             playButton.interactable = unlocked;
+            stagePresentation?.Refresh(stage.StageId, stage.StageNumber, unlocked);
             previousButton.interactable = stages.Length > 1;
             nextButton.interactable = stages.Length > 1;
 
