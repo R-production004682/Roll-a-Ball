@@ -1,6 +1,7 @@
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Roll_a_Ball.OutGame
 {
@@ -12,8 +13,7 @@ namespace Roll_a_Ball.OutGame
         [SerializeField] private StageDefinition[] stages;
         [SerializeField] private TMP_Text stageName;
         [SerializeField] private TMP_Text journeyLabel;
-        [SerializeField] private UnityEngine.UI.Image[] stageDots;
-        [SerializeField] private TMP_Text resultTime;
+        [SerializeField] private Image[] stageDots;
         [SerializeField] private TMP_Text resultCoins;
         [SerializeField] private TMP_Text resultWallet;
         private int startingCurrency;
@@ -27,9 +27,11 @@ namespace Roll_a_Ball.OutGame
         {
             gameManager = GameManager.instance;
             startingCurrency = GameDataManager.Currency - (gameManager != null ? gameManager.CollectedCoins : 0);
+
             var selectedId = StageSelectionContext.SelectedStageId;
             var definition = Array.Find(stages, stage => stage.StageId == selectedId);
             var number = definition != null ? definition.StageNumber : 1;
+
             stageName.text = definition != null ? definition.DisplayName : $"STAGE {number:00}";
             journeyLabel.text = $"STAGE {number:00}";
             for (var index = 0; index < stageDots.Length; index++)
@@ -41,7 +43,7 @@ namespace Roll_a_Ball.OutGame
         }
 
         /// <summary>
-        /// プレイ中の時間だけを計測し、クリア時に表示を確定する
+        /// クリア時に表示を確定する
         /// </summary>
         private void Update()
         {
@@ -58,7 +60,6 @@ namespace Roll_a_Ball.OutGame
             if (gameManager.isStageCompleted)
             {
                 var duration = TimeSpan.FromSeconds(elapsedSeconds);
-                resultTime.text = $"{(int)duration.TotalMinutes:00}:{duration.Seconds:00}";
                 resultCoins.text = $"+{gameManager.CollectedCoins:N0}";
                 resultWallet.text = $"{startingCurrency:N0} → {GameDataManager.Currency:N0}";
                 enabled = false;
