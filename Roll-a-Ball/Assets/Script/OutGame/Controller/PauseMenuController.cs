@@ -9,8 +9,6 @@ namespace Roll_a_Ball.OutGame
     /// </summary>
     public sealed class PauseMenuController : MonoBehaviour
     {
-        private const KeyCode MenuKey = KeyCode.M;
-
         [SerializeField, Tooltip("ポーズ中に表示するメニューです。")]
         private GameObject menuDialog;
         [SerializeField, Tooltip("メニューを開いたときに最初に選ぶボタンです。")]
@@ -19,7 +17,6 @@ namespace Roll_a_Ball.OutGame
         private GameObject controlsGuide;
         [SerializeField, Header("ゲーム開始時の状態"), Tooltip("有効にするとシーン開始時からゲームを動かします。無効ならメニュー状態で始めます。")]
         private bool startsInPlay;
-        private UiInputScope menuInputScope;
 
         /// <summary>
         /// 移行済みメニューは最前面の入力範囲を使い、未移行シーンは他の UI がない場合だけ許可する
@@ -32,7 +29,6 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private void Awake()
         {
-            menuInputScope = menuDialog != null ? menuDialog.GetComponent<UiInputScope>() : null;
             CloseMenuVisuals();
 
             if (startsInPlay)
@@ -48,31 +44,23 @@ namespace Roll_a_Ball.OutGame
         }
 
         /// <summary>
-        /// ゲーム進行状態の変更と共通キャンセルを購読する
+        /// ゲーム進行状態の変更を購読する
         /// </summary>
         private void OnEnable()
         {
             OutGameStateController.StateChanged += RefreshControlsGuide;
-            if (menuInputScope != null)
-            {
-                menuInputScope.CancelRequested.AddListener(ResumeGame);
-            }
         }
 
         /// <summary>
-        /// ゲーム進行状態の変更と共通キャンセルの購読を解除する
+        /// ゲーム進行状態の変更の購読を解除する
         /// </summary>
         private void OnDisable()
         {
             OutGameStateController.StateChanged -= RefreshControlsGuide;
-            if (menuInputScope != null)
-            {
-                menuInputScope.CancelRequested.RemoveListener(ResumeGame);
-            }
         }
 
         /// <summary>
-        /// プレイ中のメニューキー入力を監視する
+        /// プレイ中だけ Esc でポーズを開き、表示後の操作はマウスへ任せる
         /// </summary>
         private void Update()
         {
@@ -82,22 +70,9 @@ namespace Roll_a_Ball.OutGame
             }
 
             if (OutGameStateController.IsPlaying && !UiInputScope.BlocksPlayer &&
-                (Input.GetKeyDown(MenuKey) || Input.GetKeyDown(KeyCode.Escape)))
+                Input.GetKeyDown(KeyCode.Escape))
             {
                 OpenMenu();
-            }
-            else if (menuDialog != null && menuDialog.activeSelf &&
-                (Input.GetKeyDown(MenuKey) || Input.GetKeyDown(KeyCode.Escape)) &&
-                CanUseMenu)
-            {
-                if (firstSelectedButton != null)
-                {
-                    firstSelectedButton.onClick.Invoke();
-                }
-                else
-                {
-                    ResumeGame();
-                }
             }
         }
 

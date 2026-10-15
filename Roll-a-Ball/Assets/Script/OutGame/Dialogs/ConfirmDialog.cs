@@ -44,11 +44,10 @@ namespace Roll_a_Ball.OutGame
 
             okButton.onClick.AddListener(Accept);
             cancelButton.onClick.AddListener(Decline);
-            inputScope.CancelRequested.AddListener(Decline);
         }
 
         /// <summary>
-        /// ボタンと Cancel の購読を解除し、途中で表示に失敗した場合も後始末する
+        /// ボタンの購読を解除し、途中で表示に失敗した場合も後始末する
         /// </summary>
         public override void OnClose()
         {
@@ -62,10 +61,6 @@ namespace Roll_a_Ball.OutGame
                 cancelButton.onClick.RemoveListener(Decline);
             }
 
-            if (inputScope != null)
-            {
-                inputScope.CancelRequested.RemoveListener(Decline);
-            }
         }
 
         /// <summary>

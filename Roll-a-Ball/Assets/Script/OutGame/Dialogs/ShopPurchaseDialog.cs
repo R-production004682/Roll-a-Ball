@@ -32,9 +32,10 @@ namespace Roll_a_Ball.OutGame
         private void Awake()
         {
             inputScope = GetComponent<UiInputScope>();
-            isReady = iconImage != null && categoryLabel != null && nameLabel != null &&
-                descriptionLabel != null && priceValueLabel != null && purchaseButton != null &&
-                cancelButton != null && inputScope != null;
+            var hasItemDetails = iconImage != null && categoryLabel != null &&
+                nameLabel != null && descriptionLabel != null;
+            var hasPurchaseControls = priceValueLabel != null && purchaseButton != null && cancelButton != null;
+            isReady = hasItemDetails && hasPurchaseControls && inputScope != null;
             if (!isReady)
             {
                 Debug.LogError($"ShopPurchaseDialog の参照が不足しています: {name}", this);
@@ -77,7 +78,6 @@ namespace Roll_a_Ball.OutGame
             purchaseButton.interactable = !isSoldOut && GameDataManager.Currency >= item.Price;
             purchaseButton.onClick.AddListener(Accept);
             cancelButton.onClick.AddListener(Cancel);
-            inputScope.CancelRequested.AddListener(Cancel);
             if (purchaseButton.interactable)
             {
                 purchaseButton.Select();
@@ -102,10 +102,6 @@ namespace Roll_a_Ball.OutGame
                 cancelButton.onClick.RemoveListener(Cancel);
             }
 
-            if (inputScope != null)
-            {
-                inputScope.CancelRequested.RemoveListener(Cancel);
-            }
         }
 
         /// <summary>

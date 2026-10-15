@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Roll_a_Ball.OutGame
@@ -89,7 +90,7 @@ namespace Roll_a_Ball.OutGame
             settingsButton.onClick.AddListener(OpenSettings);
             GameDataManager.Changed += Refresh;
             Refresh();
-            playButton.Select();
+            SelectStageAction();
         }
 
         /// <summary>
@@ -182,6 +183,7 @@ namespace Roll_a_Ball.OutGame
 
             selectedIndex = (selectedIndex - 1 + stages.Length) % stages.Length;
             Refresh();
+            SelectStageAction();
         }
 
         /// <summary>
@@ -196,6 +198,29 @@ namespace Roll_a_Ball.OutGame
 
             selectedIndex = (selectedIndex + 1) % stages.Length;
             Refresh();
+            SelectStageAction();
+        }
+
+        /// <summary>
+        /// 選択したステージの開始ボタン、または操作可能なステージ送りへフォーカスを移す
+        /// </summary>
+        private void SelectStageAction()
+        {
+            Button target;
+            if (playButton.IsInteractable())
+            {
+                target = playButton;
+            }
+            else if (nextButton.IsInteractable())
+            {
+                target = nextButton;
+            }
+            else
+            {
+                target = settingsButton;
+            }
+
+            target.Select();
         }
 
         /// <summary>
@@ -312,6 +337,11 @@ namespace Roll_a_Ball.OutGame
             stagePresentation?.Refresh(stage.StageId, stage.StageNumber, unlocked);
             previousButton.interactable = stages.Length > 1;
             nextButton.interactable = stages.Length > 1;
+            if (!unlocked && EventSystem.current != null &&
+                EventSystem.current.currentSelectedGameObject == playButton.gameObject)
+            {
+                (nextButton.IsInteractable() ? nextButton : settingsButton).Select();
+            }
 
             var clearTimes = GameDataManager.GetTopClearTimes(stage.StageId);
             for (var index = 0; index < clearTimeLabels.Length; index++)

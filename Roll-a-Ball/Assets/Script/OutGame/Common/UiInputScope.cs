@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
-using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
 
 namespace Roll_a_Ball.OutGame
 {
     /// <summary>
-    /// 表示中の UI の入力範囲を登録し、最前面の選択・キャンセル・Player 遮断を共有する
+    /// 表示中の UI の入力範囲を登録し、最前面のマウス操作と Player 遮断を共有する
     /// </summary>
     [DefaultExecutionOrder(-1000)]
     [DisallowMultipleComponent]
@@ -18,12 +17,10 @@ namespace Roll_a_Ball.OutGame
     {
         [SerializeField, Tooltip("画面を開いたときに最初に選ぶボタンなどを指定します。")]
         private Selectable firstSelected;
-        [SerializeField, Tooltip("キャンセル操作で呼び出す処理を登録します。")]
-        private UnityEvent onCancel = new UnityEvent();
+        [SerializeField] private UnityEvent onCancel = new UnityEvent();
 
         private static readonly List<UiInputScope> scopes = new List<UiInputScope>();
         private static readonly HashSet<object> inputLocks = new HashSet<object>();
-        private static int cancelFrame = -1;
         private CanvasGroup canvasGroup;
         private GameObject lastSelection;
 
@@ -38,9 +35,9 @@ namespace Roll_a_Ball.OutGame
         public static bool IsBlocked => inputLocks.Count > 0 || FadeTransition.IsTransitioning;
 
         /// <summary>
-        /// 開いている UI、入力ロック、または Cancel 処理中のフレームにプレイヤー入力を遮断するか
+        /// 開いている UI または入力ロックによってプレイヤー入力を遮断するか
         /// </summary>
-        public static bool BlocksPlayer => HasOpenUi || IsBlocked || cancelFrame == Time.frameCount;
+        public static bool BlocksPlayer => HasOpenUi || IsBlocked;
 
         /// <summary>
         /// この入力範囲が有効で、遮断されておらず、最前面にあるため入力を受け付けられるか
@@ -48,7 +45,7 @@ namespace Roll_a_Ball.OutGame
         public bool CanReceiveInput => isActiveAndEnabled && !IsBlocked && scopes.Count > 0 && scopes[scopes.Count - 1] == this;
 
         /// <summary>
-        /// 最前面の UI からのキャンセル要求イベント
+        /// 既存デバッグ UI が参照するイベントを保持し、キー入力からは通知しない
         /// </summary>
         public UnityEvent CancelRequested => onCancel;
 
@@ -60,7 +57,6 @@ namespace Roll_a_Ball.OutGame
         {
             scopes.Clear();
             inputLocks.Clear();
-            cancelFrame = -1;
         }
 
         /// <summary>
@@ -105,7 +101,7 @@ namespace Roll_a_Ball.OutGame
         }
 
         /// <summary>
-        /// EventSystem より先に遷移中の遮断とフォーカスを更新し、最前面だけで Cancel を処理する
+        /// EventSystem より先に遷移中の遮断と最前面のフォーカスを更新する
         /// </summary>
         private void Update()
         {
@@ -116,26 +112,6 @@ namespace Roll_a_Ball.OutGame
             }
 
             RestoreSelection();
-            var module = EventSystem.current != null ? EventSystem.current.currentInputModule as InputSystemUIInputModule : null;
-            if (Input.GetKeyDown(KeyCode.Escape) ||
-                (module != null && module.cancel != null && module.cancel.action.WasPressedThisFrame()))
-            {
-                RequestCancel();
-            }
-        }
-
-        /// <summary>
-        /// 最前面の Cancel を一フレーム一回通知し、背面や遷移中の要求は無視する
-        /// </summary>
-        public void RequestCancel()
-        {
-            if (!CanReceiveInput || cancelFrame == Time.frameCount)
-            {
-                return;
-            }
-
-            cancelFrame = Time.frameCount;
-            onCancel.Invoke();
         }
 
         /// <summary>
@@ -199,12 +175,36 @@ namespace Roll_a_Ball.OutGame
                 return;
             }
 
-            var target = IsValidSelection(lastSelection) ? lastSelection :
-                firstSelected != null && IsValidSelection(firstSelected.gameObject) ? firstSelected.gameObject : null;
+            var target = GetSelectionToRestore();
             if (selected != target)
             {
                 EventSystem.current.SetSelectedGameObject(target);
             }
+        }
+
+        /// <summary>
+        /// 保存済み選択を優先し、利用できない場合は有効な初期選択を返す
+        /// </summary>
+        /// <returns>復元する選択先。利用可能な選択先がなければ null</returns>
+        private GameObject GetSelectionToRestore()
+        {
+            if (IsValidSelection(lastSelection))
+            {
+                return lastSelection;
+            }
+
+            if (firstSelected == null)
+            {
+                return null;
+            }
+
+            var initialSelection = firstSelected.gameObject;
+            if (IsValidSelection(initialSelection))
+            {
+                return initialSelection;
+            }
+
+            return null;
         }
 
         /// <summary>

@@ -305,8 +305,17 @@ namespace Roll_a_Ball.OutGame
             EnsureInitialized();
             currencyAfterPurchase = saveData.currency;
 
-            if (string.IsNullOrWhiteSpace(itemId) || price < 0 || purchaseLimit <= 0 ||
-                price > saveData.currency || GetItemPurchaseCount(itemId) >= purchaseLimit)
+            if (string.IsNullOrWhiteSpace(itemId) || price < 0 || purchaseLimit <= 0)
+            {
+                return false;
+            }
+
+            if (price > saveData.currency)
+            {
+                return false;
+            }
+
+            if (GetItemPurchaseCount(itemId) >= purchaseLimit)
             {
                 return false;
             }

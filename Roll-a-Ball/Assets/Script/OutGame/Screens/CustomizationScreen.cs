@@ -55,7 +55,6 @@ namespace Roll_a_Ball.OutGame
 
             RefreshBackLabel();
             backButton.onClick.AddListener(ReturnToSource);
-            inputScope.CancelRequested.AddListener(ReturnToSource);
             backButton.Select();
         }
 
@@ -70,10 +69,6 @@ namespace Roll_a_Ball.OutGame
                 backButton.onClick.RemoveListener(ReturnToSource);
             }
 
-            if (inputScope != null)
-            {
-                inputScope.CancelRequested.RemoveListener(ReturnToSource);
-            }
         }
 
         /// <summary>

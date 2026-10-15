@@ -431,15 +431,15 @@ MonoBehaviour:
       m_Calls: []
   m_text: roll-a-ball
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: c5d95cd9e9ef96d41a1f596c5234ae2d, type: 2}
-  m_sharedMaterial: {fileID: 2100000, guid: aacc3212cdf55a74d97d8ad86f7ace4c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: cbf8a21ba98b7da4cb6b0d9c6eb7ca2f, type: 2}
+  m_sharedMaterial: {fileID: -205241725312303788, guid: cbf8a21ba98b7da4cb6b0d9c6eb7ca2f, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontColor: {r: 0.9647059, g: 0.94509804, b: 0.8745098, a: 1}
+  m_fontColor: {r: 0.92158204, g: 0.87962234, b: 0.73791057, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -456,8 +456,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 78
-  m_fontSizeBase: 78
+  m_fontSize: 86
+  m_fontSizeBase: 86
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -859,15 +859,15 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: c5d95cd9e9ef96d41a1f596c5234ae2d, type: 2}
-  m_sharedMaterial: {fileID: -1049185255595371932, guid: c5d95cd9e9ef96d41a1f596c5234ae2d, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: cbf8a21ba98b7da4cb6b0d9c6eb7ca2f, type: 2}
+  m_sharedMaterial: {fileID: -205241725312303788, guid: cbf8a21ba98b7da4cb6b0d9c6eb7ca2f, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontColor: {r: 0.9647059, g: 0.94509804, b: 0.8745098, a: 1}
+  m_fontColor: {r: 0.92158204, g: 0.87962234, b: 0.73791057, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -1314,7 +1314,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 620, y: 70}
+  m_SizeDelta: {x: 820, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1459213698530100563
 CanvasRenderer:
@@ -1344,17 +1344,17 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Any Press Key
+  m_text: "\u30AD\u30FC\u30FB\u30DC\u30BF\u30F3\u3092\u62BC\u3057\u3066\u306F\u3058\u3081\u308B"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: c5d95cd9e9ef96d41a1f596c5234ae2d, type: 2}
-  m_sharedMaterial: {fileID: 2100000, guid: 89037dfd589720a42b01627def989aa1, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: cbf8a21ba98b7da4cb6b0d9c6eb7ca2f, type: 2}
+  m_sharedMaterial: {fileID: -205241725312303788, guid: cbf8a21ba98b7da4cb6b0d9c6eb7ca2f, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontColor: {r: 0.9647059, g: 0.94509804, b: 0.8745098, a: 1}
+  m_fontColor: {r: 0.92158204, g: 0.87962234, b: 0.73791057, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:

@@ -86,10 +86,11 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private bool ValidateReferences()
         {
-            if (cameraRig != null && leftShutter != null && rightShutter != null &&
-                visuals != null && titleGroup != null && promptGroup != null && blackFade != null &&
-                forestBackdrop != null && exitLabel != null && branches != null &&
-                Array.TrueForAll(branches, branch => branch != null))
+            var hasWindow = cameraRig != null && leftShutter != null && rightShutter != null;
+            var hasText = titleGroup != null && promptGroup != null && exitLabel != null;
+            var hasBackdrop = visuals != null && blackFade != null && forestBackdrop != null;
+            var hasBranches = branches != null && Array.TrueForAll(branches, branch => branch != null);
+            if (hasWindow && hasText && hasBackdrop && hasBranches)
             {
                 return true;
             }

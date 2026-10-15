@@ -19,8 +19,6 @@ namespace Roll_a_Ball.OutGame
         /// <param name="seSlider">SE 音量スライダー</param>
         /// <param name="bgmValue">BGM 音量表示</param>
         /// <param name="seValue">SE 音量表示</param>
-        /// <param name="backLabel">戻るボタンのラベル</param>
-        /// <param name="contextLabel">設定画面の説明ラベル</param>
         /// <param name="previewSource">SE 試聴用 AudioSource</param>
         /// <returns>未設定の参照名一覧</returns>
         public static IReadOnlyList<string> GetMissingReferences(
@@ -30,8 +28,6 @@ namespace Roll_a_Ball.OutGame
             Slider seSlider,
             TMP_Text bgmValue,
             TMP_Text seValue,
-            TMP_Text backLabel,
-            TMP_Text contextLabel,
             AudioSource previewSource)
         {
             var missingReferences = new List<string>();
@@ -41,8 +37,6 @@ namespace Roll_a_Ball.OutGame
             AddMissingReference(seSlider, nameof(seSlider), missingReferences);
             AddMissingReference(bgmValue, nameof(bgmValue), missingReferences);
             AddMissingReference(seValue, nameof(seValue), missingReferences);
-            AddMissingReference(backLabel, nameof(backLabel), missingReferences);
-            AddMissingReference(contextLabel, nameof(contextLabel), missingReferences);
             AddMissingReference(previewSource, nameof(previewSource), missingReferences);
             return missingReferences;
         }

@@ -64,9 +64,9 @@ namespace Roll_a_Ball.OutGame
                 return;
             }
 
-            if (previousPageButton == null || nextPageButton == null ||
-                currencyValueLabel == null || pageIndicatorLabel == null ||
-                itemGrid == null || itemViewPrefab == null || itemCatalog == null)
+            var hasPageControls = previousPageButton != null && nextPageButton != null && pageIndicatorLabel != null;
+            var hasItemDisplay = itemGrid != null && itemViewPrefab != null && itemCatalog != null;
+            if (!hasPageControls || !hasItemDisplay || currencyValueLabel == null)
             {
                 Debug.LogError("ShopScreen のヘッダー、ページボタン、商品表示の参照が設定されていません。", this);
                 return;
@@ -76,7 +76,6 @@ namespace Roll_a_Ball.OutGame
             customizeButton.onClick.AddListener(OpenCustomization);
             previousPageButton.onClick.AddListener(ShowPreviousPage);
             nextPageButton.onClick.AddListener(ShowNextPage);
-            inputScope.CancelRequested.AddListener(ReturnToStages);
             GameDataManager.Changed += RefreshCurrency;
             RefreshItems();
             RefreshCurrency();
@@ -91,10 +90,6 @@ namespace Roll_a_Ball.OutGame
             returnQueued = false;
             purchaseQueued = false;
             StopAllCoroutines();
-            if (inputScope != null)
-            {
-                inputScope.CancelRequested.RemoveListener(ReturnToStages);
-            }
             if (backButton != null)
             {
                 backButton.onClick.RemoveListener(ReturnToStages);
@@ -284,8 +279,17 @@ namespace Roll_a_Ball.OutGame
         /// <param name="item">押下された商品</param>
         private void HandleItemClicked(ShopItemDefinition item)
         {
-            if (item == null || purchaseQueued || inputScope == null || !inputScope.CanReceiveInput ||
-                GameDataManager.GetItemPurchaseCount(item.Id) >= item.PurchaseLimit)
+            if (item == null || purchaseQueued)
+            {
+                return;
+            }
+
+            if (inputScope == null || !inputScope.CanReceiveInput)
+            {
+                return;
+            }
+
+            if (GameDataManager.GetItemPurchaseCount(item.Id) >= item.PurchaseLimit)
             {
                 return;
             }
