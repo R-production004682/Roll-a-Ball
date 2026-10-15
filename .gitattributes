@@ -1,0 +1,3 @@
+# Tools are outside the Unity project's .gitattributes. Keep their text stable
+# regardless of each developer's core.autocrlf setting; preserve UTF-8 BOMs.
+/Tools/**/*.ps1 text eol=lf

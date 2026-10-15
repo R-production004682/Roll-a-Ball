@@ -75,3 +75,73 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\Tools\PublishWebGL.ps1 -Ou
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\Tools\Tests\PublishWebGL.Tests.ps1
 ```
+
+## Git の stash・ブランチ切り替えで止まる場合
+
+### テストファイルの Permission denied
+
+`Tools/Tests/PublishWebGL.Tests.ps1: Permission denied` は、Git がその端末のファイルへアクセスできなかったことを示します。画像や改行警告だけでは、ファイルロック・NTFS 権限・セキュリティソフトのどれかは断定できません。テストは自動実行されず、このファイルは公開する WebGL にも含まれません。
+
+まず読み取り専用の診断を実行してください。ファイル内容、Webhook、認証トークンは出力しません。ファイル・ACL・Git 設定・index を変更せず、現在の stash にも触れません。
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\Tools\Check-WebGLTestFile.ps1
+```
+
+- `CanRead: false` の場合は `ReadError` の例外型・HResult・メッセージを確認します。まずテストファイルを開いているアプリを閉じ、同じ診断を再実行します。Windows セキュリティの「保護の履歴」や使用中のセキュリティソフトの記録も、対象パスと発生時刻で確認してください。検出を確認できていない状態で、誤検知とは判断しません。
+- ACL の拒否や所有者の問題が確認できた場合は、その端末の管理者に対象ファイルの権限を確認してもらいます。リポジトリ全体への権限リセット、全員への書き込み許可、保護機能の無効化は行いません。検出が確認できた場合は、検出名と該当ファイルを確認し、必要に応じて製品提供元へ誤検知の調査を依頼します。
+- `CanRead: true` で `ContentMatchesIndex: true` なら、Git が正規化した内容は index と同じです。`false` なら実際の変更があるので、内容を確認しバックアップまたは通常の stash で保管してください。ステージ済みの変更はこの判定とは別に確認します。
+- SourceTree の組み込み Git とターミナルの Git が異なる場合は、診断の `-GitExecutable 'Git の exe パス'` で同じ実行ファイルでも確認できます。
+
+この修正では Tools 配下の PowerShell の改行を LF に固定します。個人の `core.autocrlf` や他のアセットの属性は変更しません。これは改行だけの差分の予防であり、OS が拒否するアクセス権を変更する処理ではありません。
+
+修正ブランチを取得できず診断スクリプトがまだ手元にない場合は、次の読み取りだけでもエラーを確認できます。
+
+```powershell
+Get-Item -LiteralPath .\Tools\Tests\PublishWebGL.Tests.ps1 | Format-List FullName,Attributes,Length
+[IO.File]::ReadAllBytes((Join-Path $PWD 'Tools/Tests/PublishWebGL.Tests.ps1')).Length
+git status --short -- Tools/Tests/PublishWebGL.Tests.ps1
+git ls-files --eol -- Tools/Tests/PublishWebGL.Tests.ps1
+```
+
+読み取りが回復し、テストファイルを HEAD の状態へ戻したい場合に限り、まずリポジトリ外にコピーして内容を確認します。次の処理はファイルを読めなければ停止します。既存のコピーを上書きせず、他のソースや index は戻しません。
+
+```powershell
+$ErrorActionPreference = 'Stop'
+$testFile = '.\Tools\Tests\PublishWebGL.Tests.ps1'
+$backupFolder = Join-Path (Split-Path $PWD -Parent) ('RollABall-GitRecovery-' + [Guid]::NewGuid().ToString('N'))
+New-Item -ItemType Directory -Path $backupFolder | Out-Null
+$backupFile = Join-Path $backupFolder 'PublishWebGL.Tests.ps1'
+Copy-Item -LiteralPath $testFile -Destination $backupFile -ErrorAction Stop
+if ((Get-FileHash -LiteralPath $testFile).Hash -ne (Get-FileHash -LiteralPath $backupFile).Hash) { throw 'Backup verification failed' }
+git restore --source=HEAD --worktree -- Tools/Tests/PublishWebGL.Tests.ps1
+```
+
+バックアップには実際の変更が残ります。復旧できない場合はそのまま保管し、強制 checkout、`reset --hard`、`clean -fdx` などで作業を消さないでください。
+
+### SourceTree の stash が Library まで処理している
+
+`git stash push --all` は `.gitignore` の対象も退避・削除します。Unity が使用中の Library、Temp、ビルド出力やローカル設定まで巻き込むため、普段の作業退避には使いません。Library の CRLF 警告は、これらを取り込もうとしているサインで、上記の Permission denied の原因とは別です。
+
+SourceTree で無視ファイルを含める設定を外すか、ターミナルで次を使います。未追跡のソースも含め、無視ファイルは残します。アクセス拒否が継続しているファイルを読めるようにするコマンドではないため、先に上記の診断を済ませてください。
+
+```powershell
+git stash push --include-untracked -m "作業の一時退避"
+git stash list
+```
+
+復元はまず `git stash apply 'stash@{0}'` で内容を確認します。成功するまでは stash を削除しません。既に失敗した stash が一部作成されている可能性もあるため、最初に `git stash list` を確認してください。
+
+### ブランチが別の worktree で使用中
+
+同じ端末の `git worktree list` に表示されるチェックアウトが、そのブランチを占有しています。リモートや共同開発者の端末の設定が原因ではありません。
+
+```powershell
+git worktree list
+git -C '表示された worktree のパス' status --short --branch
+git -C '表示された worktree のパス' switch --detach
+```
+
+`switch --detach` は同じコミットでブランチを解放し、そこにある未コミット変更とブランチ自体を残します。作業中の別ウィンドウがある場合はそこでの編集を止めてから操作します。worktree のフォルダーを直接消したり、強制削除する必要はありません。ブランチ削除が未マージで拒否された場合も、コミットを確認せず `-D` に置き換えないでください。
+
+仕様の参照先: [git stash](https://git-scm.com/docs/git-stash)、[git worktree](https://git-scm.com/docs/git-worktree)、[改行属性](https://git-scm.com/docs/gitattributes)、[Windows の保護の履歴](https://support.microsoft.com/en-us/windows/security/windows-security/protection-history-in-the-windows-security-app)
