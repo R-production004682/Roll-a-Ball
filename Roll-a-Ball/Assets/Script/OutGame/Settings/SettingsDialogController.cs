@@ -35,10 +35,6 @@ namespace Roll_a_Ball.OutGame
         private TMP_Text bgmValue;
         [SerializeField, Tooltip("効果音の音量を数字で表示するテキストです。")]
         private TMP_Text seValue;
-        [SerializeField, Tooltip("呼び出し元に戻る案内を表示するテキストです。")]
-        private TMP_Text backLabel;
-        [SerializeField, Tooltip("設定画面の説明を表示するテキストです。")]
-        private TMP_Text contextLabel;
         [SerializeField, Tooltip("効果音を試しに鳴らす音源です。")]
         private AudioSource previewSource;
         [SerializeField, Tooltip("効果音を試しに再生するときに使う音です。")]
@@ -126,7 +122,7 @@ namespace Roll_a_Ball.OutGame
         }
 
         /// <summary>
-        /// ステージ選択画面から設定を開く
+        /// 親設定メニューから音量設定を開く
         /// </summary>
         public void OpenFromStageSelect()
         {
@@ -139,29 +135,6 @@ namespace Roll_a_Ball.OutGame
         public void OpenFromPause()
         {
             Open(OpenOrigin.Pause);
-        }
-
-        /// <summary>
-        /// 設定画面から、同じ窓を閉じる終了演出を開始する
-        /// </summary>
-        public void QuitGame()
-        {
-            if (!IsOpen || !dialogInputScope.CanReceiveInput)
-            {
-                return;
-            }
-            var home = ForestHomeTransition.GetOrCreate();
-            if (home == null)
-            {
-                return;
-            }
-            GameSettings.Save();
-            previewSource.Stop();
-            DialogMotion.Hide(dialog, () =>
-            {
-                dialog.SetActive(false);
-                home.QuitGame();
-            });
         }
 
         /// <summary>
@@ -190,8 +163,6 @@ namespace Roll_a_Ball.OutGame
                     pauseMenu.SetActive(false);
                 }
             }
-            backLabel.text = openOrigin == OpenOrigin.Pause ? "ポーズへ戻る" : "ステージセレクトへ戻る";
-            contextLabel.text = "心地よい音量に調整できます";
             RefreshValues();
             dialog.SetActive(true);
             if (EventSystem.current != null)
@@ -241,7 +212,13 @@ namespace Roll_a_Ball.OutGame
 
             if (EventSystem.current != null)
             {
-                EventSystem.current.SetSelectedGameObject(previousSelection != null && previousSelection.activeInHierarchy ? previousSelection : null);
+                GameObject selectionToRestore = null;
+                if (previousSelection != null && previousSelection.activeInHierarchy)
+                {
+                    selectionToRestore = previousSelection;
+                }
+
+                EventSystem.current.SetSelectedGameObject(selectionToRestore);
             }
 
             previousSelection = null;
@@ -361,8 +338,6 @@ namespace Roll_a_Ball.OutGame
                 seSlider,
                 bgmValue,
                 seValue,
-                backLabel,
-                contextLabel,
                 previewSource);
 
             if (missingReferences.Count > 0)

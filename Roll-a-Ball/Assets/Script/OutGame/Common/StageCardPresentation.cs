@@ -21,8 +21,22 @@ namespace Roll_a_Ball.OutGame
         public void Refresh(string stageId, int number, bool unlocked)
         {
             var cleared = GameDataManager.IsStageCleared(stageId);
-            statusLabel.text = !unlocked ? "未解放" : cleared ? "クリア済み" : "選択中";
-            statusIcon.sprite = !unlocked ? lockSprite : cleared ? checkSprite : leafSprite;
+            if (!unlocked)
+            {
+                statusLabel.text = "未解放";
+                statusIcon.sprite = lockSprite;
+            }
+            else if (cleared)
+            {
+                statusLabel.text = "クリア済み";
+                statusIcon.sprite = checkSprite;
+            }
+            else
+            {
+                statusLabel.text = "選択中";
+                statusIcon.sprite = leafSprite;
+            }
+
             for (var index = 0; index < stageDots.Length; index++)
             {
                 stageDots[index].color = index + 1 == number

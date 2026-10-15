@@ -66,8 +66,26 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private void ApplyVolume()
         {
-            var volume = channel == Channel.Bgm ? GameSettings.BgmVolume
-                : channel == Channel.Es ? GameSettings.AmbientVolume : GameSettings.SeVolume;
+            float volume;
+            switch (channel)
+            {
+                case Channel.Bgm:
+                    {
+                        volume = GameSettings.BgmVolume;
+                        break;
+                    }
+                case Channel.Es:
+                    {
+                        volume = GameSettings.AmbientVolume;
+                        break;
+                    }
+                default:
+                    {
+                        volume = GameSettings.SeVolume;
+                        break;
+                    }
+            }
+
             source.volume = baseVolume * volume;
         }
     }

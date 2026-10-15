@@ -14,6 +14,11 @@ namespace Roll_a_Ball.OutGame
         private static bool transitionRequested;
 
         /// <summary>
+        /// 開始済みの非同期シーン読み込みが完了待ちかを返す
+        /// </summary>
+        private static bool IsLoading => currentLoadOperation != null && !currentLoadOperation.isDone;
+
+        /// <summary>
         /// プレイ開始時に Scene 遷移状態を初期化する
         /// </summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -31,7 +36,7 @@ namespace Roll_a_Ball.OutGame
         /// <returns>読み込みを開始できた場合は true</returns>
         public static bool LoadScene(string scenePath, Object context)
         {
-            if (transitionRequested || UiInputScope.IsBlocked || currentLoadOperation != null && !currentLoadOperation.isDone)
+            if (transitionRequested || UiInputScope.IsBlocked || IsLoading)
             {
                 Debug.LogWarning("シーン遷移はすでに実行中です。", context);
                 return false;

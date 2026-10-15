@@ -2,6 +2,7 @@ using DG.Tweening;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
+using UnityEngine.UI;
 
 namespace Roll_a_Ball.OutGame
 {
@@ -12,13 +13,15 @@ namespace Roll_a_Ball.OutGame
     {
         private const float MinimumBlinkDuration = 0.1f;
 
-        [SerializeField, Tooltip("Any Press Key の文字と光をまとめて明滅させるグループです。")]
+        [SerializeField, Tooltip("開始案内の文字と光をまとめて明滅させるグループです。")]
         private CanvasGroup promptGroup;
         [SerializeField] private AudioClip confirmSound;
         [SerializeField, Min(MinimumBlinkDuration), Tooltip("文字が暗くなり、元の明るさに戻るまでの秒数です。")]
         private float blinkDuration = 4f;
         [SerializeField, Range(0f, 1f), Tooltip("明滅中に最も暗くなったときの不透明度です。")]
         private float minimumAlpha = 0.2f;
+        [SerializeField, Tooltip("タイトルからクレジットを開くボタンです。")]
+        private Button creditsButton;
 
         private UiInputScope inputScope;
         private Tween blinkTween;
@@ -31,9 +34,9 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         public override void OnOpen(object arg)
         {
-            if (promptGroup == null)
+            if (promptGroup == null || creditsButton == null)
             {
-                Debug.LogError("TitleScreen の promptGroup が未設定です。", this);
+                Debug.LogError("TitleScreen の開始案内・クレジットボタンの参照が不足しています。", this);
                 return;
             }
 
@@ -47,6 +50,7 @@ namespace Roll_a_Ball.OutGame
             openedFrame = Time.frameCount;
             transitionRequested = false;
             isOpen = true;
+            creditsButton.onClick.AddListener(OpenCredits);
             StopBlink();
             blinkTween = promptGroup.DOFade(Mathf.Clamp01(minimumAlpha),
                     Mathf.Max(MinimumBlinkDuration, blinkDuration) * 0.5f)
@@ -61,6 +65,11 @@ namespace Roll_a_Ball.OutGame
         public override void OnClose()
         {
             isOpen = false;
+            if (creditsButton != null)
+            {
+                creditsButton.onClick.RemoveListener(OpenCredits);
+            }
+
             StopBlink();
         }
 
@@ -78,8 +87,17 @@ namespace Roll_a_Ball.OutGame
         /// </summary>
         private void Update()
         {
-            if (!isOpen || transitionRequested || Time.frameCount <= openedFrame ||
-                !Application.isFocused || !inputScope.CanReceiveInput || !HasStartInput())
+            if (!isOpen || !inputScope.CanReceiveInput || transitionRequested)
+            {
+                return;
+            }
+
+            if (Time.frameCount <= openedFrame || !Application.isFocused)
+            {
+                return;
+            }
+
+            if (UsesFooterControl() || !HasStartInput())
             {
                 return;
             }
@@ -92,6 +110,63 @@ namespace Roll_a_Ball.OutGame
                 UiSoundPlayer.Play(confirmSound);
             }
             transitionRequested = home != null && home.EnterStageSelect(this);
+        }
+
+        /// <summary>
+        /// 開始入力と競合させずにクレジット画面をタイトルへ重ねる
+        /// </summary>
+        private void OpenCredits()
+        {
+            if (!isOpen || transitionRequested || !inputScope.CanReceiveInput)
+            {
+                return;
+            }
+
+            var manager = GameServices.Screens;
+            if (manager == null)
+            {
+                Debug.LogError("TitleScreen: クレジット表示用の ScreenManager がありません。", this);
+                return;
+            }
+
+            manager.Push<CreditsScreen>((System.Action)ResumeTitleInput);
+        }
+
+        /// <summary>
+        /// タイトルの表示と選択を維持したまま設定ダイアログを開く
+        /// </summary>
+        private void OpenSettings()
+        {
+            if (!isOpen || transitionRequested || !inputScope.CanReceiveInput)
+            {
+                return;
+            }
+
+            var settings = GameServices.Settings;
+            if (settings == null)
+            {
+                Debug.LogError("TitleScreen: 設定表示用の SettingsDialogHost がありません。", this);
+                return;
+            }
+
+            settings.OpenFromTitle(ResumeTitleInput);
+        }
+
+        /// <summary>
+        /// 閉じる操作と同じフレームの開始入力を抑止する
+        /// </summary>
+        private void ResumeTitleInput()
+        {
+            openedFrame = Time.frameCount;
+        }
+
+        /// <summary>
+        /// 設定とクレジットのクリックをタイトルの開始入力から除外する
+        /// </summary>
+        private bool UsesFooterControl()
+        {
+            return Mouse.current != null && HasPressedButton(Mouse.current) &&
+                (RectTransformUtility.RectangleContainsScreenPoint((RectTransform)creditsButton.transform, Mouse.current.position.ReadValue()));
         }
 
         /// <summary>

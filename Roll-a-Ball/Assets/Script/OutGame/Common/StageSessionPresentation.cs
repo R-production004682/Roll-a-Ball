@@ -25,9 +25,10 @@ namespace Roll_a_Ball.OutGame
         private void Start()
         {
             gameManager = GameManager.instance;
-            if (gameManager == null || stageName == null || journeyLabel == null ||
-                resultCoins == null || resultWallet == null || stages == null ||
-                stageDots == null || Array.Exists(stageDots, dot => dot == null))
+            var hasStageDisplay = stageName != null && journeyLabel != null && stages != null;
+            var hasResultDisplay = resultCoins != null && resultWallet != null;
+            var hasStageDots = stageDots != null && !Array.Exists(stageDots, dot => dot == null);
+            if (gameManager == null || !hasStageDisplay || !hasResultDisplay || !hasStageDots)
             {
                 Debug.LogError("StageSessionPresentation: GameManager、ステージ定義、ステージ名・進行表示・リザルトの UI 参照を設定してください。プレイ情報の表示更新を無効化します。", this);
                 enabled = false;
