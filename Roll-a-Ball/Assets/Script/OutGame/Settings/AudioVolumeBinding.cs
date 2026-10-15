@@ -70,20 +70,20 @@ namespace Roll_a_Ball.OutGame
             switch (channel)
             {
                 case Channel.Bgm:
-                {
-                    volume = GameSettings.BgmVolume;
-                    break;
-                }
+                    {
+                        volume = GameSettings.BgmVolume;
+                        break;
+                    }
                 case Channel.Es:
-                {
-                    volume = GameSettings.AmbientVolume;
-                    break;
-                }
+                    {
+                        volume = GameSettings.AmbientVolume;
+                        break;
+                    }
                 default:
-                {
-                    volume = GameSettings.SeVolume;
-                    break;
-                }
+                    {
+                        volume = GameSettings.SeVolume;
+                        break;
+                    }
             }
 
             source.volume = baseVolume * volume;
